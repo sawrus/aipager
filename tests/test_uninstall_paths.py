@@ -35,6 +35,7 @@ PKG = Path(aipager.__file__).parent
 NOT_AIPAGERS_DATA = {
     (".claude",): "Claude Code's config folder (read)",
     (".claude", "settings.json"): "Claude Code's settings; uninstall takes out only aipager's entries",
+    (".bashrc",): "the shell's startup file; uninstall takes out only `aipager wrap`'s alias block",
     (".claude.json",): "Claude Code's own state",
     (".claude", ".credentials.json"): "Claude Code's login (read)",
     (".claude", "projects"): "Claude Code's transcripts (read)",

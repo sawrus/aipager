@@ -196,10 +196,15 @@
 {"k": "btn.rep.report", "src": "e4e182b3", "v": "🐞 Sorun bildir"}
 {"k": "btn.rep.report_this", "src": "4a993c9d", "v": "🐞 Bunu bildir"}
 {"k": "btn.rep.send", "src": "22abdd99", "v": "📤 Gönder"}
+{"k": "btn.resume.foreign", "src": "add28aee", "v": "🔎 Diğer Claude oturumları"}
+{"k": "btn.resume.foreign_back", "src": "a4b7fcb6", "v": "« Geri"}
+{"k": "btn.resume.foreign_pick", "src": "8ca5ef3f", "v": "{title} ({ago})"}
 {"k": "btn.resume.next", "src": "315a382a", "v": "Sonraki »"}
 {"k": "btn.resume.page", "src": "378cafa4", "v": "Sayfa {pages}"}
 {"k": "btn.resume.prev", "src": "ac05dfe9", "v": "« Önceki"}
 {"k": "btn.resume.session", "src": "1d8ba7fd", "v": "{session} ({ago})"}
+{"k": "btn.resume.take_over", "src": "2c7f5505", "v": "Devral"}
+{"k": "btn.resume.take_over_cancel", "src": "77dfd213", "v": "İptal"}
 {"k": "btn.settings_back", "src": "a4b7fcb6", "v": "« Geri"}
 {"k": "btn.upd.aipager", "src": "54631d4b", "v": "aipager'ı güncelle"}
 {"k": "btn.upd.both", "src": "e219575e", "v": "İkisini de güncelle"}
@@ -642,6 +647,19 @@
 {"k": "rep.status.note_refused", "src": "c92adef7", "v": "Bu not eklenemedi. Daha kısa ve sade bir not dene."}
 {"k": "rep.status.send_failed", "src": "ff84d63e", "v": "Bu rapor aipager içindeki bir sorun yüzünden gönderilemedi. Hiçbir şey gönderilmedi."}
 {"k": "rep.status.sending", "src": "c338c191", "v": "Gönderiliyor..."}
+{"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> şu an terminalde çalışıyor. Beklemeye geçince tekrar dene."}
+{"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
+{"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 Bu konuşmalara yalnızca sohbetin sahibi veya bir yönetici devam edebilir."}
+{"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ <b>{title}</b> sürdürülemedi: {error}"}
+{"k": "resume.foreign.none", "src": "699cb115", "v": "📭 Son iki haftada başka Claude Code konuşması yok."}
+{"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ Bu konuşma artık yok."}
+{"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}
+{"k": "resume.foreign.takeover", "src": "eb4e132b", "v": "🖥 <b>{title}</b> bir terminalde açık: orada kapatıp burada devam edelim mi?"}
+{"k": "resume.foreign.takeover_failed", "src": "81598ca6", "v": "❌ Terminaldeki Claude kapanmadı, bu yüzden hiçbir şey değişmedi."}
+{"k": "resume.foreign.tap", "src": "ee1c1afb", "v": "Burada devam etmek için birine dokun."}
+{"k": "resume.foreign.title", "src": "9106828b", "v": {"one": "🔎 <b>Diğer Claude Code konuşmaları</b> (toplam {n})", "other": "🔎 <b>Diğer Claude Code konuşmaları</b> (toplam {n})"}}
+{"k": "resume.foreign.waiting", "src": "2790e541", "v": "🖥 Bir terminalde açık ve bekliyor."}
+{"k": "resume.foreign.working", "src": "3bad8dc0", "v": "⚙️ Şu an bir terminalde çalışıyor."}
 {"k": "resume.header", "src": "74554c53", "v": "{icon} <b>[{session}]</b> · {state}"}
 {"k": "resume.header_clock", "src": "b1522d3c", "v": "{icon} <b>[{session}]</b> · {state} {clock}"}
 {"k": "resume.more_no_transcript", "src": "d8f1f6e8", "v": {"one": "<i>Devam ettirilecek kayıtlı konuşması olmayan {n} oturum daha var.</i>", "other": "<i>Devam ettirilecek kayıtlı konuşması olmayan {n} oturum daha var.</i>"}}
@@ -988,6 +1006,8 @@
 {"k": "toast.rep.not_opened", "src": "8841123f", "v": "Rapor önizlemesi şu an açılamadı. Daha sonra tekrar dene."}
 {"k": "toast.rep.not_owner", "src": "ed142ea6", "v": "Sorun bildirmeyi yalnızca bu aipager'ın sahibi yapabilir."}
 {"k": "toast.rep.offer_stale", "src": "f5aa4d59", "v": "Bu teklif artık geçerli değil."}
+{"k": "toast.resume_foreign_denied", "src": "f6651e7c", "v": "Bunu yalnızca sohbetin sahibi veya bir yönetici yapabilir."}
+{"k": "toast.resume_foreign_stale", "src": "2c4a3f5f", "v": "Bu liste eskimişti, işte yeniden."}
 {"k": "toast.retry_failed", "src": "8954b4b9", "v": "Tekrar gönderilemedi"}
 {"k": "toast.retry_not_alive", "src": "807834ac", "v": "“{session}” oturumu artık çalışmıyor"}
 {"k": "toast.retry_nothing", "src": "def91a40", "v": "Tekrar gönderilecek bir şey yok"}

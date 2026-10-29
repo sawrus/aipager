@@ -168,12 +168,21 @@ def cmd_install(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_uninstall(args: argparse.Namespace) -> int:
+def remove_block() -> bool:
+    """Take the alias block out of ``~/.bashrc``; True when there was one.
+    ``aipager uninstall`` calls it too: left behind, the alias would point
+    ``claude`` at a removed program."""
     text = _read()
     if not _installed(text):
+        return False
+    _write(_strip(text))
+    return True
+
+
+def cmd_uninstall(args: argparse.Namespace) -> int:
+    if not remove_block():
         print(f"Not installed in {BASHRC_PATH}.")
         return 0
-    _write(_strip(text))
     print(f"Removed from {BASHRC_PATH}.")
     return 0
 

@@ -196,10 +196,15 @@
 {"k": "btn.rep.report", "src": "e4e182b3", "v": "🐞 문제 신고"}
 {"k": "btn.rep.report_this", "src": "4a993c9d", "v": "🐞 이 문제 신고"}
 {"k": "btn.rep.send", "src": "22abdd99", "v": "📤 보내기"}
+{"k": "btn.resume.foreign", "src": "add28aee", "v": "🔎 다른 Claude 세션"}
+{"k": "btn.resume.foreign_back", "src": "a4b7fcb6", "v": "« 뒤로"}
+{"k": "btn.resume.foreign_pick", "src": "8ca5ef3f", "v": "{title} ({ago})"}
 {"k": "btn.resume.next", "src": "315a382a", "v": "다음 »"}
 {"k": "btn.resume.page", "src": "378cafa4", "v": "{pages} 페이지"}
 {"k": "btn.resume.prev", "src": "ac05dfe9", "v": "« 이전"}
 {"k": "btn.resume.session", "src": "1d8ba7fd", "v": "{session} ({ago})"}
+{"k": "btn.resume.take_over", "src": "2c7f5505", "v": "넘겨받기"}
+{"k": "btn.resume.take_over_cancel", "src": "77dfd213", "v": "취소"}
 {"k": "btn.settings_back", "src": "a4b7fcb6", "v": "« 뒤로"}
 {"k": "btn.upd.aipager", "src": "54631d4b", "v": "aipager 업데이트"}
 {"k": "btn.upd.both", "src": "e219575e", "v": "둘 다 업데이트"}
@@ -642,6 +647,19 @@
 {"k": "rep.status.note_refused", "src": "c92adef7", "v": "그 메모는 추가할 수 없어요. 더 짧고 단순하게 써 보세요."}
 {"k": "rep.status.send_failed", "src": "ff84d63e", "v": "aipager 내부 문제로 이 보고서를 보낼 수 없었어요. 아무것도 보내지 않았어요."}
 {"k": "rep.status.sending", "src": "c338c191", "v": "보내는 중..."}
+{"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b>은(는) 지금 터미널에서 작업 중이에요. 대기 상태가 되면 다시 시도하세요."}
+{"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
+{"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 이 대화는 채팅 소유자나 관리자만 이어갈 수 있어요."}
+{"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ <b>{title}</b>을(를) 이어가지 못했어요: {error}"}
+{"k": "resume.foreign.none", "src": "699cb115", "v": "📭 최근 2주 동안 다른 Claude Code 대화가 없어요."}
+{"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ 그 대화는 더 이상 없어요."}
+{"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}
+{"k": "resume.foreign.takeover", "src": "eb4e132b", "v": "🖥 <b>{title}</b>이(가) 터미널에서 열려 있어요. 터미널에서 닫고 여기서 이어갈까요?"}
+{"k": "resume.foreign.takeover_failed", "src": "81598ca6", "v": "❌ 터미널의 Claude가 닫히지 않아서 바뀐 것은 없어요."}
+{"k": "resume.foreign.tap", "src": "ee1c1afb", "v": "하나를 눌러 여기서 이어가세요."}
+{"k": "resume.foreign.title", "src": "9106828b", "v": {"other": "🔎 <b>다른 Claude Code 대화</b> (총 {n}개)"}}
+{"k": "resume.foreign.waiting", "src": "2790e541", "v": "🖥 터미널에서 열려 있고 입력을 기다리고 있어요."}
+{"k": "resume.foreign.working", "src": "3bad8dc0", "v": "⚙️ 지금 터미널에서 작업 중이에요."}
 {"k": "resume.header", "src": "74554c53", "v": "{icon} <b>[{session}]</b> · {state}"}
 {"k": "resume.header_clock", "src": "b1522d3c", "v": "{icon} <b>[{session}]</b> · {state} {clock}"}
 {"k": "resume.more_no_transcript", "src": "d8f1f6e8", "v": {"other": "<i>저장된 대화가 없어 재개할 수 없는 세션이 {n}개 더 있어요.</i>"}}
@@ -988,6 +1006,8 @@
 {"k": "toast.rep.not_opened", "src": "8841123f", "v": "지금은 보고서 미리 보기를 열 수 없어요. 나중에 다시 시도해 주세요."}
 {"k": "toast.rep.not_owner", "src": "ed142ea6", "v": "이 aipager의 소유자만 문제를 신고할 수 있어요."}
 {"k": "toast.rep.offer_stale", "src": "f5aa4d59", "v": "이 제안은 더 이상 열려 있지 않아요."}
+{"k": "toast.resume_foreign_denied", "src": "f6651e7c", "v": "채팅 소유자나 관리자만 할 수 있어요."}
+{"k": "toast.resume_foreign_stale", "src": "2c4a3f5f", "v": "목록이 오래되어 다시 보여드려요."}
 {"k": "toast.retry_failed", "src": "8954b4b9", "v": "다시 보내지 못했어요"}
 {"k": "toast.retry_not_alive", "src": "807834ac", "v": "“{session}” 세션이 실행 중이 아니에요"}
 {"k": "toast.retry_nothing", "src": "def91a40", "v": "다시 보낼 것이 없어요"}

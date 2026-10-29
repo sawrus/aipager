@@ -196,10 +196,15 @@
 {"k": "btn.rep.report", "src": "e4e182b3", "v": "🐞 Signaler un problème"}
 {"k": "btn.rep.report_this", "src": "4a993c9d", "v": "🐞 Signaler ceci"}
 {"k": "btn.rep.send", "src": "22abdd99", "v": "📤 Envoyer"}
+{"k": "btn.resume.foreign", "src": "add28aee", "v": "🔎 Autres sessions Claude"}
+{"k": "btn.resume.foreign_back", "src": "a4b7fcb6", "v": "« Retour"}
+{"k": "btn.resume.foreign_pick", "src": "8ca5ef3f", "v": "{title} ({ago})"}
 {"k": "btn.resume.next", "src": "315a382a", "v": "Suivant »"}
 {"k": "btn.resume.page", "src": "378cafa4", "v": "Page {pages}"}
 {"k": "btn.resume.prev", "src": "ac05dfe9", "v": "« Précédent"}
 {"k": "btn.resume.session", "src": "1d8ba7fd", "v": "{session} ({ago})"}
+{"k": "btn.resume.take_over", "src": "2c7f5505", "v": "Prendre la main"}
+{"k": "btn.resume.take_over_cancel", "src": "77dfd213", "v": "Annuler"}
 {"k": "btn.settings_back", "src": "a4b7fcb6", "v": "« Retour"}
 {"k": "btn.upd.aipager", "src": "54631d4b", "v": "Mettre à jour aipager"}
 {"k": "btn.upd.both", "src": "e219575e", "v": "Mettre à jour les deux"}
@@ -642,6 +647,19 @@
 {"k": "rep.status.note_refused", "src": "c92adef7", "v": "Cette note n'a pas pu être ajoutée. Essayez-en une plus courte et plus simple."}
 {"k": "rep.status.send_failed", "src": "ff84d63e", "v": "Ce rapport n'a pas pu être envoyé à cause d'un problème interne à aipager. Rien n'a été envoyé."}
 {"k": "rep.status.sending", "src": "c338c191", "v": "Envoi..."}
+{"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> travaille dans le terminal en ce moment. Réessayez quand elle sera en attente."}
+{"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
+{"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 Seul le propriétaire ou un admin de la discussion peut reprendre ces conversations."}
+{"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ Impossible de reprendre <b>{title}</b> : {error}"}
+{"k": "resume.foreign.none", "src": "699cb115", "v": "📭 Aucune autre conversation Claude Code ces deux dernières semaines."}
+{"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ Cette conversation n'existe plus."}
+{"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}
+{"k": "resume.foreign.takeover", "src": "eb4e132b", "v": "🖥 <b>{title}</b> est ouverte dans un terminal : la fermer là-bas et la reprendre ici ?"}
+{"k": "resume.foreign.takeover_failed", "src": "81598ca6", "v": "❌ Claude ne s'est pas fermé dans le terminal, rien n'a donc changé."}
+{"k": "resume.foreign.tap", "src": "ee1c1afb", "v": "Touchez-en une pour la reprendre ici."}
+{"k": "resume.foreign.title", "src": "9106828b", "v": {"many": "🔎 <b>Autres conversations Claude Code</b> ({n} au total)", "one": "🔎 <b>Autres conversations Claude Code</b> ({n} au total)", "other": "🔎 <b>Autres conversations Claude Code</b> ({n} au total)"}}
+{"k": "resume.foreign.waiting", "src": "2790e541", "v": "🖥 Ouverte dans un terminal et en attente."}
+{"k": "resume.foreign.working", "src": "3bad8dc0", "v": "⚙️ En cours de travail dans un terminal."}
 {"k": "resume.header", "src": "74554c53", "v": "{icon} <b>[{session}]</b> · {state}"}
 {"k": "resume.header_clock", "src": "b1522d3c", "v": "{icon} <b>[{session}]</b> · {state} {clock}"}
 {"k": "resume.more_no_transcript", "src": "d8f1f6e8", "v": {"many": "<i>Encore {n} sessions sans conversation enregistrée à reprendre.</i>", "one": "<i>Encore {n} session sans conversation enregistrée à reprendre.</i>", "other": "<i>Encore {n} sessions sans conversation enregistrée à reprendre.</i>"}}
@@ -988,6 +1006,8 @@
 {"k": "toast.rep.not_opened", "src": "8841123f", "v": "Impossible d'ouvrir l'aperçu du rapport pour le moment. Réessayez plus tard."}
 {"k": "toast.rep.not_owner", "src": "ed142ea6", "v": "Seul le propriétaire de cet aipager peut signaler un problème."}
 {"k": "toast.rep.offer_stale", "src": "f5aa4d59", "v": "Cette proposition n'est plus ouverte."}
+{"k": "toast.resume_foreign_denied", "src": "f6651e7c", "v": "Seul le propriétaire ou un admin de la discussion peut faire cela."}
+{"k": "toast.resume_foreign_stale", "src": "2c4a3f5f", "v": "Cette liste était périmée, la voici à nouveau."}
 {"k": "toast.retry_failed", "src": "8954b4b9", "v": "Impossible de renvoyer"}
 {"k": "toast.retry_not_alive", "src": "807834ac", "v": "La session « {session} » ne tourne plus"}
 {"k": "toast.retry_nothing", "src": "def91a40", "v": "Rien à renvoyer"}

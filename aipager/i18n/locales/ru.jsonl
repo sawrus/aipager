@@ -196,10 +196,15 @@
 {"k": "btn.rep.report", "src": "e4e182b3", "v": "🐞 Сообщить о проблеме"}
 {"k": "btn.rep.report_this", "src": "4a993c9d", "v": "🐞 Сообщить об этом"}
 {"k": "btn.rep.send", "src": "22abdd99", "v": "📤 Отправить"}
+{"k": "btn.resume.foreign", "src": "add28aee", "v": "🔎 Другие сессии Claude"}
+{"k": "btn.resume.foreign_back", "src": "a4b7fcb6", "v": "« Назад"}
+{"k": "btn.resume.foreign_pick", "src": "8ca5ef3f", "v": "{title} ({ago})"}
 {"k": "btn.resume.next", "src": "315a382a", "v": "Далее »"}
 {"k": "btn.resume.page", "src": "378cafa4", "v": "Стр. {pages}"}
 {"k": "btn.resume.prev", "src": "ac05dfe9", "v": "« Назад"}
 {"k": "btn.resume.session", "src": "1d8ba7fd", "v": "{session} ({ago})"}
+{"k": "btn.resume.take_over", "src": "2c7f5505", "v": "Перехватить"}
+{"k": "btn.resume.take_over_cancel", "src": "77dfd213", "v": "Отмена"}
 {"k": "btn.settings_back", "src": "a4b7fcb6", "v": "« Назад"}
 {"k": "btn.upd.aipager", "src": "54631d4b", "v": "Обновить aipager"}
 {"k": "btn.upd.both", "src": "e219575e", "v": "Обновить оба"}
@@ -642,6 +647,19 @@
 {"k": "rep.status.note_refused", "src": "c92adef7", "v": "Эту заметку не удалось добавить. Попробуй короче и проще."}
 {"k": "rep.status.send_failed", "src": "ff84d63e", "v": "Этот отчёт не удалось отправить из-за проблемы внутри aipager. Ничего не отправлено."}
 {"k": "rep.status.sending", "src": "c338c191", "v": "Отправка..."}
+{"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> сейчас работает в терминале. Попробуй ещё раз, когда она будет ждать."}
+{"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
+{"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 Продолжать эти переписки может только владелец чата или админ."}
+{"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ Не удалось продолжить <b>{title}</b>: {error}"}
+{"k": "resume.foreign.none", "src": "699cb115", "v": "📭 За последние две недели других переписок Claude Code нет."}
+{"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ Этой переписки больше нет."}
+{"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}
+{"k": "resume.foreign.takeover", "src": "eb4e132b", "v": "🖥 <b>{title}</b> открыта в терминале: закрыть её там и продолжить здесь?"}
+{"k": "resume.foreign.takeover_failed", "src": "81598ca6", "v": "❌ Claude в терминале не закрылся, поэтому ничего не изменилось."}
+{"k": "resume.foreign.tap", "src": "ee1c1afb", "v": "Нажми на нужную, чтобы продолжить её здесь."}
+{"k": "resume.foreign.title", "src": "9106828b", "v": {"few": "🔎 <b>Другие переписки Claude Code</b> (всего {n})", "many": "🔎 <b>Другие переписки Claude Code</b> (всего {n})", "one": "🔎 <b>Другие переписки Claude Code</b> (всего {n})", "other": "🔎 <b>Другие переписки Claude Code</b> (всего {n})"}}
+{"k": "resume.foreign.waiting", "src": "2790e541", "v": "🖥 Открыта в терминале и ждёт."}
+{"k": "resume.foreign.working", "src": "3bad8dc0", "v": "⚙️ Сейчас работает в терминале."}
 {"k": "resume.header", "src": "74554c53", "v": "{icon} <b>[{session}]</b> · {state}"}
 {"k": "resume.header_clock", "src": "b1522d3c", "v": "{icon} <b>[{session}]</b> · {state} {clock}"}
 {"k": "resume.more_no_transcript", "src": "d8f1f6e8", "v": {"few": "<i>Ещё {n} сессии без сохранённой переписки, их не продолжить.</i>", "many": "<i>Ещё {n} сессий без сохранённой переписки, их не продолжить.</i>", "one": "<i>Ещё {n} сессия без сохранённой переписки, её не продолжить.</i>", "other": "<i>Ещё {n} сессии без сохранённой переписки, их не продолжить.</i>"}}
@@ -988,6 +1006,8 @@
 {"k": "toast.rep.not_opened", "src": "8841123f", "v": "Сейчас не удалось открыть предпросмотр отчёта. Попробуй позже."}
 {"k": "toast.rep.not_owner", "src": "ed142ea6", "v": "Сообщить о проблеме может только владелец этого aipager."}
 {"k": "toast.rep.offer_stale", "src": "f5aa4d59", "v": "Это предложение больше не действует."}
+{"k": "toast.resume_foreign_denied", "src": "f6651e7c", "v": "Это может сделать только владелец чата или админ."}
+{"k": "toast.resume_foreign_stale", "src": "2c4a3f5f", "v": "Список устарел, вот он снова."}
 {"k": "toast.retry_failed", "src": "8954b4b9", "v": "Не удалось отправить повторно"}
 {"k": "toast.retry_not_alive", "src": "807834ac", "v": "Сессия «{session}» больше не работает"}
 {"k": "toast.retry_nothing", "src": "def91a40", "v": "Нечего отправлять повторно"}

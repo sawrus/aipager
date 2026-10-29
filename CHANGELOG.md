@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Fork `sawrus/aipager`, based on 1.3.10 (the version stays 1.3.10: aipager's update checks read only plain releases).
 
 ### Added
+- **Pick up Claude sessions started without aipager.** `/resume` has **🔎 Other Claude sessions** for owners and admins: the Claude Code conversations of the last 14 days that aipager does not run, with their title, folder and whether a terminal still has them open. Tap one to continue it under aipager; one still open in a terminal is closed there after you confirm (`Take over`), never while it is working. `aipager resume --claude` does the same in the terminal. See [other sessions](docs/foreign-sessions.md).
+- **`aipager wrap install`: every terminal `claude` starts under aipager.** An alias in `~/.bashrc` runs `aipager-claude`, which starts the session under aipager (in Telegram from the start) and runs the real claude directly for `-p`, `--version`, Claude Code's subcommands, non-terminal use, or when aipager is not running.
 - **Idle lock: a TOTP code after a quiet spell.** `aipager lock setup` makes a secret for an authenticator app, `aipager lock enable` turns the lock on. After 60 minutes (`--after-min`) without activity from a member, aipager deletes the messages it knows of, says `🔒 aipager is locked after a quiet spell. Send /start to unlock it.`, sends nothing from the sessions, takes no messages or taps, and the Mini App answers 423. `/start` and the 6-digit code in a private chat unlock it; five wrong codes in ten minutes pause the checks. See [idle lock](docs/idle-lock.md).
 
 ## [1.3.10] - 2026-10-25

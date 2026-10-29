@@ -320,6 +320,18 @@ def _settings_left(plan) -> tuple[str, ...]:
             "yours, remove them by hand.")
 
 
+def _remove_wrap_alias() -> None:
+    """Take `aipager wrap`'s alias block out of ~/.bashrc, if any. Never
+    stops the uninstall half way."""
+    from aipager.cli import wrap
+    try:
+        if wrap.remove_block():
+            ui_ok(f"removed the `claude` alias from [path]{wrap.BASHRC_PATH}[/path]")
+    except Exception as e:
+        friendly_warn(f"Could not remove the `claude` alias from {wrap.BASHRC_PATH}",
+                      f"Delete the `# >>> aipager wrap >>>` block by hand ({e}).")
+
+
 def cmd_uninstall(args=None) -> int:
     """Stop the daemon, remove user state, uninstall the binary."""
     from aipager.wizard import settings_patch
@@ -393,6 +405,10 @@ def cmd_uninstall(args=None) -> int:
     # 8.119): left there, every session would run a program removed below.
     # After the stop: the daemon adds them again when it starts. Read again
     # here, in case the file changed while the question was open.
+    # 2c. The `claude` alias of `aipager wrap` (fork): left in ~/.bashrc,
+    # `claude` would run the wrapper removed below.
+    _remove_wrap_alias()
+
     for path in settings_files:
         unpatch = settings_patch.plan_unpatch(path)
         if unpatch.new_text is not None:

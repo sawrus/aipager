@@ -1176,6 +1176,8 @@ Run `aipager <command> --help` for the same list on your machine.
 | `aipager resume [name]` | Bring back an ended session with its conversation; without a name, a picker. It follows a moved conversation and handles a background job that holds it, as `aipager session --resume` does. |
 | `aipager miniapp enable [--port PORT] [--url URL]` | Turn the Mini App on, on `127.0.0.1:PORT` (default 8765), behind the managed tunnel or your own `https://` URL. Takes effect at the next daemon restart. |
 | `aipager miniapp disable\|status` | Turn it off (at the next restart), or show its settings and address. |
+| `aipager resume --claude` | Pick a Claude Code conversation started without aipager (last 14 days) and continue it under aipager; one still open in a terminal is taken over after `[y/N]` (fork, see [other sessions](foreign-sessions.md)). |
+| `aipager wrap install\|uninstall\|status` | Make `claude` in an interactive shell start under aipager (`alias claude=aipager-claude` in `~/.bashrc`) (fork, see [other sessions](foreign-sessions.md)). |
 | `aipager lock setup [--reset]` | Make the idle lock's TOTP secret and print its `otpauth://` URI once (fork, see [idle lock](idle-lock.md)). |
 | `aipager lock enable [--after-min N]\|disable\|now\|status` | Turn the idle lock on (default 60 minutes) or off, lock at the next tick, or show its state. No restart needed. |
 | `aipager policy validate` | Check `policy.yaml` (and `policy.d`); exits non-zero on a problem. |

@@ -196,10 +196,15 @@
 {"k": "btn.rep.report", "src": "e4e182b3", "v": "🐞 Segnala un problema"}
 {"k": "btn.rep.report_this", "src": "4a993c9d", "v": "🐞 Segnala questo"}
 {"k": "btn.rep.send", "src": "22abdd99", "v": "📤 Invia"}
+{"k": "btn.resume.foreign", "src": "add28aee", "v": "🔎 Altre sessioni di Claude"}
+{"k": "btn.resume.foreign_back", "src": "a4b7fcb6", "v": "« Indietro"}
+{"k": "btn.resume.foreign_pick", "src": "8ca5ef3f", "v": "{title} ({ago})"}
 {"k": "btn.resume.next", "src": "315a382a", "v": "Avanti »"}
 {"k": "btn.resume.page", "src": "378cafa4", "v": "Pagina {pages}"}
 {"k": "btn.resume.prev", "src": "ac05dfe9", "v": "« Indietro"}
 {"k": "btn.resume.session", "src": "1d8ba7fd", "v": "{session} ({ago})"}
+{"k": "btn.resume.take_over", "src": "2c7f5505", "v": "Prendi il controllo"}
+{"k": "btn.resume.take_over_cancel", "src": "77dfd213", "v": "Annulla"}
 {"k": "btn.settings_back", "src": "a4b7fcb6", "v": "« Indietro"}
 {"k": "btn.upd.aipager", "src": "54631d4b", "v": "Aggiorna aipager"}
 {"k": "btn.upd.both", "src": "e219575e", "v": "Aggiorna entrambi"}
@@ -642,6 +647,19 @@
 {"k": "rep.status.note_refused", "src": "c92adef7", "v": "Non è stato possibile aggiungere quella nota. Provane una più breve e semplice."}
 {"k": "rep.status.send_failed", "src": "ff84d63e", "v": "Questa segnalazione non è partita per un problema dentro aipager. Non è stato inviato nulla."}
 {"k": "rep.status.sending", "src": "c338c191", "v": "Invio in corso..."}
+{"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> sta lavorando nel terminale in questo momento. Riprova quando è in attesa."}
+{"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
+{"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 Solo il proprietario o un admin della chat può riprendere queste conversazioni."}
+{"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ Impossibile riprendere <b>{title}</b>: {error}"}
+{"k": "resume.foreign.none", "src": "699cb115", "v": "📭 Nessun'altra conversazione di Claude Code nelle ultime due settimane."}
+{"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ Quella conversazione non esiste più."}
+{"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}
+{"k": "resume.foreign.takeover", "src": "eb4e132b", "v": "🖥 <b>{title}</b> è aperta in un terminale: chiuderla lì e riprenderla qui?"}
+{"k": "resume.foreign.takeover_failed", "src": "81598ca6", "v": "❌ Claude nel terminale non si è chiuso, quindi non è cambiato nulla."}
+{"k": "resume.foreign.tap", "src": "ee1c1afb", "v": "Tocca una per riprenderla qui."}
+{"k": "resume.foreign.title", "src": "9106828b", "v": {"many": "🔎 <b>Altre conversazioni di Claude Code</b> ({n} in totale)", "one": "🔎 <b>Altre conversazioni di Claude Code</b> ({n} in totale)", "other": "🔎 <b>Altre conversazioni di Claude Code</b> ({n} in totale)"}}
+{"k": "resume.foreign.waiting", "src": "2790e541", "v": "🖥 Aperta in un terminale e in attesa."}
+{"k": "resume.foreign.working", "src": "3bad8dc0", "v": "⚙️ Sta lavorando in un terminale in questo momento."}
 {"k": "resume.header", "src": "74554c53", "v": "{icon} <b>[{session}]</b> · {state}"}
 {"k": "resume.header_clock", "src": "b1522d3c", "v": "{icon} <b>[{session}]</b> · {state} {clock}"}
 {"k": "resume.more_no_transcript", "src": "d8f1f6e8", "v": {"many": "<i>Ci sono altre {n} sessioni senza conversazione salvata da riprendere.</i>", "one": "<i>C'è {n} altra sessione senza conversazione salvata da riprendere.</i>", "other": "<i>Ci sono altre {n} sessioni senza conversazione salvata da riprendere.</i>"}}
@@ -988,6 +1006,8 @@
 {"k": "toast.rep.not_opened", "src": "8841123f", "v": "Al momento non è stato possibile aprire l'anteprima della segnalazione. Riprova più tardi."}
 {"k": "toast.rep.not_owner", "src": "ed142ea6", "v": "Solo il proprietario di questo aipager può segnalare un problema."}
 {"k": "toast.rep.offer_stale", "src": "f5aa4d59", "v": "Questa proposta non è più aperta."}
+{"k": "toast.resume_foreign_denied", "src": "f6651e7c", "v": "Solo il proprietario o un admin della chat può farlo."}
+{"k": "toast.resume_foreign_stale", "src": "2c4a3f5f", "v": "Questa lista era vecchia, eccola di nuovo."}
 {"k": "toast.retry_failed", "src": "8954b4b9", "v": "Non è stato possibile reinviare"}
 {"k": "toast.retry_not_alive", "src": "807834ac", "v": "La sessione «{session}» non è più in esecuzione"}
 {"k": "toast.retry_nothing", "src": "def91a40", "v": "Niente da reinviare"}

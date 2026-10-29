@@ -290,3 +290,19 @@ def test_real_claude_takes_the_pinned_path_first(tmp_path, monkeypatch):
     monkeypatch.setattr(scope, "load_claude_path", lambda path: str(loop))
     assert wrap._real_claude() == "claude"
     assert called == [1]
+
+
+def test_uninstall_takes_the_alias_out(tmp_path, monkeypatch):
+    """`aipager uninstall` removes the block (else `claude` runs a removed
+    program) and keeps the rest of the file."""
+    from aipager import updater
+
+    rc = tmp_path / ".bashrc"
+    rc.write_text("export A=1\n")
+    monkeypatch.setattr(wrap, "BASHRC_PATH", rc)
+    assert wrap.cmd_install(None) == 0
+    assert "aipager-claude" in rc.read_text()
+    updater._remove_wrap_alias()
+    assert rc.read_text() == "export A=1\n"
+    updater._remove_wrap_alias()          # nothing left: no error
+    assert rc.read_text() == "export A=1\n"
