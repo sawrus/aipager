@@ -171,6 +171,7 @@
 {"k": "bg.err.still_running", "src": "5914ed5a", "v": "کار پس‌زمینه هنوز در حال اجراست"}
 {"k": "bg.err.stop_exit", "src": "43459cfa", "v": "دستور توقف claude stop با کد خروج {code} تمام شد"}
 {"k": "bg.err.stop_timeout", "src": "fc33b6ae", "v": "دستور توقف claude stop به‌موقع جواب نداد"}
+{"k": "bg.err.terminal_still_running", "src": "52cd4117", "v": "claude‌ای که این گفتگو را باز کرده بود هنوز در حال اجراست"}
 {"k": "bg.failed", "src": "00860287", "v": "برگرداندن <b>{session}</b> از پس‌زمینهٔ Claude Code نشد: {error}"}
 {"k": "bg.halt_not_stopped", "src": "6866d8bb", "v": "⚠️ کار پس‌زمینهٔ Claude Code برای <b>{session}</b> متوقف نشد، پس ممکن است کاری که جلویش گرفته شد هنوز آنجا در حال اجرا باشد: {error}"}
 {"k": "bg.halt_not_stopped_plain", "src": "5810033d", "v": "⚠️ کار پس‌زمینهٔ Claude Code برای <b>{session}</b> متوقف نشد، پس ممکن است کاری که جلویش گرفته شد هنوز آنجا در حال اجرا باشد."}
@@ -272,6 +273,8 @@
 {"k": "cli.session.bg_stop_failed", "src": "1f4af338", "v": "کار پس‌زمینهٔ {job} در Claude Code متوقف نشد: {error}"}
 {"k": "cli.session.continued", "src": "ae69418c", "v": "گفتگو به {session_id} منتقل شد، پس این سشن همان‌جا ادامه پیدا می‌کند."}
 {"k": "cli.session.stopped_bg", "src": "a1bda078", "v": "کار پس‌زمینهٔ {job} در Claude Code که گفتگو دستش بود متوقف شد تا اینجا ادامه پیدا کند."}
+{"k": "cli.session.stopped_terminal", "src": "049a0b65", "v": "claude‌ای (pid {pid}) که این گفتگو را باز کرده بود بسته شد: حالا فقط این سشن آن را دارد."}
+{"k": "cli.session.terminal_stop_failed", "src": "1a6c8693", "v": "بستن claude‌ای که این گفتگو را باز کرده ممکن نشد: {error}"}
 {"k": "cmd.app", "src": "486dfc4e", "v": "باز کردن داشبورد Mini App"}
 {"k": "cmd.help", "src": "fb2dbad1", "v": "چه کارهایی از دستتان برمی‌آید"}
 {"k": "cmd.language", "src": "9dc3a234", "v": "زبان پیام‌های aipager"}

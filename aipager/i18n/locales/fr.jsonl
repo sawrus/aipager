@@ -171,6 +171,7 @@
 {"k": "bg.err.still_running", "src": "5914ed5a", "v": "la tâche d'arrière-plan tourne encore"}
 {"k": "bg.err.stop_exit", "src": "43459cfa", "v": "claude stop s'est terminé avec le code de sortie {code}"}
 {"k": "bg.err.stop_timeout", "src": "fc33b6ae", "v": "claude stop n'a pas répondu à temps"}
+{"k": "bg.err.terminal_still_running", "src": "52cd4117", "v": "le claude qui avait la conversation ouverte tourne encore"}
 {"k": "bg.failed", "src": "00860287", "v": "Impossible de ramener <b>{session}</b> de l'arrière-plan de Claude Code : {error}"}
 {"k": "bg.halt_not_stopped", "src": "6866d8bb", "v": "⚠️ Impossible d'arrêter la tâche d'arrière-plan de Claude Code de <b>{session}</b>, donc le travail bloqué tourne peut-être encore là-bas : {error}"}
 {"k": "bg.halt_not_stopped_plain", "src": "5810033d", "v": "⚠️ Impossible d'arrêter la tâche d'arrière-plan de Claude Code de <b>{session}</b>, donc le travail bloqué tourne peut-être encore là-bas."}
@@ -272,6 +273,8 @@
 {"k": "cli.session.bg_stop_failed", "src": "1f4af338", "v": "Impossible d'arrêter la tâche d'arrière-plan {job} de Claude Code : {error}"}
 {"k": "cli.session.continued", "src": "ae69418c", "v": "La conversation est passée à {session_id}, donc cette session continue là-bas."}
 {"k": "cli.session.stopped_bg", "src": "a1bda078", "v": "La tâche d'arrière-plan {job} de Claude Code, qui détenait la conversation, a été arrêtée pour la reprendre ici."}
+{"k": "cli.session.stopped_terminal", "src": "049a0b65", "v": "Le claude (pid {pid}) qui avait la conversation ouverte a été fermé : seule cette session l'a maintenant."}
+{"k": "cli.session.terminal_stop_failed", "src": "1a6c8693", "v": "Impossible de fermer le claude qui a la conversation ouverte : {error}"}
 {"k": "cmd.app", "src": "486dfc4e", "v": "Ouvrir le tableau de bord Mini App"}
 {"k": "cmd.help", "src": "fb2dbad1", "v": "Ce que vous pouvez faire"}
 {"k": "cmd.language", "src": "9dc3a234", "v": "Langue des messages d'aipager"}

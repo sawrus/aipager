@@ -2960,7 +2960,8 @@ class SessionOpsMixin:
         if own_conversation and resume_id:
             # R1/R2: where the conversation moved, and whether a Claude
             # Code background job holds it (it would refuse the resume).
-            target, refusal = await self._resume_target(resume_id, force=force)
+            target, refusal = await self._resume_target(resume_id, force=force,
+                                                        own_live=True)
             if refusal is not None:
                 sess.restarting_until = earlier_window
                 return self._bg_refused_restart(sess, refusal, target_mode)
@@ -3087,7 +3088,7 @@ class SessionOpsMixin:
         return "still_running", {}
 
     async def _resume_target(self, session_id: str, *, force: bool,
-                             force_job: str = "") -> tuple:
+                             force_job: str = "", own_live: bool = False) -> tuple:
         """R1 and R2 before *session_id* is resumed: ``(id, refusal)``.
 
         *id* is where the conversation went (``continued-in`` followed,
@@ -3098,13 +3099,22 @@ class SessionOpsMixin:
         read; nothing was done) or ``("bg_stop_failed", (code, params))``.
         An unreadable registry launches as before. *force_job* (the job a
         keyed button was shown for): *force* applies only to a holder whose
-        job id starts with it; any other holder is asked about. Never
-        raises."""
+        job id starts with it; any other holder is asked about. Every
+        interactive claude that has the conversation open (a terminal,
+        tmux) is closed first, so aipager is its only owner; not with
+        *own_live* (a relaunch of a session whose own claude still runs and
+        is killed by the caller). Never raises."""
         from aipager import claude_jobs
 
         def look():
             entries = claude_jobs.read_registry()
             target = claude_jobs.follow_continued(session_id, entries)
+            # One owner per conversation: a terminal or tmux claude that has
+            # it open is closed before aipager resumes it.
+            _closed, err = (claude_jobs.stop_interactive_sync(target, entries)
+                            if entries is not None and not own_live else ([], ""))
+            if err:
+                return entries, target, None, target, err
             holder = (claude_jobs.live_holder(target, entries)
                       if entries is not None else None)
             # A hop to a live holder's conversation with no transcript (an
@@ -3115,13 +3125,15 @@ class SessionOpsMixin:
             saved = (target if target == session_id
                      or claude_jobs.find_transcript(target) is not None
                      else claude_jobs.follow_continued(session_id, []))
-            return entries, target, holder, saved
+            return entries, target, holder, saved, ""
 
         try:
-            entries, target, holder, saved = await claude_jobs.off_loop(look)
+            entries, target, holder, saved, err = await claude_jobs.off_loop(look)
         except Exception:
             log.warning("resume target of %s not checked", session_id, exc_info=True)
             return session_id, None
+        if err:
+            return saved, ("bg_stop_failed", (err, {}))
         if target != session_id:
             log.info("resuming %s instead of %s, where its conversation moved",
                      saved, session_id)

@@ -34,6 +34,28 @@ conversation by then, aipager asks again.
 
 A conversation aipager already runs is never picked up a second time.
 
+## One owner per conversation
+
+`claude --resume <id>` starts a new process; it does not join the one that
+has the conversation open. Two processes on one conversation both write to
+its transcript. So every resume closes the other copies first:
+
+- `/resume <name>`, the resume picker, `aipager resume`, `aipager resume
+  --claude`, `aipager session <name> -- --resume <id>`, and
+  `aipager-claude --resume <id>` (also when the daemon is not running);
+- each live interactive claude in Claude Code's session registry
+  (`~/.claude/sessions/<pid>.json`) with that conversation id gets SIGTERM,
+  then SIGKILL if it is still there after 5 seconds; its own process line
+  and a pid whose start time no longer matches are left alone;
+- when that claude ran in a tmux pane (the registry's `tmux` field) and only
+  an idle shell is left in it, the pane is closed too;
+- a claude that outlives both signals stops the resume: nothing is launched.
+
+The other direction works the same: a resume of the conversation in a tmux
+window closes aipager's copy, and aipager marks that session gone. A
+relaunch of a session aipager runs (a mode change) keeps its own claude: the
+relaunch closes it itself.
+
 ## Start every terminal session under aipager: `aipager wrap`
 
 ```

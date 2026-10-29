@@ -171,6 +171,7 @@
 {"k": "bg.err.still_running", "src": "5914ed5a", "v": "фоновая задача всё ещё работает"}
 {"k": "bg.err.stop_exit", "src": "43459cfa", "v": "команда остановки claude stop завершилась с кодом выхода {code}"}
 {"k": "bg.err.stop_timeout", "src": "fc33b6ae", "v": "команда остановки claude stop не ответила вовремя"}
+{"k": "bg.err.terminal_still_running", "src": "52cd4117", "v": "claude, в котором был открыт этот разговор, всё ещё работает"}
 {"k": "bg.failed", "src": "00860287", "v": "Не удалось вернуть <b>{session}</b> из фонового режима Claude Code: {error}"}
 {"k": "bg.halt_not_stopped", "src": "6866d8bb", "v": "⚠️ Не удалось остановить фоновую задачу Claude Code для <b>{session}</b>, поэтому заблокированная работа, возможно, всё ещё идёт там: {error}"}
 {"k": "bg.halt_not_stopped_plain", "src": "5810033d", "v": "⚠️ Не удалось остановить фоновую задачу Claude Code для <b>{session}</b>, поэтому заблокированная работа, возможно, всё ещё идёт там."}
@@ -272,6 +273,8 @@
 {"k": "cli.session.bg_stop_failed", "src": "1f4af338", "v": "Не удалось остановить фоновую задачу Claude Code {job}: {error}"}
 {"k": "cli.session.continued", "src": "ae69418c", "v": "Разговор перешёл в {session_id}, поэтому эта сессия продолжится там."}
 {"k": "cli.session.stopped_bg", "src": "a1bda078", "v": "Фоновая задача Claude Code {job}, в которой был разговор, остановлена, чтобы продолжить его здесь."}
+{"k": "cli.session.stopped_terminal", "src": "049a0b65", "v": "Закрыт claude (pid {pid}), в котором был открыт этот разговор: теперь он только в этой сессии."}
+{"k": "cli.session.terminal_stop_failed", "src": "1a6c8693", "v": "Не удалось закрыть claude, в котором открыт этот разговор: {error}"}
 {"k": "cmd.app", "src": "486dfc4e", "v": "Открыть панель Mini App"}
 {"k": "cmd.help", "src": "fb2dbad1", "v": "Что ты можешь сделать"}
 {"k": "cmd.language", "src": "9dc3a234", "v": "Язык сообщений aipager"}

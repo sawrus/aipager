@@ -35,6 +35,11 @@ BG_ERRORS = {
     "no_claude": Msg(
         "bg.err.no_claude", "the claude command could not be run",
         note="Filled into bg.failed as {error}: Claude Code's own command is missing"),
+    "terminal_still_running": Msg(
+        "bg.err.terminal_still_running",
+        "the claude that had the conversation open is still running",
+        note="Filled into bg.failed as {error}: another interactive claude (a terminal, "
+             "tmux) had the conversation open and did not end after SIGTERM and SIGKILL"),
 }
 
 CLI_CONTINUED = Msg(
@@ -62,6 +67,18 @@ CLI_BG_STOP_FAILED = Msg(
     note="Command line: stopping the job that held the conversation failed; {error} "
          "is one of bg.err.*", eg={"job": "ab12cd34", "error": "claude stop did not "
                                    "answer in time"})
+CLI_STOPPED_TERMINAL = Msg(
+    "cli.session.stopped_terminal",
+    "Closed the claude (pid {pid}) that had the conversation open, so only this "
+    "session has it.",
+    note="Command line: another interactive claude (a terminal, tmux) had the "
+         "conversation open and was closed before the resume", eg={"pid": "12345"})
+CLI_TERMINAL_STOP_FAILED = Msg(
+    "cli.session.terminal_stop_failed",
+    "Could not close the claude that has the conversation open: {error}",
+    note="Command line: the interactive claude holding the conversation outlived "
+         "SIGTERM and SIGKILL; {error} is one of bg.err.*",
+    eg={"error": "the claude that had the conversation open is still running"})
 
 
 def error_msg(code: str) -> Msg:
