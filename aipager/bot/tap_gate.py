@@ -117,6 +117,9 @@ EXACT_CAPS: dict[str, Cap] = {
     "st:ended": VIEW,
     "pick:cancel": VIEW,
     "resume_noop": VIEW,
+    # /resume → Other Claude sessions: Cancel on the Take over card (the
+    # handler re-checks owner or admin, like every tap there).
+    "rcn": PROMPT,
     "clear_gone": PROMPT,        # hides the chat's ended sessions
     # /settings: browsing is open; a write is admin-gated in a group by
     # `_dispatch_settings_action` / `new_flow.handle_defaults_callback`.
@@ -146,6 +149,12 @@ NUMBERED_CAPS: tuple[tuple[str, Cap], ...] = (
 PREFIX_CAPS: tuple[tuple[str, Cap], ...] = (
     ("now:", PROMPT),           # "Send now" under a queued message
     ("resume_page:", VIEW),     # /resume picker pages
+    # /resume → Other Claude sessions (owner or admin, re-checked inside):
+    # the list's pages look; a conversation and its Take over start it here
+    # (and may close a terminal Claude).
+    ("rcp:", VIEW),
+    ("rc:", PROMPT),
+    ("rcy:", PROMPT),
     ("rdy_", PROMPT),           # Ready card (rdy_full: MANAGE, above)
     ("nw:", PROMPT),            # /new Name card (author-bound inside)
     ("up:", UPDATE),            # /update (re-checked inside)

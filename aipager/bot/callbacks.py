@@ -909,6 +909,44 @@ class CallbackDispatchMixin:
                 # Even if this task is cancelled mid-answer (shutdown).
                 _ACKS.pop(id(query), None)
 
+    async def _foreign_tap(self, update: Update, query, action: str) -> None:
+        """/resume → Other Claude sessions (fork; ``aipager.claude_catalog``):
+        ``rcp:<page>`` a page of the list (page 0 lists afresh), ``rcn``
+        the list again, ``rc:<id8>`` a conversation, ``rcy:<id8>`` its Take
+        over. The chat's owner or an admin only: the list names another
+        person's folders and work, and the tap gate lets anyone look. An id
+        the chat's last listing does not know (older than ten minutes, or
+        never listed) answers with a pop-up and the list afresh."""
+        from aipager.bot.dashboard import (  # local: import cycle
+            RESUME_FOREIGN_DENIED, RESUME_FOREIGN_STALE)
+        chat_id = calling_chat_id(update)
+        user_id = calling_user_id(update)
+        tr = i18n.for_update(update)
+        if not self._is_admin_user(user_id, chat_id):
+            await self._safe_answer(query, i18n.for_person(update).text(
+                RESUME_FOREIGN_DENIED))
+            return
+        verb, _, arg = action.partition(":")
+        if verb in ("rcp", "rcn"):
+            page = int(arg) if arg.isdigit() else 0
+            text, kb = self._render_foreign_picker(
+                chat_id, page, tr=tr, refresh=verb == "rcp" and page == 0)
+        else:
+            conv = self._foreign_lookup(chat_id, arg)
+            if conv is None:
+                await self._safe_answer(query, i18n.for_person(update).text(
+                    RESUME_FOREIGN_STALE))
+                text, kb = self._render_foreign_picker(chat_id, 0, tr=tr, refresh=True)
+            else:
+                outcome = await self.adopt_conversation(
+                    conv.session_id, chat_id=chat_id or 0, user_id=user_id,
+                    confirm=verb == "rcy")
+                text, kb = self._render_adopt_outcome(conv, outcome, chat_id, tr=tr)
+        try:
+            await edit_text(query, text, parse_mode="HTML", reply_markup=kb)
+        except Exception:
+            log.debug("other Claude sessions: the edit failed", exc_info=True)
+
     async def _ack_after_bound(self, query) -> None:
         await _sleep(CALLBACK_ACK_BOUND)
         # Claim the query HERE, synchronously, in the step the bound wakes
@@ -1580,8 +1618,10 @@ class CallbackDispatchMixin:
                 page = int(action.split(":", 1)[1])
             except (IndexError, ValueError):
                 page = 0
+            chat_id = calling_chat_id(query)
             text, kb = self._render_resume_picker(
-                page=page, scope_chat_id=calling_chat_id(query),
+                page=page, scope_chat_id=chat_id,
+                foreign=self._is_admin_user(calling_user_id(update), chat_id),
             )
             try:
                 await edit_text(query,
@@ -1589,6 +1629,13 @@ class CallbackDispatchMixin:
                 )
             except Exception:
                 pass
+            return
+
+        # /resume → Other Claude sessions (fork): the list, a conversation,
+        # its Take over and Cancel.
+        if (action.startswith("rcp:") or action.startswith("rc:")
+                or action.startswith("rcy:") or action == "rcn"):
+            await self._foreign_tap(update, query, action)
             return
 
         if action == "resume_noop":

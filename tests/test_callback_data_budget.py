@@ -143,6 +143,13 @@ ALLOWED_JOINEDSTR_SIGNATURES = frozenset({
     # a session name.
     "_:resume_page:{page - 1}",
     "_:resume_page:{page + 1}",
+    # dashboard.py's /resume → Other Claude sessions (fork): a page NUMBER,
+    # or the first 8 characters of a Claude Code conversation id (a UUID),
+    # never a session name: "_:rcy:" + 8 = 14 bytes.
+    "_:rcp:{page - 1}",
+    "_:rcp:{page + 1}",
+    "_:rc:{conv.session_id[:8]}",
+    "_:rcy:{short}",
     # bot/update_flow.py's self-update job controls (roadmap 8.36) —
     # interpolate the JOB id, an int epoch (10 digits for centuries), never
     # a session name: "_:up:stop:" + 10 digits = 20 bytes.

@@ -238,6 +238,11 @@ def main() -> None:
         "name", nargs="?",
         help="session label to resume; omit for an interactive picker",
     )
+    resume_p.add_argument(
+        "--claude", action="store_true",
+        help="pick a Claude Code conversation started without aipager "
+             "(last 14 days) and continue it under aipager",
+    )
     resume_p.set_defaults(fn=_cmd_resume)
 
     uninstall_p = sub.add_parser(

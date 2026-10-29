@@ -1873,8 +1873,11 @@ class CommandHandlersMixin:
             return
         parts = (update.message.text or "").split(maxsplit=1)
         if len(parts) < 2:
+            chat_id = calling_chat_id(update)
+            # Other Claude sessions: the chat's owner or an admin only.
             text, kb = self._render_resume_picker(
-                page=0, scope_chat_id=calling_chat_id(update),
+                page=0, scope_chat_id=chat_id,
+                foreign=self._is_admin_user(calling_user_id(update), chat_id),
             )
             await reply_text(update.message,
                 text, parse_mode="HTML", reply_markup=kb,
