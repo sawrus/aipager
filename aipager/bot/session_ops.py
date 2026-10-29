@@ -115,6 +115,59 @@ _spawn = asyncio.create_task
 #: already has "💀 Killed"). Only prunes: the id itself decides.
 KILL_NOTICE_QUIET_SECONDS: float = 60.0
 
+# Adopting a conversation started without aipager (fork; see
+# ``aipager.claude_catalog``). ``_kill`` is the seam the takeover's SIGTERM
+# goes through: tests replace it, and never send a real signal.
+_kill = os.kill
+#: How long a takeover waits for the terminal claude to exit after SIGTERM,
+#: and how often it looks.
+_TAKEOVER_WAIT_SECONDS = 10.0
+_TAKEOVER_POLL = 0.25
+#: A label is a Telegram bot command too: ``[a-z0-9_]{1,32}``.
+_ADOPT_LABEL_MAX = 32
+#: How much of a transcript is read for its folder: its first records.
+_CWD_READ_BYTES = 256 * 1024
+_CWD_READ_LINES = 200
+
+
+def _transcript_cwd(path) -> str:
+    """The folder a transcript's conversation ran in: the ``cwd`` of its
+    first record that has one, read from the first lines only; ``""``
+    when none says or the file cannot be read."""
+    import json
+    try:
+        with open(path, "rb") as f:
+            head = f.read(_CWD_READ_BYTES)
+    except OSError:
+        return ""
+    for line in head.splitlines()[:_CWD_READ_LINES]:
+        try:
+            record = json.loads(line)
+        except (ValueError, UnicodeDecodeError):
+            continue
+        cwd = record.get("cwd") if isinstance(record, dict) else None
+        if isinstance(cwd, str) and cwd:
+            return cwd
+    return ""
+
+
+def _adopt_label(base: str, taken) -> str:
+    """A label for an adopted conversation from *base* (a name or a
+    folder): normalised like a typed session name, kept to
+    ``[a-z0-9_]`` and :data:`_ADOPT_LABEL_MAX` characters, never empty
+    (``c1``), never a reserved command, and not one *taken* (a
+    predicate) says is used: ``_2``, ``_3``, ... are added until free."""
+    clean = re.sub(r"[^a-z0-9_]", "", inject.normalize_session_name(base))
+    clean = clean.strip("_") or "c1"
+    n = 1
+    while True:
+        suffix = "" if n == 1 else f"_{n}"
+        stem = clean[:_ADOPT_LABEL_MAX - len(suffix)].rstrip("_")
+        label = stem + suffix
+        if label not in inject._RESERVED and not taken(label):
+            return label
+        n += 1
+
 
 @dataclass
 class StopOutcome:
@@ -2438,7 +2491,124 @@ class SessionOpsMixin:
         session with a fresh label is registered and resumed through
         :meth:`_do_resume_core`. CONTRACT: reasons in
         ``claude_catalog.ADOPT_REASONS``."""
-        raise NotImplementedError
+        from aipager import claude_catalog, claude_jobs
+        from aipager.scope import disambiguated_name
+
+        if not claude_jobs.valid_session_id(session_id):
+            return AdoptOutcome(ok=False, reason="not_found")
+        transcript = claude_jobs.find_transcript(session_id)
+        if transcript is None:
+            log.info("adopt %s: no transcript", session_id)
+            return AdoptOutcome(ok=False, reason="not_found")
+        if not self._may_adopt(user_id, chat_id):
+            log.info("adopt %s: refused for user %s in chat %s",
+                     session_id, user_id, chat_id)
+            return AdoptOutcome(ok=False, reason="forbidden")
+
+        h = claude_catalog.holder(session_id)
+        if h is not None:
+            pid, status = h.get("pid"), h.get("status") or ""
+            if status == "busy":
+                log.info("adopt %s: terminal claude pid %s is busy",
+                         session_id, pid)
+                return AdoptOutcome(ok=False, reason="terminal_busy",
+                                    holder_status=status)
+            if not confirm:
+                return AdoptOutcome(ok=False, reason="needs_takeover",
+                                    holder_status=status)
+            # The person confirmed what they saw: only that process is
+            # closed. Another one holding it now (or the same one now
+            # working) goes back to them.
+            again = claude_catalog.holder(session_id)
+            if again is not None and (again.get("pid") != pid
+                                      or (again.get("status") or "") == "busy"):
+                again_status = again.get("status") or ""
+                log.info("adopt %s: holder changed (pid %s -> %s), not closed",
+                         session_id, pid, again.get("pid"))
+                return AdoptOutcome(
+                    ok=False,
+                    reason=("terminal_busy" if again_status == "busy"
+                            else "needs_takeover"),
+                    holder_status=again_status)
+            if again is not None:
+                err = await self._take_over_terminal(pid, claude_jobs)
+                if err:
+                    log.info("adopt %s: takeover of pid %s failed: %s",
+                             session_id, pid, err)
+                    return AdoptOutcome(ok=False, reason="takeover_failed",
+                                        holder_status=status, err=err)
+                log.info("adopt %s: terminal claude pid %s closed (SIGTERM)",
+                         session_id, pid)
+
+        cwd = _transcript_cwd(transcript)
+        name = h.get("name") if h else ""
+        base = (name if isinstance(name, str) else "") or os.path.basename(
+            cwd.rstrip("/"))
+        kind = "group" if chat_id < 0 else "dm"
+        chat_sessions = self.registry.all_sessions(chat_id)
+        used = {s.label for s in chat_sessions.values()}
+        label = _adopt_label(base, lambda c: c in used or self.registry.get(
+            disambiguated_name(c, chat_id, kind)) is not None)
+        session_name = disambiguated_name(label, chat_id, kind)
+
+        sess = self.registry.get_or_create(session_name)
+        sess.label = label
+        sess.claude_session_id = session_id
+        sess.cwd = cwd
+        sess.scope_chat_id = chat_id
+        sess.scope_kind = kind
+        self.registry.transition(session_name, Status.GONE)
+        self.registry.mark_dirty()
+
+        outcome = await self._do_resume_core(sess, driver_user_id=user_id)
+        if outcome.ok:
+            log.info("adopt %s: running as [%s] (cwd=%s)",
+                     session_id, label, cwd or "<daemon>")
+            return AdoptOutcome(ok=True, reason="ok", label=label)
+        # Nothing half-adopted is left behind: the conversation stays the
+        # terminal's to resume, and a retry picks a fresh entry.
+        if self.registry.get(session_name) is sess:
+            self.registry.remove(session_name)
+        self.registry.mark_dirty()
+        log.info("adopt %s: resume as [%s] failed: %s %s",
+                 session_id, label, outcome.reason, outcome.err)
+        return AdoptOutcome(ok=False, reason="launch_failed",
+                            err=outcome.err or outcome.reason)
+
+    def _may_adopt(self, user_id: int | None, chat_id: int) -> bool:
+        """Who may adopt a conversation into *chat_id*: an admin there
+        (:meth:`_is_admin_user`: a role with ``can_manage``, owner and
+        admin), and in personal mode, where that rule is True for anyone,
+        the operator only (:meth:`_is_personal_mode_operator`). Fails
+        closed for an unknown caller."""
+        if not self._is_admin_user(user_id, chat_id):
+            return False
+        if self.scopes is None and self.team is None:
+            return self._is_personal_mode_operator(user_id)
+        return True
+
+    async def _take_over_terminal(self, pid, claude_jobs) -> str:
+        """SIGTERM the terminal claude *pid* and wait up to
+        :data:`_TAKEOVER_WAIT_SECONDS` for it to exit. ``""`` when it is
+        gone, else why not. Never SIGKILL: a claude that ignores SIGTERM
+        is left as it is."""
+        import signal
+
+        if not isinstance(pid, int) or isinstance(pid, bool) or pid <= 1:
+            return f"bad pid {pid!r}"
+        try:
+            _kill(pid, signal.SIGTERM)
+        except ProcessLookupError:
+            return ""
+        except OSError as exc:
+            return f"SIGTERM failed: {exc}"
+        for _ in range(int(_TAKEOVER_WAIT_SECONDS / _TAKEOVER_POLL)):
+            if not claude_jobs._pid_alive(pid):
+                return ""
+            await _sleep(_TAKEOVER_POLL)
+        if not claude_jobs._pid_alive(pid):
+            return ""
+        return f"pid {pid} still running {_TAKEOVER_WAIT_SECONDS:g}s after SIGTERM"
 
     async def _do_resume(self, *, label: str, reply_fn,
                           update: Update | None = None,
