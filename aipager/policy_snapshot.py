@@ -463,7 +463,14 @@ def write_snapshot(session_name: str, role, scope, member,
 
 
 def read_snapshot(session_name: str) -> dict | None:
-    """Read a session's snapshot, or None if absent/unreadable."""
+    """Read a session's snapshot, or None if absent/unreadable.
+
+    A claude that aipager does not run (no ``CLAUDE_DTACH_SESSION``) has
+    no snapshot: every such session would share
+    ``claude-policy-.json``, and one's peer turn would hold all the others'
+    terminal turns to the floor."""
+    if not session_name:
+        return None
     try:
         return json.loads(snapshot_path(session_name).read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
@@ -482,7 +489,11 @@ def write_merged_snapshot(session_name: str, snap: dict) -> None:
     atomic-replace + 0600 pattern; kept separate so
     :func:`write_snapshot`'s own role/scope/member-based signature stays
     unchanged.
+
+    Nothing is written for an unnamed session (see :func:`read_snapshot`).
     """
+    if not session_name:
+        return
     path = snapshot_path(session_name)
     try:
         tmp = path.with_suffix(f"{path.suffix}.{os.getpid()}.tmp")

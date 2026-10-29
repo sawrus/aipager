@@ -19,6 +19,9 @@ Fork `sawrus/aipager`, based on 1.3.10 (the version stays 1.3.10: aipager's upda
 ### Changed
 - **The fork's test suite is cut to under 5000 tests and runs in under a minute** (`-n 12`). The upstream test files that were slow or covered the same code again were removed; see `CLAUDE.md`.
 
+### Fixed
+- **A claude aipager does not run no longer blocks its own terminal turns.** Every such session (no `CLAUDE_DTACH_SESSION`, e.g. a plain `claude` in tmux) shared one policy snapshot, `claude-policy-.json`. A message from another session in one of them held every other one to the floor: `Bash is in this role's deny_tools`, `Bash command blocked by safety policy`, `Read on protected path ~/.claude/**` on turns typed in the terminal. Such a session now has no snapshot; a turn from Telegram or from another session there is still held to the floor.
+
 ## [1.3.10] - 2026-10-25
 
 ### Fixed
