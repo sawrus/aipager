@@ -75,6 +75,7 @@ miniapp = []
 
 [project.scripts]
 aipager            = "aipager.cli:main"
+aipager-claude     = "aipager.cli.wrap:main"
 # Internal hooks invoked by Claude Code (not by users). They stay on
 # PATH because ~/.claude/settings.json references them by name.
 aipager-hook       = "aipager.dtach.notify_hook:main"

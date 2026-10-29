@@ -15,6 +15,7 @@ Subcommands:
   service  install / manage daemon as a systemd-user or launchd service
   miniapp  enable / disable / inspect the self-hosted Mini App dashboard
   lock     the idle lock: a TOTP code after a quiet spell
+  wrap     run plain `claude` under aipager (alias in ~/.bashrc)
 
 The ``_cmd_*`` functions in this file are thin dispatchers that
 delegate to feature modules (cli.daemon, cli.session, cli.resume) or
@@ -350,6 +351,8 @@ def main() -> None:
 
     from aipager.cli.lock import add_parser as _add_lock_parser
     lock_p = _add_lock_parser(sub)
+    from aipager.cli.wrap import add_parser as _add_wrap_parser
+    wrap_p = _add_wrap_parser(sub)
 
     args = parser.parse_args()
     if not args.cmd:
@@ -384,6 +387,9 @@ def main() -> None:
         sys.exit(0)
     if args.cmd == "lock" and not getattr(args, "lock_cmd", None):
         lock_p.print_help()
+        sys.exit(0)
+    if args.cmd == "wrap" and not getattr(args, "wrap_cmd", None):
+        wrap_p.print_help()
         sys.exit(0)
     if args.cmd == "miniapp" and not getattr(args, "miniapp_cmd", None):
         miniapp_p.print_help()
