@@ -326,6 +326,12 @@
 {"k": "kb.back", "src": "a4b7fcb6", "v": "« Quay lại"}
 {"k": "kb.commands", "src": "45e5f3f7", "v": "Lệnh"}
 {"k": "kb.kill", "src": "c80f5bc1", "v": "tắt"}
+{"k": "kb.menu.help", "src": "83aa4d9a", "v": "❓ Trợ giúp"}
+{"k": "kb.menu.language", "src": "4167c72b", "v": "🌐 Ngôn ngữ"}
+{"k": "kb.menu.mode", "src": "8bac9ea1", "v": "🔐 Chế độ"}
+{"k": "kb.menu.now", "src": "fb1a1f09", "v": "⏩ Ngay"}
+{"k": "kb.menu.resume", "src": "3021b745", "v": "📚 Tiếp tục"}
+{"k": "kb.menu.settings", "src": "b1f2d607", "v": "⚙️ Cài đặt"}
 {"k": "kb.models", "src": "d068cea1", "v": "Mô hình ›"}
 {"k": "kb.new", "src": "c2a6b03f", "v": "mới"}
 {"k": "kb.status", "src": "48a3661d", "v": "phiên"}

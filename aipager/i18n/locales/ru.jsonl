@@ -326,6 +326,12 @@
 {"k": "kb.back", "src": "a4b7fcb6", "v": "« Назад"}
 {"k": "kb.commands", "src": "45e5f3f7", "v": "Команды"}
 {"k": "kb.kill", "src": "c80f5bc1", "v": "завершить"}
+{"k": "kb.menu.help", "src": "83aa4d9a", "v": "❓ Помощь"}
+{"k": "kb.menu.language", "src": "4167c72b", "v": "🌐 Язык"}
+{"k": "kb.menu.mode", "src": "8bac9ea1", "v": "🔐 Режим"}
+{"k": "kb.menu.now", "src": "fb1a1f09", "v": "⏩ Сейчас"}
+{"k": "kb.menu.resume", "src": "3021b745", "v": "📚 Продолжить"}
+{"k": "kb.menu.settings", "src": "b1f2d607", "v": "⚙️ Настройки"}
 {"k": "kb.models", "src": "d068cea1", "v": "Модель ›"}
 {"k": "kb.new", "src": "c2a6b03f", "v": "новая"}
 {"k": "kb.status", "src": "48a3661d", "v": "статус"}

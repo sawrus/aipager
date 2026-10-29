@@ -226,6 +226,14 @@ def _fresh_idle_lock(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _menu_keeps_the_chat(monkeypatch):
+    """A menu tap cleans no chat (aipager.bot.menu): a keyboard word in any
+    other test runs as before; tests/test_menu.py turns it back on."""
+    from aipager.bot import menu
+    monkeypatch.setattr(menu, "enabled", lambda: False)
+
+
+@pytest.fixture(autouse=True)
 def _isolate_home_paths(tmp_path, monkeypatch):
     """Redirect every module-level ``Path.home()`` write target to tmp.
 
@@ -271,6 +279,9 @@ def _isolate_home_paths(tmp_path, monkeypatch):
         "aipager.idle_lock.LOCK_STATE_PATH":
             home / ".local" / "state" / "aipager" / "lock.json",
         "aipager.cli.wrap.BASHRC_PATH": home / ".bashrc",
+        # The menu's clean-up marks (aipager.bot.menu).
+        "aipager.bot.menu.MENU_STATE_PATH":
+            home / ".local" / "state" / "aipager" / "menu.json",
         "aipager.config.SESSION_STATE_FILE": sessions_json,
         "aipager.state.SESSION_STATE_FILE": sessions_json,
         "aipager.status.SESSION_STATE_FILE": sessions_json,

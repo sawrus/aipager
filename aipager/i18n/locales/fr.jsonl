@@ -326,6 +326,12 @@
 {"k": "kb.back", "src": "a4b7fcb6", "v": "« Retour"}
 {"k": "kb.commands", "src": "45e5f3f7", "v": "Commandes ›"}
 {"k": "kb.kill", "src": "c80f5bc1", "v": "kill"}
+{"k": "kb.menu.help", "src": "83aa4d9a", "v": "❓ Aide"}
+{"k": "kb.menu.language", "src": "4167c72b", "v": "🌐 Langue"}
+{"k": "kb.menu.mode", "src": "8bac9ea1", "v": "🔐 Mode"}
+{"k": "kb.menu.now", "src": "fb1a1f09", "v": "⏩ Maintenant"}
+{"k": "kb.menu.resume", "src": "3021b745", "v": "📚 Reprendre"}
+{"k": "kb.menu.settings", "src": "b1f2d607", "v": "⚙️ Paramètres"}
 {"k": "kb.models", "src": "d068cea1", "v": "Modèle IA ›"}
 {"k": "kb.new", "src": "c2a6b03f", "v": "new"}
 {"k": "kb.status", "src": "48a3661d", "v": "status"}

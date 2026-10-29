@@ -44,6 +44,7 @@ from aipager.bot import (
     held_message,
     kbwords,
     language_menu,
+    menu,
     miniapp_link,
     mode_labels,
     mode_switch,
@@ -2442,6 +2443,13 @@ class CommandHandlersMixin:
             await self._send_keyboard(level=parent, chat_id=kb_chat, tap=update)
             return
 
+        # Fork: a menu button of a private chat's main keyboard (bot/menu.py).
+        if keyboard_words and not group_intake.is_group_chat(kb_chat):
+            tapped = menu.action(text)
+            if tapped is not None:
+                await menu.run(self, update, ctx, tapped)
+                return
+
         # Quick template buttons inject their prompt into the active
         # session; Claude Code slash commands and model choices are sent
         # instantly, with no BUSY transition.
@@ -2481,6 +2489,8 @@ class CommandHandlersMixin:
         # Bare text matching keyboard buttons (no slash)
         if keyboard_words and " " not in text and not text.startswith("/"):
             word = kbwords.bare_word(text)
+            if word in menu.CLEANING:
+                await menu.clean(self, update, word)
             if word == "status":
                 await self._handle_status(update, ctx)
                 return

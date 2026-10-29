@@ -326,6 +326,12 @@
 {"k": "kb.back", "src": "a4b7fcb6", "v": "« 返回"}
 {"k": "kb.commands", "src": "45e5f3f7", "v": "命令"}
 {"k": "kb.kill", "src": "c80f5bc1", "v": "结束"}
+{"k": "kb.menu.help", "src": "83aa4d9a", "v": "❓ 帮助"}
+{"k": "kb.menu.language", "src": "4167c72b", "v": "🌐 语言"}
+{"k": "kb.menu.mode", "src": "8bac9ea1", "v": "🔐 模式"}
+{"k": "kb.menu.now", "src": "fb1a1f09", "v": "⏩ 立即"}
+{"k": "kb.menu.resume", "src": "3021b745", "v": "📚 恢复"}
+{"k": "kb.menu.settings", "src": "b1f2d607", "v": "⚙️ 设置"}
 {"k": "kb.models", "src": "d068cea1", "v": "模型 ›"}
 {"k": "kb.new", "src": "c2a6b03f", "v": "新建"}
 {"k": "kb.status", "src": "48a3661d", "v": "状态"}

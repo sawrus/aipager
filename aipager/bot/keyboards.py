@@ -23,7 +23,7 @@ from telegram.error import BadRequest, Forbidden
 
 
 from aipager import i18n
-from aipager.bot import kbwords, question_form
+from aipager.bot import kbwords, menu, question_form
 from aipager.i18n import Msg, Safe
 from aipager import perm_modes
 from aipager.bot.mode_labels import mode_label
@@ -234,6 +234,9 @@ class KeyboardMixin:
             # App opened from a reply-keyboard `web_app` button no init
             # data, so it could never sign in. The menu button beside the
             # message box, /app and the inline Open buttons carry it.
+            if not is_group:
+                # Fork: every other command a button too (bot/menu.py).
+                rows += menu.rows(tr, button)
             rows.append([button(tr.text(kbwords.KB_TEMPLATES)),
                          button(tr.text(kbwords.KB_COMMANDS))])
             msg_text = "\u2328\ufe0f"
