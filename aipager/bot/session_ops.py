@@ -24,6 +24,7 @@ from telegram import (
     Update,
 )
 
+from aipager.claude_catalog import AdoptOutcome
 from aipager import i18n, perm_modes
 from aipager.config import RESUME_GUARD_SECONDS
 from aipager.i18n import Command, Msg, Safe, Span
@@ -2423,6 +2424,21 @@ class SessionOpsMixin:
         if wants == perm_modes.FULL and not self._may_use_full_access(actor, chat_id):
             return perm_modes.narrowest_allowed(wants, False), True
         return mode_override, False
+
+    async def adopt_conversation(self, session_id: str, *, chat_id: int,
+                                 user_id: int | None,
+                                 confirm: bool = False) -> AdoptOutcome:
+        """Run a Claude Code conversation started without aipager under
+        aipager, in *chat_id* (fork; see :mod:`aipager.claude_catalog`).
+
+        Owner or admin of *chat_id* only (``forbidden``). A live terminal
+        claude holding it: ``terminal_busy`` while it works; otherwise
+        ``needs_takeover`` until *confirm*, then SIGTERM and up to 10 s for
+        it to exit (``takeover_failed`` when it does not). Then a GONE
+        session with a fresh label is registered and resumed through
+        :meth:`_do_resume_core`. CONTRACT: reasons in
+        ``claude_catalog.ADOPT_REASONS``."""
+        raise NotImplementedError
 
     async def _do_resume(self, *, label: str, reply_fn,
                           update: Update | None = None,
