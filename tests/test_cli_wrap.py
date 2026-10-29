@@ -268,3 +268,25 @@ def test_entry_point_declared():
     data = tomllib.loads(
         (Path(__file__).resolve().parent.parent / "pyproject.toml").read_text())
     assert data["project"]["scripts"]["aipager-claude"] == "aipager.cli.wrap:main"
+
+
+def test_real_claude_takes_the_pinned_path_first(tmp_path, monkeypatch):
+    """No resolver (and its `claude --version` runs) when aipager.yaml pins
+    claude_path to an executable; never the wrapper itself."""
+    from aipager import claude_resolve, scope
+
+    real = tmp_path / "claude"
+    real.write_text("#!/bin/sh\n")
+    real.chmod(0o755)
+    called = []
+    monkeypatch.setattr(claude_resolve, "try_resolve_claude_binary",
+                        lambda: called.append(1))
+    monkeypatch.setattr(scope, "load_claude_path", lambda path: str(real))
+    assert wrap._real_claude() == str(real)
+    assert called == []
+    loop = tmp_path / "aipager-claude"
+    loop.write_text("#!/bin/sh\n")
+    loop.chmod(0o755)
+    monkeypatch.setattr(scope, "load_claude_path", lambda path: str(loop))
+    assert wrap._real_claude() == "claude"
+    assert called == [1]

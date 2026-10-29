@@ -251,14 +251,38 @@ def test_label_prefers_the_holders_name(mk_bot, run_async, transcript, seams):
     seams["holders"] = [h, dict(h)]
     seams["alive"].add(4242)
     out = _adopt(bot, run_async, confirm=True)
-    assert out.label == "fix_loginbug"
+    assert out.label == "fix_login_bug"
 
 
 def test_label_collision_gets_a_suffix(mk_bot, run_async, transcript, seams):
     bot = _bot(mk_bot)
     assert _adopt(bot, run_async).label == "my_proj"
+    # The first one now names another conversation: only the label clashes.
+    first = bot.registry.find_by_label("my_proj", OWNER, include_gone=True)
+    first.claude_session_id = ""
+    first.transcript_path = ""
     assert _adopt(bot, run_async).label == "my_proj_2"
-    assert _adopt(bot, run_async).label == "my_proj_3"
+
+
+def test_a_tracked_conversation_is_never_adopted_twice(
+        mk_bot, run_async, transcript, seams):
+    """A stale picker button or a second tap: no second entry."""
+    bot = _bot(mk_bot)
+    assert _adopt(bot, run_async).ok
+    before = set(bot.registry.all_sessions())
+    out = _adopt(bot, run_async)
+    assert (out.ok, out.reason, out.err) == (False, "not_found", "already tracked")
+    assert set(bot.registry.all_sessions()) == before
+
+
+def test_a_live_session_on_the_transcript_counts_as_tracked(
+        mk_bot, run_async, transcript, seams):
+    bot = _bot(mk_bot)
+    assert _adopt(bot, run_async).ok
+    sess = bot.registry.find_by_label("my_proj", OWNER, include_gone=True)
+    sess.claude_session_id = ""          # cleared at launch
+    sess.transcript_path = str(transcript)
+    assert _adopt(bot, run_async).reason == "not_found"
 
 
 def test_label_skips_a_name_another_entry_holds(mk_bot, run_async, transcript,

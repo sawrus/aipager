@@ -40,8 +40,15 @@ _SUBCOMMANDS = frozenset({
 
 
 def _real_claude() -> str:
-    """The full path of the real claude, or the bare name as a last resort."""
-    from aipager import claude_resolve
+    """The full path of the real claude, or the bare name as a last resort.
+
+    ``claude_path`` from ``aipager.yaml`` first: the resolver runs
+    ``claude --version`` on each candidate, seconds on every start."""
+    from aipager import claude_resolve, scope
+    pinned = scope.load_claude_path(scope.CONFIG_PATH)
+    if (pinned and os.access(pinned, os.X_OK)
+            and os.path.basename(pinned) != "aipager-claude"):
+        return pinned
     resolved = claude_resolve.try_resolve_claude_binary()
     return resolved.chosen.path if resolved else "claude"
 

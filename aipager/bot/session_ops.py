@@ -157,8 +157,8 @@ def _adopt_label(base: str, taken) -> str:
     ``[a-z0-9_]`` and :data:`_ADOPT_LABEL_MAX` characters, never empty
     (``c1``), never a reserved command, and not one *taken* (a
     predicate) says is used: ``_2``, ``_3``, ... are added until free."""
-    clean = re.sub(r"[^a-z0-9_]", "", inject.normalize_session_name(base))
-    clean = clean.strip("_") or "c1"
+    clean = re.sub(r"[^a-z0-9_]+", "_", inject.normalize_session_name(base))
+    clean = re.sub(r"_+", "_", clean).strip("_") or "c1"
     n = 1
     while True:
         suffix = "" if n == 1 else f"_{n}"
@@ -2500,6 +2500,14 @@ class SessionOpsMixin:
         if transcript is None:
             log.info("adopt %s: no transcript", session_id)
             return AdoptOutcome(ok=False, reason="not_found")
+        # Already aipager's (a stale picker button, a second tap): never a
+        # second entry for one conversation.
+        for tracked in self.registry.all_sessions().values():
+            if session_id in (tracked.claude_session_id,
+                              Path(tracked.transcript_path or "x").stem):
+                log.info("adopt %s: already tracked as %s", session_id, tracked.label)
+                return AdoptOutcome(ok=False, reason="not_found",
+                                    err="already tracked")
         if not self._may_adopt(user_id, chat_id):
             log.info("adopt %s: refused for user %s in chat %s",
                      session_id, user_id, chat_id)
