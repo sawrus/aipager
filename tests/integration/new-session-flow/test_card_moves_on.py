@@ -182,10 +182,13 @@ def test_the_close_runs_before_every_other_handler(mk_bot, run_async, monkeypatc
     # through, so the close still sees them.
     # The language launch's TypeHandler (group 1, multilingual phase 5)
     # runs after every reply, so it is not one of those before.
-    from aipager.bot import language_launch
+    # The idle lock's gate (group -4, fork) runs before everything too; it
+    # stops updates only while locked.
+    from aipager.bot import idle_gate, language_launch
     first = [(h, g) for h, g in registered if isinstance(h, TypeHandler)
              and getattr(h.callback, "func", None) not in (
-                 group_intake.intake_gate, language_launch.after_update)]
+                 group_intake.intake_gate, language_launch.after_update,
+                 idle_gate.gate)]
     assert len(first) == 1
     handler, group = first[0]
     assert group == -1 and handler.type is Update
@@ -199,7 +202,8 @@ def test_the_close_runs_before_every_other_handler(mk_bot, run_async, monkeypatc
                if h is not handler
                and getattr(h.callback, "func", None) not in (
                    group_intake.intake_gate,
-                   chat_migration.handle_migrate_message))
+                   chat_migration.handle_migrate_message,
+                   idle_gate.gate))
 
 
 # ---- anything else the person does closes the card ---------------------------

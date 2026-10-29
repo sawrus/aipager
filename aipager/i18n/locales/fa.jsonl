@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 زبان: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager ری‌استارت شد"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · سشن بسته شد"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "کد ۶ رقمی برنامهٔ احراز هویت خود را بفرستید."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager قفل است"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 aipager پس از مدتی بدون فعالیت قفل شد. برای باز کردن قفل {command} را بفرستید."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ این کد قبلاً استفاده شده است. منتظر کد بعدی بمانید."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager قفل است. برای باز کردن قفل {command} را بفرستید."}
+{"k": "lock.throttled", "src": "67b40235", "v": "تعداد کدهای نادرست زیاد است. ۱۰ دقیقه دیگر دوباره تلاش کنید."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 قفل باز شد. با {command} سشن‌های خود را ببینید."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ کد نادرست است."}
 {"k": "log.agent", "src": "ff163576", "v": {"one": "- 🤖 {agent} ({clock}، {n} ابزار اجرا کرد)", "other": "- 🤖 {agent} ({clock}، {n} ابزار اجرا کرد)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## ایجنت‌ها"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## جواب نهایی"}

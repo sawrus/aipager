@@ -218,6 +218,14 @@ def _isolate_member_roots(tmp_path_factory, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _fresh_idle_lock(monkeypatch):
+    """A new idle lock per test: its state and settings cache live in the
+    instance (aipager.idle_lock.LOCK), so one test's lock never leaks."""
+    from aipager import idle_lock
+    monkeypatch.setattr(idle_lock, "LOCK", idle_lock.IdleLock())
+
+
+@pytest.fixture(autouse=True)
 def _isolate_home_paths(tmp_path, monkeypatch):
     """Redirect every module-level ``Path.home()`` write target to tmp.
 
@@ -258,6 +266,10 @@ def _isolate_home_paths(tmp_path, monkeypatch):
             claude / "aipager-pending-users.json",
         "aipager.team.TEAM_CONFIG_PATH": team_yaml,
         "aipager.policy.POLICY_D_DIR": cfg / "policy.d",
+        # The idle lock (aipager.idle_lock): its secret and its state.
+        "aipager.idle_lock.TOTP_PATH": cfg / "totp.env",
+        "aipager.idle_lock.LOCK_STATE_PATH":
+            home / ".local" / "state" / "aipager" / "lock.json",
         "aipager.config.SESSION_STATE_FILE": sessions_json,
         "aipager.state.SESSION_STATE_FILE": sessions_json,
         "aipager.status.SESSION_STATE_FILE": sessions_json,

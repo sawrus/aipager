@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Fork `sawrus/aipager`, based on 1.3.10 (the version stays 1.3.10: aipager's update checks read only plain releases).
+
+### Added
+- **Idle lock: a TOTP code after a quiet spell.** `aipager lock setup` makes a secret for an authenticator app, `aipager lock enable` turns the lock on. After 60 minutes (`--after-min`) without activity from a member, aipager deletes the messages it knows of, says `🔒 aipager is locked after a quiet spell. Send /start to unlock it.`, sends nothing from the sessions, takes no messages or taps, and the Mini App answers 423. `/start` and the 6-digit code in a private chat unlock it; five wrong codes in ten minutes pause the checks. See [idle lock](docs/idle-lock.md).
+
 ## [1.3.10] - 2026-10-25
 
 ### Fixed

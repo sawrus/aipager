@@ -335,8 +335,13 @@ def test_the_gate_runs_before_everything(mk_bot, run_async, monkeypatch):
     # takes nothing but that notice and never stops an update.
     from aipager.bot import chat_migration
     from telegram.ext import MessageHandler, filters
+    # And the idle lock's gate (group -4, fork), first of all.
+    from aipager.bot import idle_gate
+    locks = [(h, g) for h, g in registered
+             if getattr(h.callback, "func", None) is idle_gate.gate]
+    assert [g for _h, g in locks] == [-4]
     earlier = [(h, g) for h, g in registered
-               if h is not handler and g <= -2]
+               if h is not handler and g <= -2 and (h, g) not in locks]
     assert len(earlier) == 1
     mig, mig_group = earlier[0]
     assert mig_group == -3 and isinstance(mig, MessageHandler)

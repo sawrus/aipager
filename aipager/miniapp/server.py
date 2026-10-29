@@ -809,6 +809,18 @@ class MiniAppServer:
         else:
             scope_chat_id = self._default_chat(user_id, chats)
 
+        # The idle lock (aipager.idle_lock): a valid member is still refused
+        # while it is on; only a code in the private chat opens it. Only a
+        # write counts as activity: the page polls on its own, and an app
+        # left open must not keep aipager unlocked.
+        from aipager import idle_lock
+        idle_lock.LOCK.reload_if_changed()
+        if idle_lock.LOCK.is_locked():
+            log.info("miniapp: %s rejected (423) — aipager is locked", route_name)
+            return web.json_response({"error": "locked"}, status=423)
+        if getattr(request, "method", "GET") not in _READ_METHODS and idle_lock.LOCK.enabled:
+            idle_lock.LOCK.touch()
+
         log.debug("miniapp: %s authorized (scope_chat_id=%s)", route_name, scope_chat_id)
         try:
             request[_auth_user_key()] = user_id

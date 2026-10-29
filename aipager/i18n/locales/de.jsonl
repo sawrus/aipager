@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 Sprache: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager wurde neu gestartet"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · Sitzung beendet"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "Sende den 6-stelligen Code aus deiner Authenticator-App."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager ist gesperrt"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 aipager wurde nach einer Ruhephase gesperrt. Sende {command}, um es zu entsperren."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ Dieser Code wurde schon verwendet. Warte auf den nächsten."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager ist gesperrt. Sende {command}, um es zu entsperren."}
+{"k": "lock.throttled", "src": "67b40235", "v": "Zu viele falsche Codes. Versuche es in 10 Minuten erneut."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 Entsperrt. Mit {command} siehst du deine Sitzungen."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ Falscher Code."}
 {"k": "log.agent", "src": "ff163576", "v": {"one": "- 🤖 {agent} ({clock}, {n} Tool genutzt)", "other": "- 🤖 {agent} ({clock}, {n} Tools genutzt)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## Agenten"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## Endgültige Antwort"}

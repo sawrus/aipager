@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 اللغة: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · أُعيد تشغيل aipager"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · انتهت الجلسة"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "أرسل الرمز المكوّن من ٦ أرقام من تطبيق المصادقة."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager مقفل"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 قُفل aipager بعد فترة دون نشاط. أرسل {command} لفتحه."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ هذا الرمز مستخدم من قبل. انتظر الرمز التالي."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager مقفل. أرسل {command} لفتحه."}
+{"k": "lock.throttled", "src": "67b40235", "v": "رموز خاطئة كثيرة جدًا. حاول مرة أخرى بعد ١٠ دقائق."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 تم فتح القفل. استخدم {command} لرؤية جلساتك."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ رمز خاطئ."}
 {"k": "log.agent", "src": "ff163576", "v": {"few": "- 🤖 {agent} ({clock}، استخدم {n} أدوات)", "many": "- 🤖 {agent} ({clock}، استخدم {n} أداة)", "one": "- 🤖 {agent} ({clock}، استخدم أداة واحدة)", "other": "- 🤖 {agent} ({clock}، استخدم {n} أداة)", "two": "- 🤖 {agent} ({clock}، استخدم أداتين)", "zero": "- 🤖 {agent} ({clock}، لم يستخدم أي أداة)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## الوكلاء"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## الإجابة النهائية"}

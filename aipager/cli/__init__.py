@@ -14,6 +14,7 @@ Subcommands:
   session  open / manage a Claude Code session under dtach
   service  install / manage daemon as a systemd-user or launchd service
   miniapp  enable / disable / inspect the self-hosted Mini App dashboard
+  lock     the idle lock: a TOTP code after a quiet spell
 
 The ``_cmd_*`` functions in this file are thin dispatchers that
 delegate to feature modules (cli.daemon, cli.session, cli.resume) or
@@ -347,6 +348,9 @@ def main() -> None:
              "public URL is currently auto-detectable",
     )
 
+    from aipager.cli.lock import add_parser as _add_lock_parser
+    lock_p = _add_lock_parser(sub)
+
     args = parser.parse_args()
     if not args.cmd:
         parser.print_help()
@@ -377,6 +381,9 @@ def main() -> None:
         sys.exit(0)
     if args.cmd == "policy" and not getattr(args, "policy_cmd", None):
         policy_p.print_help()
+        sys.exit(0)
+    if args.cmd == "lock" and not getattr(args, "lock_cmd", None):
+        lock_p.print_help()
         sys.exit(0)
     if args.cmd == "miniapp" and not getattr(args, "miniapp_cmd", None):
         miniapp_p.print_help()

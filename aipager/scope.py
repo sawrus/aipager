@@ -47,6 +47,11 @@ _MINIAPP_DEFAULTS: dict = {"enabled": True, "port": 8765, "public_url": ""}
 # surgical read-modify-write, and this key must ALSO join dump_scopes()'s
 # preservation list below, or the next `aipager config` silently wipes it.
 _CLAUDE_PATH_KEY = "claude_path"
+# The idle lock (aipager.idle_lock): ``security: {idle_lock: {...}}``.
+_SECURITY_KEY = "security"
+_IDLE_LOCK_DEFAULTS: dict = {"enabled": False, "after_min": 60}
+# What the surgical writers below raise when there is no file to edit.
+_NO_CONFIG = "aipager.yaml is missing or unreadable - run `aipager config` first"
 
 # Roadmap 8.87: groups Telegram upgraded to a supergroup, ``{old id: new
 # id}``. Written by :func:`migrate_scope_chat_id` (the daemon follows the
@@ -377,9 +382,7 @@ def dump_miniapp(settings: dict, path: Path = CONFIG_PATH) -> None:
     """
     raw = _raw_yaml(path)
     if not raw:
-        raise ScopeConfigError(
-            "aipager.yaml is missing or unreadable - run `aipager config` first"
-        )
+        raise ScopeConfigError(_NO_CONFIG)
     raw[_MINIAPP_KEY] = {
         "enabled": settings.get("enabled", False) is True,
         "port": int(settings.get("port", _MINIAPP_DEFAULTS["port"])),
@@ -388,6 +391,41 @@ def dump_miniapp(settings: dict, path: Path = CONFIG_PATH) -> None:
     # Writing through this path also lands the current SCHEMA_VERSION, so a
     # v2 file becomes a v3 file the first time the Mini App is configured.
     raw["schema_version"] = SCHEMA_VERSION
+    _atomic_write_yaml(raw, path)
+
+
+def load_idle_lock(path: Path | None = None) -> dict:
+    """Return the idle lock block: ``{enabled: bool, after_min: int}``.
+
+    Absent, malformed or out-of-range values fall back to the default for
+    that field: **off**, 60 minutes. Only a real YAML boolean turns it on,
+    as for the Mini App. Never raises."""
+    block = _raw_yaml(path or CONFIG_PATH).get(_SECURITY_KEY)
+    block = block.get("idle_lock") if isinstance(block, dict) else None
+    out = dict(_IDLE_LOCK_DEFAULTS)
+    if not isinstance(block, dict):
+        return out
+    out["enabled"] = block.get("enabled", False) is True
+    after = block.get("after_min", out["after_min"])
+    if isinstance(after, int) and not isinstance(after, bool) and after >= 1:
+        out["after_min"] = after
+    return out
+
+
+def dump_idle_lock(settings: dict, path: Path | None = None) -> None:
+    """Persist only ``security.idle_lock``, keeping the rest of the
+    document (and any other ``security`` key) as it is."""
+    path = path or CONFIG_PATH
+    raw = _raw_yaml(path)
+    if not raw:
+        raise ScopeConfigError(_NO_CONFIG)
+    security = raw.get(_SECURITY_KEY)
+    security = dict(security) if isinstance(security, dict) else {}
+    security["idle_lock"] = {
+        "enabled": settings.get("enabled", False) is True,
+        "after_min": int(settings.get("after_min", _IDLE_LOCK_DEFAULTS["after_min"])),
+    }
+    raw[_SECURITY_KEY] = security
     _atomic_write_yaml(raw, path)
 
 
@@ -407,9 +445,7 @@ def dump_claude_path(value: str, path: Path = CONFIG_PATH) -> None:
     """
     raw = _raw_yaml(path)
     if not raw:
-        raise ScopeConfigError(
-            "aipager.yaml is missing or unreadable - run `aipager config` first"
-        )
+        raise ScopeConfigError(_NO_CONFIG)
     value = value.strip()
     if value:
         raw[_CLAUDE_PATH_KEY] = value
@@ -499,6 +535,8 @@ def dump_scopes(
     # And the record of groups Telegram upgraded (8.87): without it a
     # session named after a group's old id lands in the home chat again.
     existing_migrations = _raw_yaml(path).get(_CHAT_MIGRATIONS_KEY)
+    # And the idle lock: dropping it would switch the lock off silently.
+    existing_security = _raw_yaml(path).get(_SECURITY_KEY)
     data: dict = {
         "schema_version": SCHEMA_VERSION,
         "bot_token": bot_token,
@@ -540,6 +578,9 @@ def dump_scopes(
 
     if isinstance(existing_migrations, dict) and existing_migrations:
         data[_CHAT_MIGRATIONS_KEY] = existing_migrations
+
+    if isinstance(existing_security, dict) and existing_security:
+        data[_SECURITY_KEY] = existing_security
 
     _atomic_write_yaml(data, path)
 

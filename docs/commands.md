@@ -1176,6 +1176,8 @@ Run `aipager <command> --help` for the same list on your machine.
 | `aipager resume [name]` | Bring back an ended session with its conversation; without a name, a picker. It follows a moved conversation and handles a background job that holds it, as `aipager session --resume` does. |
 | `aipager miniapp enable [--port PORT] [--url URL]` | Turn the Mini App on, on `127.0.0.1:PORT` (default 8765), behind the managed tunnel or your own `https://` URL. Takes effect at the next daemon restart. |
 | `aipager miniapp disable\|status` | Turn it off (at the next restart), or show its settings and address. |
+| `aipager lock setup [--reset]` | Make the idle lock's TOTP secret and print its `otpauth://` URI once (fork, see [idle lock](idle-lock.md)). |
+| `aipager lock enable [--after-min N]\|disable\|now\|status` | Turn the idle lock on (default 60 minutes) or off, lock at the next tick, or show its state. No restart needed. |
 | `aipager policy validate` | Check `policy.yaml` (and `policy.d`); exits non-zero on a problem. |
 | `aipager update` | Upgrade aipager through the installer that owns it (uv, pipx, Homebrew, pip). It never restarts the daemon; restart it yourself, or use `/update` in Telegram, which can (see [Update](#update)). |
 | `aipager report [--note TEXT]` | Show a problem report and send it if you say yes (see [below](#command-line-aipager-report)). |

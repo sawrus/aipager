@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 Dil: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager yeniden başlatıldı"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · Oturum sona erdi"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "Kimlik doğrulama uygulamanızdaki 6 haneli kodu gönderin."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager kilitli"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 aipager bir süre işlem olmadığı için kilitlendi. Kilidi açmak için {command} gönderin."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ Bu kod zaten kullanıldı. Bir sonrakini bekleyin."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager kilitli. Kilidi açmak için {command} gönderin."}
+{"k": "lock.throttled", "src": "67b40235", "v": "Çok fazla yanlış kod. 10 dakika sonra yeniden deneyin."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 Kilit açıldı. Oturumlarınızı görmek için {command} kullanın."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ Yanlış kod."}
 {"k": "log.agent", "src": "ff163576", "v": {"one": "- 🤖 {agent} ({clock}, {n} araç)", "other": "- 🤖 {agent} ({clock}, {n} araç)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## Ajanlar"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## Son yanıt"}

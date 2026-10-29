@@ -337,7 +337,11 @@ def test_the_daemon_routes_both_service_messages_to_the_migration(
     bot = gbot()
     chat_migration.set_handler(None)
     handlers = _start_with_recorded_handlers(bot, run_async)
-    first = min(g for g, _h in handlers)
+    # The first group after the idle lock's gate (-4, fork), which lets a
+    # migration notice through even while locked (tests/test_idle_lock.py).
+    from aipager.bot import idle_gate
+    first = min(g for g, h in handlers
+                if getattr(h.callback, "func", None) is not idle_gate.gate)
     mig = [(g, h) for g, h in handlers if isinstance(h, MessageHandler)
            and h.check_update(update)]
     # Its own group, before the intake gate (-2): nothing can stop it, and

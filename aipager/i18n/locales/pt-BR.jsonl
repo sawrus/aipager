@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 Idioma: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · O aipager reiniciou"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · Sessão encerrada"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "Envie o código de 6 dígitos do seu app autenticador."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "O aipager está bloqueado"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 O aipager foi bloqueado após um período sem atividade. Envie {command} para desbloquear."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ Este código já foi usado. Aguarde o próximo."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 O aipager está bloqueado. Envie {command} para desbloquear."}
+{"k": "lock.throttled", "src": "67b40235", "v": "Códigos incorretos demais. Tente de novo em 10 minutos."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 Desbloqueado. Use {command} para ver suas sessões."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ Código incorreto."}
 {"k": "log.agent", "src": "ff163576", "v": {"many": "- 🤖 {agent} ({clock}, {n} ferramentas usadas)", "one": "- 🤖 {agent} ({clock}, {n} ferramenta usada)", "other": "- 🤖 {agent} ({clock}, {n} ferramentas usadas)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## Agentes"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## Resposta final"}

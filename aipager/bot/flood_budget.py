@@ -108,9 +108,9 @@ from pathlib import Path
 from telegram.error import ChatMigrated, RetryAfter
 from telegram.ext import BaseRateLimiter
 
-from aipager import flood_policy
+from aipager import flood_policy, idle_lock
 from aipager.bot import chat_migration
-from aipager.bot.flood import MUTE, FloodMuted
+from aipager.bot.flood import MUTE, FloodMuted, IdleLocked
 from aipager.config import (
     CARD_CADENCE_FLOOR_GROUP,
     CARD_CADENCE_FLOOR_PRIVATE,
@@ -1959,6 +1959,25 @@ class BudgetRateLimiter(BaseRateLimiter):
     # ── the BaseRateLimiter entry point ──────────────────────────────────
 
     async def process_request(
+        self, callback, args, kwargs, endpoint, data, rate_limit_args,
+    ):
+        """The idle lock's gate (:mod:`aipager.idle_lock`), then
+        :meth:`_paced_request`.
+
+        Here because every outbound Bot API call passes this method (see
+        :meth:`_paced_request`): while locked, a call that carries a chat
+        raises :class:`~aipager.bot.flood.IdleLocked` and is never made.
+        Each message a call returns is remembered for the wipe at the
+        next lock."""
+        chat_id = data.get("chat_id") if isinstance(data, dict) else None
+        if idle_lock.refuses(endpoint, chat_id):
+            raise IdleLocked(chat_id)
+        result = await self._paced_request(
+            callback, args, kwargs, endpoint, data, rate_limit_args)
+        idle_lock.record_result(result)
+        return result
+
+    async def _paced_request(
         self, callback, args, kwargs, endpoint, data, rate_limit_args,
     ):
         """Pace one Bot API call and return whatever *callback* returns.

@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 언어: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager 재시작됨"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · 세션 종료됨"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "인증 앱의 6자리 코드를 보내세요."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager가 잠겨 있습니다"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 한동안 활동이 없어 aipager가 잠겼습니다. 잠금을 해제하려면 {command}을(를) 보내세요."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ 이미 사용된 코드입니다. 다음 코드를 기다리세요."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager가 잠겨 있습니다. 잠금을 해제하려면 {command}을(를) 보내세요."}
+{"k": "lock.throttled", "src": "67b40235", "v": "잘못된 코드가 너무 많습니다. 10분 후에 다시 시도하세요."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 잠금이 해제되었습니다. {command}(으)로 세션을 확인하세요."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ 잘못된 코드입니다."}
 {"k": "log.agent", "src": "ff163576", "v": {"other": "- 🤖 {agent} ({clock}, 도구 {n}번 사용)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## 에이전트"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## 최종 답변"}

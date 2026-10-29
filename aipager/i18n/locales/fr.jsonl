@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 Langue : {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager a redémarré"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · Session terminée"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "Envoie le code à 6 chiffres de ton application d'authentification."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager est verrouillé"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 aipager s'est verrouillé après une période d'inactivité. Envoie {command} pour le déverrouiller."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ Ce code a déjà servi. Attends le suivant."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager est verrouillé. Envoie {command} pour le déverrouiller."}
+{"k": "lock.throttled", "src": "67b40235", "v": "Trop de codes incorrects. Réessaie dans 10 minutes."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 Déverrouillé. Utilise {command} pour voir tes sessions."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ Code incorrect."}
 {"k": "log.agent", "src": "ff163576", "v": {"many": "- 🤖 {agent} ({clock}, {n} outils utilisés)", "one": "- 🤖 {agent} ({clock}, {n} outil utilisé)", "other": "- 🤖 {agent} ({clock}, {n} outils utilisés)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## Agents"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## Réponse finale"}

@@ -4,6 +4,7 @@
 
 # aipager
 
+
 <h3>Claude is one more chat.</h3>
 
 Your [Claude Code](https://claude.com/claude-code) sessions in Telegram, next to your family, your friends and your team.<br>
@@ -28,6 +29,13 @@ They run on your own computer. You follow them, answer them and steer them from 
 <sub>You write in Telegram. aipager types it into Claude Code on your computer, and one card edits itself as the turn runs.</sub>
 
 </div>
+
+> **Fork `sawrus/aipager`.** Upstream aipager ([dev-aly3n/aipager](https://github.com/dev-aly3n/aipager)) plus an
+> idle lock: after a quiet spell the bot and the Mini App need a code from an authenticator app
+> ([idle lock](docs/idle-lock.md)). Install it as an editable tool
+> (`uv tool install --editable .`); aipager's own updater then leaves it alone, and upstream changes come in with
+> `git fetch upstream && git rebase upstream/main`.
+
 
 <br>
 

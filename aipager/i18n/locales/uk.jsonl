@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 Мова: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager перезапущено"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · Сесію завершено"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "Надішліть 6-значний код із застосунку-автентифікатора."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager заблоковано"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 aipager заблоковано після періоду без активності. Надішліть {command}, щоб розблокувати."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ Цей код уже використано. Дочекайтеся наступного."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager заблоковано. Надішліть {command}, щоб розблокувати."}
+{"k": "lock.throttled", "src": "67b40235", "v": "Забагато неправильних кодів. Спробуйте знову через 10 хвилин."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 Розблоковано. {command} покаже ваші сесії."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ Неправильний код."}
 {"k": "log.agent", "src": "ff163576", "v": {"few": "- 🤖 {agent} ({clock}, {n} інструменти)", "many": "- 🤖 {agent} ({clock}, {n} інструментів)", "one": "- 🤖 {agent} ({clock}, {n} інструмент)", "other": "- 🤖 {agent} ({clock}, {n} інструменти)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## Агенти"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## Підсумкова відповідь"}

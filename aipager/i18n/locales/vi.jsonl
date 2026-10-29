@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 Ngôn ngữ: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager đã khởi động lại"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · Phiên đã kết thúc"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "Gửi mã 6 chữ số từ ứng dụng xác thực của bạn."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager đang khóa"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 aipager đã khóa sau một thời gian không hoạt động. Gửi {command} để mở khóa."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ Mã này đã được dùng. Hãy chờ mã tiếp theo."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager đang khóa. Gửi {command} để mở khóa."}
+{"k": "lock.throttled", "src": "67b40235", "v": "Nhập sai mã quá nhiều lần. Hãy thử lại sau 10 phút."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 Đã mở khóa. Dùng {command} để xem các phiên của bạn."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ Mã sai."}
 {"k": "log.agent", "src": "ff163576", "v": {"other": "- 🤖 {agent} ({clock}, {n} công cụ đã chạy)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## Agent"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## Câu trả lời cuối cùng"}

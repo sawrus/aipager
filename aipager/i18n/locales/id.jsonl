@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 Bahasa: {language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager dimulai ulang"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · Sesi berakhir"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "Kirim kode 6 digit dari aplikasi autentikator Anda."}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager terkunci"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 aipager terkunci setelah tidak ada aktivitas. Kirim {command} untuk membukanya."}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ Kode ini sudah dipakai. Tunggu kode berikutnya."}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager terkunci. Kirim {command} untuk membukanya."}
+{"k": "lock.throttled", "src": "67b40235", "v": "Terlalu banyak kode salah. Coba lagi dalam 10 menit."}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 Terbuka. Gunakan {command} untuk melihat sesi Anda."}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ Kode salah."}
 {"k": "log.agent", "src": "ff163576", "v": {"other": "- 🤖 {agent} ({clock}, {n} alat)"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## Agen"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## Jawaban akhir"}

@@ -95,6 +95,16 @@ class FloodMuted(Exception):
         )
 
 
+class IdleLocked(FloodMuted):
+    """An outbound call was refused because the idle lock is on
+    (:mod:`aipager.idle_lock`). A :class:`FloodMuted`, so every caller
+    already treats it as "nothing sent, do not retry"; ``retry_after`` is
+    0 because no deadline lifts it, only a code does."""
+
+    def __init__(self, chat_id=None) -> None:
+        super().__init__(0, chat_id)
+
+
 def _key(chat_id):
     """Normalise a chat id for the registry: ``int`` when it parses as one.
 

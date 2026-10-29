@@ -352,6 +352,14 @@
 {"k": "lang.row", "src": "69fc399f", "v": "🌐 语言：{language}"}
 {"k": "life.daemon_restarted", "src": "7253e5d2", "v": "🔄 <b>{session}</b> · aipager 已重启"}
 {"k": "life.session_ended", "src": "84bf802a", "v": "🔴 <b>{session}</b> · 会话已结束"}
+{"k": "lock.ask_code", "src": "4cdc796c", "v": "请发送身份验证器应用中的 6 位验证码。"}
+{"k": "lock.callback_locked", "src": "a3f02266", "v": "aipager 已锁定"}
+{"k": "lock.locked", "src": "ca29530b", "v": "🔒 aipager 因一段时间无活动已锁定。发送 {command} 解锁。"}
+{"k": "lock.replayed_code", "src": "90cd6a9d", "v": "❌ 此验证码已使用过。请等待下一个。"}
+{"k": "lock.still_locked", "src": "109d4528", "v": "🔒 aipager 已锁定。发送 {command} 解锁。"}
+{"k": "lock.throttled", "src": "67b40235", "v": "错误的验证码太多。请 10 分钟后再试。"}
+{"k": "lock.unlocked", "src": "217dab5b", "v": "🔓 已解锁。使用 {command} 查看你的会话。"}
+{"k": "lock.wrong_code", "src": "25fa09af", "v": "❌ 验证码错误。"}
 {"k": "log.agent", "src": "ff163576", "v": {"other": "- 🤖 {agent}（{clock}，用了 {n} 次工具）"}}
 {"k": "log.agents", "src": "5db5246b", "v": "## 代理"}
 {"k": "log.final_answer", "src": "f0ea5fc3", "v": "## 最终回答"}

@@ -42,7 +42,7 @@ from aipager.bot import (
     card_owner, chat_migration, group_intake, new_flow, session_parity, update_flow,
 )
 from aipager.bot.flood import MUTE, FloodMuted, _key as _chat_key
-from aipager.bot import flood_state, language_launch
+from aipager.bot import flood_state, idle_gate, language_launch
 from aipager.bot.flood_budget import BudgetRateLimiter, clear_backoff_signal
 from aipager.bot.rich_message import set_rate_limiter
 from aipager.config import (
@@ -546,7 +546,13 @@ class LifecycleMixin:
         language_launch.ensure_marker(self)
 
         # Register handlers
-        # First of all (group -3, never stops the update): a group Telegram
+        # Before everything (group -4): the idle lock (aipager.idle_lock).
+        # Unlocked it only notes activity; locked it stops every update
+        # except the unlock dialogue in a member's private chat.
+        self._app.add_handler(
+            TypeHandler(Update, functools.partial(idle_gate.gate, self)),
+            group=-4)
+        # Then (group -3, never stops the update): a group Telegram
         # upgraded to a supergroup (roadmap 8.87). Its service message
         # arrives in the old chat (still a scope) and in the new one (not
         # one yet, so the message chat gate below would drop it); it has
@@ -665,6 +671,9 @@ class LifecycleMixin:
         from aipager.bot import bot_descriptions
         self._descriptions_task = asyncio.get_running_loop().create_task(
             bot_descriptions.run_at_start(self._app.bot))
+        # The idle lock's tick: locks after the quiet spell (idle_gate).
+        self._idle_lock_task = asyncio.get_running_loop().create_task(
+            idle_gate.run(self))
         # In the background: start() must never wait on a group's budget
         # (the hook receiver, recovery and the monitor start after it).
         if self.scopes and any(s.kind == "group" for s in self.scopes):
@@ -707,7 +716,7 @@ class LifecycleMixin:
         probe = getattr(self, "_group_probe_task", None)
         if probe is not None and not probe.done():
             probe.cancel()
-        for name in ("_language_offer_task", "_descriptions_task"):
+        for name in ("_language_offer_task", "_descriptions_task", "_idle_lock_task"):
             task = getattr(self, name, None)
             if task is not None and not task.done():
                 task.cancel()
