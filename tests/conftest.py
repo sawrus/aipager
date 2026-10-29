@@ -270,6 +270,7 @@ def _isolate_home_paths(tmp_path, monkeypatch):
         "aipager.idle_lock.TOTP_PATH": cfg / "totp.env",
         "aipager.idle_lock.LOCK_STATE_PATH":
             home / ".local" / "state" / "aipager" / "lock.json",
+        "aipager.cli.wrap.BASHRC_PATH": home / ".bashrc",
         "aipager.config.SESSION_STATE_FILE": sessions_json,
         "aipager.state.SESSION_STATE_FILE": sessions_json,
         "aipager.status.SESSION_STATE_FILE": sessions_json,
