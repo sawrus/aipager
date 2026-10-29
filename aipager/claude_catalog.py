@@ -24,6 +24,7 @@ the CLI; change it only together with every user):
 from __future__ import annotations
 
 import json
+import os
 import time
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -34,6 +35,9 @@ from aipager import claude_jobs
 
 #: How much of a transcript's head is read for the cwd and the title.
 HEAD_READ_BYTES = 64 * 1024
+#: How much of a transcript's tail is read for the latest title: Claude
+#: Code appends a new ``ai-title`` as the task changes.
+TAIL_READ_BYTES = 256 * 1024
 #: The longest title kept.
 TITLE_MAX = 80
 
@@ -57,8 +61,11 @@ class ForeignConversation:
     session_id: str
     #: The folder the conversation ran in ("" when the transcript does not say).
     cwd: str
-    #: A custom title or summary, else the first words of the first user
-    #: message; plain text, at most 80 characters ("" when none).
+    #: ``<folder> # <task>``: the folder's name and the conversation's
+    #: latest custom title, else Claude's own title, else its summary,
+    #: else the first words of the first user message; either part alone
+    #: when the other is unknown; plain text, at most 80 characters ("" when
+    #: none).
     title: str
     #: Unix time of the last record in the transcript.
     last_ts: float
@@ -66,6 +73,9 @@ class ForeignConversation:
     holder_pid: int | None = None
     #: That claude's registry status ("idle", "busy", "waiting", ...), else "".
     holder_status: str = ""
+    #: The latest custom title, else Claude's own title (``ai-title``), as
+    #: written; "" when none.
+    name: str = ""
 
 
 @dataclass
@@ -84,9 +94,9 @@ class AdoptOutcome:
 
 
 # Record types that carry a title, best first: a title the person chose,
-# a summary Claude wrote, the title Claude generated.
-_TITLE_KEYS = (("custom-title", "customTitle"), ("summary", "summary"),
-               ("ai-title", "aiTitle"))
+# the short task title Claude keeps current, a summary Claude wrote.
+_TITLE_KEYS = (("custom-title", "customTitle"), ("ai-title", "aiTitle"),
+               ("summary", "summary"))
 # A "user" record that opens with one of these is Claude Code's own text.
 _WRAPPERS = ("<command-", "<local-command", "<system-reminder", "<bash-",
              "Caveat:", "[Request interrupted")
@@ -102,12 +112,9 @@ def _tracked_ids() -> set[str]:
             if isinstance(sd, dict) and isinstance(sd.get("claude_session_id"), str)}
 
 
-def _head_records(path: Path) -> Iterator[dict]:
-    """The JSON records among the lines of the first
-    :data:`HEAD_READ_BYTES` of *path* (a line cut by the limit is not JSON
+def _records(data: bytes) -> Iterator[dict]:
+    """The JSON records among the lines of *data* (a cut line is not JSON
     and is skipped)."""
-    with open(path, "rb") as f:
-        data = f.read(HEAD_READ_BYTES)
     for line in data.split(b"\n"):
         try:
             record = json.loads(line)
@@ -140,24 +147,54 @@ def _clip(text: str) -> str:
     return text if len(text) <= TITLE_MAX else text[:TITLE_MAX - 1] + "\u2026"
 
 
-def _head_facts(path: Path) -> tuple[str, str]:
-    """``(cwd, title)`` from the head of the transcript at *path*."""
-    cwd = ""
-    titles: dict[str, str] = {}
-    first_user = ""
-    for record in _head_records(path):
-        if not cwd and isinstance(record.get("cwd"), str):
-            cwd = record["cwd"]
+def _note_titles(records: Iterator[dict], titles: dict[str, str]) -> None:
+    for record in records:
         for kind, key in _TITLE_KEYS:
             value = record.get(key)
             if record.get("type") == kind and isinstance(value, str) and value.strip():
                 titles[kind] = value        # the last one wins
+
+
+def _facts(path: Path) -> tuple[str, str, str, bool]:
+    """``(cwd, title, name, scripted)`` of the transcript at *path*: the
+    cwd and the first user message from its head, titles from its head and
+    its tail (the tail's are later, so they win). *scripted* says it is a
+    ``claude -p`` run (an ``sdk-*`` entrypoint, a queue record first and
+    no entrypoint, or a head with no whole record: a prompt that large is
+    a script's), not a conversation a person had."""
+    with open(path, "rb") as f:
+        head = f.read(HEAD_READ_BYTES)
+        size = f.seek(0, 2)
+        tail = b""
+        if size > HEAD_READ_BYTES:
+            f.seek(max(HEAD_READ_BYTES, size - TAIL_READ_BYTES))
+            tail = f.read(TAIL_READ_BYTES)
+    cwd = ""
+    first_user = ""
+    head_records = list(_records(head))
+    entrypoints = {r["entrypoint"] for r in head_records
+                   if isinstance(r.get("entrypoint"), str)}
+    first_type = head_records[0].get("type") if head_records else None
+    scripted = (not head_records        # one record larger than the head
+                or any(e.startswith("sdk") for e in entrypoints)
+                or (not entrypoints and first_type == "queue-operation"))
+    for record in head_records:
+        if not cwd and isinstance(record.get("cwd"), str):
+            cwd = record["cwd"]
         if not first_user:
             first_user = _user_text(record)
-    for kind, _key in _TITLE_KEYS:
-        if kind in titles:
-            return cwd, _clip(titles[kind])
-    return cwd, _clip(first_user)
+    titles: dict[str, str] = {}
+    _note_titles(iter(head_records), titles)
+    _note_titles(_records(tail), titles)
+    name = " ".join((titles.get("custom-title") or titles.get("ai-title") or "").split())
+    task = next((titles[k] for k, _ in _TITLE_KEYS if k in titles), first_user)
+    task = " ".join(task.split())
+    folder = os.path.basename(cwd.rstrip("/"))
+    if folder and task and not task.startswith(f"{folder} #"):
+        title = f"{folder} # {task}"
+    else:                               # a name already in this form stays
+        title = task or folder
+    return cwd, _clip(title), name, scripted
 
 
 def _last_ts(path: Path, mtime: float) -> float:
@@ -174,7 +211,8 @@ def _last_ts(path: Path, mtime: float) -> float:
 
 def list_foreign(days: int = 14, limit: int = 200) -> list[ForeignConversation]:
     """Conversations with activity in the last *days* days that aipager
-    does not track, newest first, at most *limit*."""
+    does not track, newest first, at most *limit*; ``claude -p`` runs are
+    left out."""
     found: list[tuple[float, Path]] = []
     cutoff = time.time() - days * 86400
     try:
@@ -199,15 +237,17 @@ def list_foreign(days: int = 14, limit: int = 200) -> list[ForeignConversation]:
         if path.stem in tracked or claude_jobs.transcript_continued_in(path):
             continue
         try:
-            cwd, title = _head_facts(path)
+            cwd, title, name, scripted = _facts(path)
         except OSError:
+            continue
+        if scripted:
             continue
         held = holder(path.stem)
         out.append(ForeignConversation(
             session_id=path.stem, cwd=cwd, title=title,
             last_ts=_last_ts(path, mtime),
             holder_pid=held["pid"] if held else None,
-            holder_status=held["status"] if held else ""))
+            holder_status=held["status"] if held else "", name=name))
     out.sort(key=lambda c: c.last_ts, reverse=True)
     return out
 

@@ -2550,8 +2550,12 @@ class SessionOpsMixin:
 
         cwd = _transcript_cwd(transcript)
         name = h.get("name") if h else ""
-        base = (name if isinstance(name, str) else "") or os.path.basename(
-            cwd.rstrip("/"))
+        if not (isinstance(name, str) and name):
+            try:
+                name = claude_catalog._facts(Path(transcript))[2]
+            except OSError:
+                name = ""
+        base = name or os.path.basename(cwd.rstrip("/"))
         kind = "group" if chat_id < 0 else "dm"
         chat_sessions = self.registry.all_sessions(chat_id)
         used = {s.label for s in chat_sessions.values()}

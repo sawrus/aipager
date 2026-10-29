@@ -8,13 +8,16 @@ terminal is out of its reach. This fork closes the gap two ways.
 
 `/resume` shows **🔎 Other Claude sessions** to the chat's owner and admins.
 It lists the Claude Code conversations with activity in the last 14 days that
-aipager does not track, newest first, ten per page: the title (the one you
-gave it, Claude's summary or title, else the first words you typed), the
-folder, how long ago, and whether a terminal still has it open (waiting, or
+aipager does not track, newest first, ten per page: the title as
+`<folder> # <task>` (the task is the name you gave it, else the short title
+Claude keeps current as the work goes on, else Claude's summary, else the
+first words you typed; `claude -p` runs, such as scripted code reviews,
+are not listed), the folder, how long ago, and whether a terminal still has it open (waiting, or
 working right now). Tap one and aipager continues it under `dtach` with
 `claude --resume <id>` in its folder; questions, answers and permission
-prompts come to Telegram from then on. The session is named after the folder
-(`my_proj`, then `my_proj_2`, ...).
+prompts come to Telegram from then on. The session is named after the task
+(`fix_login_bug`), else after the folder (`my_proj`), then `_2`, `_3`, ...
+when the name is taken.
 
 `aipager resume --claude` is the same list in the terminal (`n`, `p`, `q`,
 or a number).

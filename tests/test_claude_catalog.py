@@ -52,14 +52,14 @@ def _registry(cfg: Path, pid: int, **fields) -> None:
 def test_first_user_message_gives_cwd_and_title(config):
     _write(config, SID, [_user("  fix   the\n  login bug  ")])
     [conv] = claude_catalog.list_foreign()
-    assert (conv.session_id, conv.cwd, conv.title) == (SID, "/work/proj", "fix the login bug")
+    assert (conv.session_id, conv.cwd, conv.title) == (SID, "/work/proj", "proj # fix the login bug")
     assert conv.holder_pid is None and conv.holder_status == ""
 
 
 def test_title_is_cut_to_80_chars(config):
     _write(config, SID, [_user("word " * 40)])
     [conv] = claude_catalog.list_foreign()
-    assert len(conv.title) == claude_catalog.TITLE_MAX
+    assert len(conv.title) == claude_catalog.TITLE_MAX and conv.title.startswith("proj # ")
 
 
 def test_custom_title_beats_summary_and_user_text(config):
@@ -69,12 +69,22 @@ def test_custom_title_beats_summary_and_user_text(config):
         {"type": "summary", "summary": "a summary"},
         {"type": "custom-title", "customTitle": "my title"},
     ])
-    assert claude_catalog.list_foreign()[0].title == "my title"
+    [conv] = claude_catalog.list_foreign()
+    assert (conv.title, conv.name) == ("proj # my title", "my title")
+
+
+def test_ai_title_beats_summary_and_names_the_conversation(config):
+    _write(config, SID, [_user("hello there"), {"type": "summary", "summary": "a summary"},
+                         {"type": "ai-title", "aiTitle": "first-name"},
+                         {"type": "ai-title", "aiTitle": "fix-login-bug"}])
+    [conv] = claude_catalog.list_foreign()
+    assert (conv.title, conv.name) == ("proj # fix-login-bug", "fix-login-bug")
 
 
 def test_summary_beats_user_text(config):
     _write(config, SID, [_user("hello there"), {"type": "summary", "summary": "a summary"}])
-    assert claude_catalog.list_foreign()[0].title == "a summary"
+    [conv] = claude_catalog.list_foreign()
+    assert (conv.title, conv.name) == ("proj # a summary", "")
 
 
 def test_tool_results_meta_and_wrappers_are_skipped(config):
@@ -87,7 +97,7 @@ def test_tool_results_meta_and_wrappers_are_skipped(config):
         {"type": "user", "cwd": "/work/proj", "message": {"content": [
             {"type": "text", "text": "real question"}]}},
     ])
-    assert claude_catalog.list_foreign()[0].title == "real question"
+    assert claude_catalog.list_foreign()[0].title == "proj # real question"
 
 
 def test_cwd_comes_from_first_record_that_has_one(config):
@@ -98,7 +108,41 @@ def test_cwd_comes_from_first_record_that_has_one(config):
 def test_no_cwd_and_no_title_read_as_empty(config):
     _write(config, SID, [{"type": "mode"}])
     [conv] = claude_catalog.list_foreign()
-    assert (conv.cwd, conv.title) == ("", "")
+    assert (conv.cwd, conv.title, conv.name) == ("", "", "")
+
+
+@pytest.mark.parametrize("records", [
+    [{"type": "queue-operation"}, _user("review this", entrypoint="sdk-cli")],
+    [{"type": "mode", "entrypoint": "sdk-py"}, _user("review this")],
+    [{"type": "queue-operation"}, _user("review this")],
+    [{"type": "queue-operation", "pad": "x" * claude_catalog.HEAD_READ_BYTES},
+     _user("review this")],
+])
+def test_scripted_runs_are_left_out(config, records):
+    _write(config, SID, records)
+    _write(config, _sid(3), [_user("talk", entrypoint="cli")])
+    assert [c.session_id for c in claude_catalog.list_foreign()] == [_sid(3)]
+
+
+def test_a_queued_conversation_from_a_person_is_kept(config):
+    _write(config, SID, [{"type": "queue-operation"},
+                         _user("hi", entrypoint="claude-desktop")])
+    assert [c.session_id for c in claude_catalog.list_foreign()] == [SID]
+
+
+def test_a_name_already_in_the_form_is_not_prefixed_again(config):
+    _write(config, SID, [_user("hi"), {"type": "custom-title", "customTitle": "proj # login"}])
+    assert claude_catalog.list_foreign()[0].title == "proj # login"
+
+
+def test_folder_alone_when_no_task(config):
+    _write(config, SID, [{"type": "mode", "cwd": "/work/app/"}])
+    assert claude_catalog.list_foreign()[0].title == "app"
+
+
+def test_task_alone_when_no_folder(config):
+    _write(config, SID, [{"type": "user", "message": {"content": "just this"}}])
+    assert claude_catalog.list_foreign()[0].title == "just this"
 
 
 def test_last_ts_is_last_record_timestamp_else_mtime(config):
@@ -114,8 +158,16 @@ def test_last_ts_is_last_record_timestamp_else_mtime(config):
 def test_head_read_is_bounded(config):
     big = "x" * (claude_catalog.HEAD_READ_BYTES + 10)
     _write(config, SID, [_user("first"), {"type": "custom-title", "customTitle": big},
-                         {"type": "custom-title", "customTitle": "late"}])
-    assert claude_catalog.list_foreign()[0].title == "first"
+                         {"type": "mode", "pad": "y" * claude_catalog.TAIL_READ_BYTES}])
+    assert claude_catalog.list_foreign()[0].title == "proj # first"
+
+
+def test_latest_title_is_read_from_the_tail(config):
+    pad = "y" * claude_catalog.HEAD_READ_BYTES
+    _write(config, SID, [_user("first"), {"type": "ai-title", "aiTitle": "early"},
+                         {"type": "mode", "pad": pad}, {"type": "mode", "pad": pad},
+                         {"type": "ai-title", "aiTitle": "late-task"}])
+    assert claude_catalog.list_foreign()[0].title == "proj # late-task"
 
 
 def test_subagent_transcripts_are_skipped(config):
@@ -173,14 +225,14 @@ def test_invalid_stem_is_skipped(config):
 def test_unreadable_file_is_skipped(config, monkeypatch):
     _write(config, SID, [_user("broken")])
     _write(config, _sid(7), [_user("fine")])
-    real = claude_catalog._head_records
+    real = claude_catalog._facts
 
     def boom(path):
         if path.stem == SID:
             raise PermissionError("denied")
         return real(path)
 
-    monkeypatch.setattr(claude_catalog, "_head_records", boom)
+    monkeypatch.setattr(claude_catalog, "_facts", boom)
     assert [c.session_id for c in claude_catalog.list_foreign()] == [_sid(7)]
 
 

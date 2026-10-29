@@ -245,6 +245,15 @@ def test_label_from_the_folder_is_normalised(mk_bot, run_async, transcript, seam
     assert sess.scope_chat_id == OWNER
 
 
+def test_label_from_claudes_task_title_without_a_holder(mk_bot, run_async,
+                                                       transcript, seams):
+    with transcript.open("a") as f:
+        f.write(json.dumps({"type": "ai-title", "aiTitle": "Fix-Login-Bug"}) + "\n")
+    bot = _bot(mk_bot)
+    out = _adopt(bot, run_async)
+    assert out.label == "fix_login_bug"
+
+
 def test_label_prefers_the_holders_name(mk_bot, run_async, transcript, seams):
     bot = _bot(mk_bot)
     h = {"pid": 4242, "status": "idle", "name": "Fix-Login.Bug"}
