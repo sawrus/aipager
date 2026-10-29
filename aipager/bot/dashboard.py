@@ -14,6 +14,7 @@ import html as html_mod
 import itertools
 import json
 import logging
+import os
 import re
 import time
 from dataclasses import dataclass
@@ -29,7 +30,7 @@ from telegram.error import (
 )
 
 
-from aipager import i18n
+from aipager import claude_catalog, i18n
 from aipager.bot import kbwords, miniapp_link
 from aipager.bot.mode_labels import shown_label
 from aipager.i18n import Msg, Plural, Safe, Span
@@ -284,6 +285,76 @@ RESUME_ROW = Msg("resume.row", "🔘 <b>{session}</b> (<i>{when}</i>)",
 RESUME_NO_PREVIEW = Msg("resume.no_preview", "<i>(no preview)</i>",
                         note="/resume: nothing to show from the session's last answer")
 RESUME_TAP = Msg("resume.tap", "Tap a button below to resume.", note="/resume")
+
+# ---- /resume → Other Claude sessions (fork): Claude Code conversations
+# started without aipager (aipager.claude_catalog), owner and admin only.
+RESUME_FOREIGN_BTN = Msg("btn.resume.foreign", "🔎 Other Claude sessions",
+                         note="/resume: opens the Claude Code conversations started "
+                              "without aipager, in a terminal")
+RESUME_FOREIGN_PICK = Msg("btn.resume.foreign_pick", "{title} ({ago})",
+                          note="Other Claude sessions: one conversation (its title or "
+                               "folder) and its last activity",
+                          eg={"title": "fix the login bug", "ago": "2h ago"})
+RESUME_FOREIGN_BACK = Msg("btn.resume.foreign_back", "« Back",
+                          note="Other Claude sessions: back to the /resume list")
+RESUME_FOREIGN_TAKE_OVER = Msg("btn.resume.take_over", "Take over",
+                               note="Other Claude sessions: close the terminal Claude and "
+                                    "continue the conversation here")
+RESUME_FOREIGN_CANCEL = Msg("btn.resume.take_over_cancel", "Cancel",
+                            note="Other Claude sessions: do not take the conversation over")
+RESUME_FOREIGN_TITLE = Plural("resume.foreign.title",
+                              one="🔎 <b>Other Claude Code conversations</b> ({n} total)",
+                              other="🔎 <b>Other Claude Code conversations</b> ({n} total)",
+                              note="Other Claude sessions: the list's title; conversations "
+                                   "from the last two weeks that aipager does not run")
+RESUME_FOREIGN_NONE = Msg("resume.foreign.none",
+                          "📭 No other Claude Code conversations in the last two weeks.",
+                          note="Other Claude sessions: nothing to list")
+RESUME_FOREIGN_ROW = Msg("resume.foreign.row", "🔘 <b>{title}</b> (<i>{when}</i>)",
+                         note="Other Claude sessions: one conversation and its last activity",
+                         eg={"title": "fix the login bug", "when": "2h ago"})
+RESUME_FOREIGN_FOLDER = Msg("resume.foreign.folder", "📁 {folder}",
+                            note="Other Claude sessions: the folder a conversation ran "
+                                 "in, as it is", eg={"folder": "~/work/app"})
+RESUME_FOREIGN_WAITING = Msg("resume.foreign.waiting", "🖥 Open in a terminal and waiting.",
+                             note="Other Claude sessions: a terminal Claude holds it and "
+                                  "waits for input")
+RESUME_FOREIGN_WORKING = Msg("resume.foreign.working", "⚙️ Working in a terminal right now.",
+                             note="Other Claude sessions: a terminal Claude holds it and works")
+RESUME_FOREIGN_TAP = Msg("resume.foreign.tap", "Tap one to continue it here.",
+                         note="Other Claude sessions: under the list")
+RESUME_FOREIGN_TAKEOVER = Msg("resume.foreign.takeover",
+                              "🖥 <b>{title}</b> is open in a terminal: close it there and "
+                              "continue here?",
+                              note="Other Claude sessions: asks before the terminal Claude "
+                                   "is closed", eg={"title": "fix the login bug"})
+RESUME_FOREIGN_BUSY = Msg("resume.foreign.busy",
+                          "⚙️ <b>{title}</b> is working in the terminal right now, so try "
+                          "again when it waits.",
+                          note="Other Claude sessions: nothing was done",
+                          eg={"title": "fix the login bug"})
+RESUME_FOREIGN_TAKEOVER_FAILED = Msg("resume.foreign.takeover_failed",
+                                     "❌ The terminal Claude did not close, so nothing changed.",
+                                     note="Other Claude sessions: the take-over failed")
+RESUME_FOREIGN_FORBIDDEN = Msg("resume.foreign.forbidden",
+                               "🔒 Only the chat's owner or an admin can continue these "
+                               "conversations.",
+                               note="Other Claude sessions: the tapper's role may not")
+RESUME_FOREIGN_NOT_FOUND = Msg("resume.foreign.not_found",
+                               "❓ That conversation is no longer there.",
+                               note="Other Claude sessions: its transcript is gone")
+RESUME_FOREIGN_LAUNCH_FAILED = Msg("resume.foreign.launch_failed",
+                                   "❌ Couldn't continue <b>{title}</b>: {error}",
+                                   note="Other Claude sessions: the start failed; the error "
+                                        "is technical text, as it is",
+                                   eg={"title": "fix the login bug",
+                                       "error": "dtach exited"})
+RESUME_FOREIGN_STALE = Msg("toast.resume_foreign_stale",
+                           "This list is out of date, so here it is again.",
+                           note="Pop-up: a tap on an old Other Claude sessions list")
+RESUME_FOREIGN_DENIED = Msg("toast.resume_foreign_denied",
+                            "Only the chat's owner or an admin can do that.",
+                            note="Pop-up: Other Claude sessions, tapped by another member")
 DASH_STATES = {
     "idle": Msg("resume.state.idle", "idle", note="Session state on the resume card"),
     "busy": Msg("resume.state.busy", "busy", note="Session state on the resume card"),
@@ -336,6 +407,38 @@ def _ago_text(tr, seconds: int) -> str:
     if seconds < 86400:
         return tr.n(AGO_HOURS, seconds // 3600, kind="text")
     return tr.n(AGO_DAYS, seconds // 86400, kind="text")
+
+
+#: Characters of a conversation's title on its Other Claude sessions button.
+_FOREIGN_BUTTON_CHARS = 24
+#: Characters of a folder shown under a conversation in that list.
+_FOREIGN_FOLDER_CHARS = 60
+
+
+def _trim(text: str, limit: int) -> str:
+    return text if len(text) <= limit else text[:limit - 1].rstrip() + "…"
+
+
+def _tilde(path: str) -> str:
+    """*path* with the home folder shown as ``~``."""
+    home = os.path.expanduser("~").rstrip("/")
+    if home and (path == home or path.startswith(home + "/")):
+        return "~" + path[len(home):]
+    return path
+
+
+def foreign_name(conv) -> str:
+    """What a conversation started without aipager is called in lists:
+    its title, else its folder's name, else the start of its id."""
+    return (conv.title or os.path.basename((conv.cwd or "").rstrip("/"))
+            or conv.session_id[:8])
+
+
+def _foreign_holder_msg(conv) -> Msg | None:
+    """The marker for a terminal Claude holding *conv*, or None."""
+    if conv.holder_pid is None and not conv.holder_status:
+        return None
+    return RESUME_FOREIGN_WORKING if conv.holder_status == "busy" else RESUME_FOREIGN_WAITING
 
 
 def _close_isolates(text: str) -> str:
@@ -1801,6 +1904,7 @@ class DashboardMixin:
 
     def _render_resume_picker(
         self, page: int = 0, scope_chat_id: int | None = None, *, tr=None,
+        foreign: bool = False,
     ) -> tuple[str, InlineKeyboardMarkup | None]:
         """Render the paginated /resume picker. Returns (text, keyboard or None).
 
@@ -1808,6 +1912,10 @@ class DashboardMixin:
         language; when None, that chat's, or with no scope the one chat
         `_pinned_chats` names when it names exactly one, else the default
         language. Never reads CHAT_ID itself (the chat-routing guard).
+
+        ``foreign``: add the "Other Claude sessions" button (the caller
+        decides: the chat's owner or an admin), also when there is nothing
+        of aipager's own to resume.
         """
         if tr is None:
             chat = scope_chat_id
@@ -1823,11 +1931,13 @@ class DashboardMixin:
         # below keeps the omission honest.
         gone = [s for s in all_gone if s.claude_session_id]
         hidden = len(all_gone) - len(gone)
+        foreign_row = [InlineKeyboardButton(
+            tr.text(RESUME_FOREIGN_BTN), callback_data="_:rcp:0")]
         if not gone:
             text = tr.html(RESUME_NONE)
             if hidden:
                 text += "\n\n" + tr.n(RESUME_NO_TRANSCRIPT, hidden)
-            return text, None
+            return text, (InlineKeyboardMarkup([foreign_row]) if foreign else None)
 
         page_size = self._RESUME_PAGE_SIZE
         total_pages = (len(gone) + page_size - 1) // page_size
@@ -1860,6 +1970,8 @@ class DashboardMixin:
                     tr.text(RESUME_NEXT), callback_data=f"_:resume_page:{page + 1}",
                 ))
             rows.append(nav)
+        if foreign:
+            rows.append(foreign_row)
 
         # Build the message body with per-row previews so the user
         # can pick by content (not just name/timestamp). Cached
@@ -1888,3 +2000,127 @@ class DashboardMixin:
             lines.append(tr.n(RESUME_MORE_NO_TRANSCRIPT, hidden))
         text = "\n\n".join(lines)
         return text, InlineKeyboardMarkup(rows)
+
+    # ---- /resume → Other Claude sessions (fork) --------------------------
+
+    _FOREIGN_PAGE_SIZE = 10
+    #: How long a chat's last listing maps a button's short id back.
+    _FOREIGN_TTL = 600.0
+    #: How far back the listing looks.
+    _FOREIGN_DAYS = 14
+
+    def _foreign_cache(self) -> dict:
+        """chat id → ``(monotonic time, [ForeignConversation])``: each
+        chat's last listing, which the buttons' 8-character ids refer to."""
+        cache = self.__dict__.get("_foreign_listings")
+        if cache is None:
+            cache = self.__dict__["_foreign_listings"] = {}
+        return cache
+
+    def _foreign_listing(self, chat_id: int | None, *,
+                         refresh: bool = False) -> list:
+        """The chat's listing: a fresh one when *refresh*, or when the last
+        one is missing or older than :attr:`_FOREIGN_TTL`."""
+        cache = self._foreign_cache()
+        key = chat_id or 0
+        now = time.monotonic()
+        hit = cache.get(key)
+        if refresh or hit is None or now - hit[0] > self._FOREIGN_TTL:
+            items = list(claude_catalog.list_foreign(days=self._FOREIGN_DAYS))
+            cache[key] = (now, items)
+            return items
+        return list(hit[1])
+
+    def _foreign_lookup(self, chat_id: int | None, short_id: str):
+        """The conversation a button's *short_id* names in the chat's last
+        listing, or None (no listing, too old, unknown or ambiguous)."""
+        hit = self._foreign_cache().get(chat_id or 0)
+        if not short_id or hit is None or time.monotonic() - hit[0] > self._FOREIGN_TTL:
+            return None
+        found = [c for c in hit[1] if c.session_id.startswith(short_id)]
+        return found[0] if len(found) == 1 else None
+
+    def _render_foreign_picker(
+        self, chat_id: int | None, page: int = 0, *, tr=None, refresh: bool = False,
+    ) -> tuple[str, InlineKeyboardMarkup]:
+        """The Other Claude sessions list: Claude Code conversations of the
+        last two weeks that aipager does not run, a page of ten."""
+        tr = tr or i18n.for_chat(chat_id)
+        items = self._foreign_listing(chat_id, refresh=refresh)
+        back = [InlineKeyboardButton(tr.text(RESUME_FOREIGN_BACK),
+                                     callback_data="_:resume_page:0")]
+        if not items:
+            return tr.html(RESUME_FOREIGN_NONE), InlineKeyboardMarkup([back])
+        size = self._FOREIGN_PAGE_SIZE
+        total_pages = (len(items) + size - 1) // size
+        page = max(0, min(page, total_pages - 1))
+        chunk = items[page * size:(page + 1) * size]
+        rows: list[list[InlineKeyboardButton]] = []
+        lines = [tr.n(RESUME_FOREIGN_TITLE, len(items))]
+        for conv in chunk:
+            name = foreign_name(conv)
+            ago = self._fmt_gone_ago(conv.last_ts, tr)
+            rows.append([InlineKeyboardButton(
+                tr.text(RESUME_FOREIGN_PICK, title=_trim(name, _FOREIGN_BUTTON_CHARS),
+                        ago=Safe(ago)),
+                callback_data=f"_:rc:{conv.session_id[:8]}")])
+            line = tr.html(RESUME_FOREIGN_ROW, title=name,
+                           when=Safe(html_mod.escape(ago)))
+            if conv.cwd:
+                # A path, as it is.
+                folder = _trim(_tilde(conv.cwd), _FOREIGN_FOLDER_CHARS)
+                line += "\n" + tr.html(RESUME_FOREIGN_FOLDER, folder=Span(
+                    f"<code>{html_mod.escape(folder)}</code>"))
+            marker = _foreign_holder_msg(conv)
+            if marker is not None:
+                line += "\n" + tr.html(marker)
+            lines.append(line)
+        if total_pages > 1:
+            nav: list[InlineKeyboardButton] = []
+            if page > 0:
+                nav.append(InlineKeyboardButton(
+                    tr.text(RESUME_PREV), callback_data=f"_:rcp:{page - 1}"))
+            nav.append(InlineKeyboardButton(
+                tr.text(RESUME_PAGE, pages=Safe(tr.num(f"{page + 1}/{total_pages}"))),
+                callback_data="_:resume_noop"))
+            if page < total_pages - 1:
+                nav.append(InlineKeyboardButton(
+                    tr.text(RESUME_NEXT), callback_data=f"_:rcp:{page + 1}"))
+            rows.append(nav)
+        rows.append(back)
+        lines.append(tr.html(RESUME_FOREIGN_TAP))
+        return "\n\n".join(lines), InlineKeyboardMarkup(rows)
+
+    def _render_adopt_outcome(
+        self, conv, outcome, chat_id: int | None, *, tr=None,
+    ) -> tuple[str, InlineKeyboardMarkup | None]:
+        """What a tap on a conversation (or on Take over) shows, by
+        ``outcome.reason`` (``claude_catalog.ADOPT_REASONS``)."""
+        from aipager.bot.session_ops import RESUMED  # local: import cycle
+        tr = tr or i18n.for_chat(chat_id)
+        title = foreign_name(conv)
+        reason = outcome.reason
+        if reason == "ok":
+            text = tr.html(RESUMED, session=outcome.label)
+            sess = self.registry.find_by_label(outcome.label, chat_id)
+            if sess is not None:
+                text = f"{text}\n\n{self._build_session_dashboard(sess)}"
+            return text, None
+        if reason == "needs_takeover":
+            short = conv.session_id[:8]
+            return tr.html(RESUME_FOREIGN_TAKEOVER, title=title), InlineKeyboardMarkup([[
+                InlineKeyboardButton(tr.text(RESUME_FOREIGN_TAKE_OVER),
+                                     callback_data=f"_:rcy:{short}"),
+                InlineKeyboardButton(tr.text(RESUME_FOREIGN_CANCEL), callback_data="_:rcn"),
+            ]])
+        if reason == "terminal_busy":
+            return tr.html(RESUME_FOREIGN_BUSY, title=title), None
+        if reason == "takeover_failed":
+            return tr.html(RESUME_FOREIGN_TAKEOVER_FAILED), None
+        if reason == "forbidden":
+            return tr.html(RESUME_FOREIGN_FORBIDDEN), None
+        if reason == "not_found":
+            return tr.html(RESUME_FOREIGN_NOT_FOUND), None
+        # launch_failed, and a reason this build does not know.
+        return tr.html(RESUME_FOREIGN_LAUNCH_FAILED, title=title,
+                       error=outcome.err or reason), None

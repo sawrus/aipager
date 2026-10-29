@@ -339,9 +339,9 @@ _LOOKING_COMMANDS = frozenset({"new", "status", "start", "help", "whoami",
 
 #: Buttons that only look: the card's own, /settings (its New sessions
 #: page is this card's own defaults; per-session preferences), and paging
-#: through the resume list.
+#: through the resume list (and its Other Claude sessions list).
 _LOOKING_BUTTONS = ("_:nw:", "_:set:", "_:spref", "_:resume_page:", "_:resume_noop",
-                    "_:st:")
+                    "_:st:", "_:rcp:")
 
 
 def _bot_username(bot: TelegramBot) -> str:

@@ -57,6 +57,8 @@ BARE_HOME_USERS = {
     "install_source.py": (1, "builds PATH entries"),
     "service.py": (2, "fills the home folder into the service unit"),
     "safety.py": (3, "expands ~ in the protected-path patterns"),
+    "bot/dashboard.py": (1, "shows a folder as ~/... in /resume's Other Claude sessions"),
+    "cli/resume.py": (1, "shows a folder as ~/... in `aipager resume --claude`"),
 }
 
 _LISTS = ("_USER_PATHS_TO_REMOVE", "_MACOS_PATHS_TO_REMOVE", "_USER_PATHS_KEPT")
