@@ -179,6 +179,20 @@ def remove_block() -> bool:
     return True
 
 
+def remove_for_uninstall() -> None:
+    """``aipager uninstall``'s step: :func:`remove_block`, said in the
+    uninstall's own style. Never raises: it must not stop the uninstall
+    half way."""
+    from aipager.errors import friendly_warn
+    from aipager.ui import ok as ui_ok
+    try:
+        if remove_block():
+            ui_ok(f"removed the `claude` alias from [path]{BASHRC_PATH}[/path]")
+    except Exception as e:
+        friendly_warn(f"Could not remove the `claude` alias from {BASHRC_PATH}",
+                      f"Delete the `# >>> aipager wrap >>>` block by hand ({e}).")
+
+
 def cmd_uninstall(args: argparse.Namespace) -> int:
     if not remove_block():
         print(f"Not installed in {BASHRC_PATH}.")

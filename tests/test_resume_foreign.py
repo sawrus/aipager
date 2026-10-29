@@ -21,7 +21,8 @@ from aipager import claude_catalog
 from aipager.bot import dashboard, new_flow, tap_gate
 from aipager.bot.tap_gate import PROMPT, VIEW
 from aipager.claude_catalog import AdoptOutcome, ForeignConversation
-from aipager.cli import resume as cli_resume
+from aipager.cli import resume as cli_resume_main
+from aipager.cli import resume_foreign as cli_resume
 from aipager.policy import load_policy
 from aipager.scope import Member, Scope
 from aipager.state import SessionRegistry, Status, TrackedSession
@@ -485,7 +486,7 @@ def cli(monkeypatch, listing):
 
 
 def _run(args_name=None):
-    return cli_resume._cmd_resume(argparse.Namespace(name=args_name, claude=True))
+    return cli_resume_main._cmd_resume(argparse.Namespace(name=args_name, claude=True))
 
 
 def test_cli_table_and_paging(cli, listing, capsys):

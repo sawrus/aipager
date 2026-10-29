@@ -321,15 +321,9 @@ def _settings_left(plan) -> tuple[str, ...]:
 
 
 def _remove_wrap_alias() -> None:
-    """Take `aipager wrap`'s alias block out of ~/.bashrc, if any. Never
-    stops the uninstall half way."""
+    """`aipager wrap`'s alias out of ~/.bashrc (aipager.cli.wrap)."""
     from aipager.cli import wrap
-    try:
-        if wrap.remove_block():
-            ui_ok(f"removed the `claude` alias from [path]{wrap.BASHRC_PATH}[/path]")
-    except Exception as e:
-        friendly_warn(f"Could not remove the `claude` alias from {wrap.BASHRC_PATH}",
-                      f"Delete the `# >>> aipager wrap >>>` block by hand ({e}).")
+    wrap.remove_for_uninstall()
 
 
 def cmd_uninstall(args=None) -> int:
