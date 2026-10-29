@@ -253,6 +253,7 @@ def _entry(data: dict, file_pid: int) -> dict | None:
         "parkedJobId": text("parkedJobId"),
         "procStart": _as_int(data.get("procStart")),
         "status": text("status"),
+        "name": text("name"),
         "spare": data.get("spare") is True,
     }
 
