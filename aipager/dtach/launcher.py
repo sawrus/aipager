@@ -374,6 +374,13 @@ def prepare_resume(session_id: str) -> tuple[str | None, int]:
     if plan.moved:
         console.print(f"  {en.text(bg_text.CLI_CONTINUED, session_id=plan.session_id)}",
                       markup=False, highlight=False)
+    for pid in plan.stopped_pids:
+        console.print(f"  {en.text(bg_text.CLI_STOPPED_TERMINAL, pid=pid)}",
+                      markup=False, highlight=False)
+    if plan.action == "stop_failed" and plan.error == "terminal_still_running":
+        friendly_error(en.text(bg_text.CLI_TERMINAL_STOP_FAILED,
+                               error=bg_text.error_text(en, plan.error, plan.params)))
+        return None, 1
     if plan.action == "busy":
         friendly_error(en.text(bg_text.CLI_BG_BUSY, job=plan.job,
                                stop_command=f"claude stop {plan.job}",

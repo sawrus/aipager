@@ -171,6 +171,7 @@
 {"k": "bg.err.still_running", "src": "5914ed5a", "v": "tugas latar belakang masih berjalan"}
 {"k": "bg.err.stop_exit", "src": "43459cfa", "v": "claude stop berakhir dengan kode keluar {code}"}
 {"k": "bg.err.stop_timeout", "src": "fc33b6ae", "v": "claude stop tidak menjawab tepat waktu"}
+{"k": "bg.err.terminal_still_running", "src": "52cd4117", "v": "claude yang membuka percakapan ini masih berjalan"}
 {"k": "bg.failed", "src": "00860287", "v": "Tidak bisa mengembalikan <b>{session}</b> dari latar belakang Claude Code: {error}"}
 {"k": "bg.halt_not_stopped", "src": "6866d8bb", "v": "⚠️ Tugas latar belakang Claude Code untuk <b>{session}</b> tidak bisa dihentikan, jadi pekerjaan yang diblokir mungkin masih berjalan di sana: {error}"}
 {"k": "bg.halt_not_stopped_plain", "src": "5810033d", "v": "⚠️ Tugas latar belakang Claude Code untuk <b>{session}</b> tidak bisa dihentikan, jadi pekerjaan yang diblokir mungkin masih berjalan di sana."}
@@ -272,6 +273,8 @@
 {"k": "cli.session.bg_stop_failed", "src": "1f4af338", "v": "Tidak bisa menghentikan tugas latar belakang Claude Code {job}: {error}"}
 {"k": "cli.session.continued", "src": "ae69418c", "v": "Percakapan pindah ke {session_id}, jadi sesi ini berlanjut di sana."}
 {"k": "cli.session.stopped_bg", "src": "a1bda078", "v": "Tugas latar belakang Claude Code {job}, yang memegang percakapan ini, dihentikan supaya bisa melanjutkannya di sini."}
+{"k": "cli.session.stopped_terminal", "src": "049a0b65", "v": "claude (pid {pid}) yang membuka percakapan ini sudah ditutup: sekarang hanya sesi ini yang memegangnya."}
+{"k": "cli.session.terminal_stop_failed", "src": "1a6c8693", "v": "Tidak bisa menutup claude yang membuka percakapan ini: {error}"}
 {"k": "cmd.app", "src": "486dfc4e", "v": "Buka dasbor Mini App"}
 {"k": "cmd.help", "src": "fb2dbad1", "v": "Apa yang bisa kamu lakukan"}
 {"k": "cmd.language", "src": "9dc3a234", "v": "Bahasa pesan aipager"}

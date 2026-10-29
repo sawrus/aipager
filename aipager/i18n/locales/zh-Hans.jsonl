@@ -171,6 +171,7 @@
 {"k": "bg.err.still_running", "src": "5914ed5a", "v": "后台任务仍在运行"}
 {"k": "bg.err.stop_exit", "src": "43459cfa", "v": "停止命令 claude stop 以退出码 {code} 结束"}
 {"k": "bg.err.stop_timeout", "src": "fc33b6ae", "v": "停止命令 claude stop 没有及时响应"}
+{"k": "bg.err.terminal_still_running", "src": "52cd4117", "v": "打开此对话的 claude 仍在运行"}
 {"k": "bg.failed", "src": "00860287", "v": "没能把 <b>{session}</b> 从 Claude Code 后台带回来：{error}"}
 {"k": "bg.halt_not_stopped", "src": "6866d8bb", "v": "⚠️ 没能停止 <b>{session}</b> 的 Claude Code 后台任务，被阻止的工作可能还在那里运行：{error}"}
 {"k": "bg.halt_not_stopped_plain", "src": "5810033d", "v": "⚠️ 没能停止 <b>{session}</b> 的 Claude Code 后台任务，被阻止的工作可能还在那里运行。"}
@@ -272,6 +273,8 @@
 {"k": "cli.session.bg_stop_failed", "src": "1f4af338", "v": "无法停止 Claude Code 后台任务 {job}：{error}"}
 {"k": "cli.session.continued", "src": "ae69418c", "v": "对话已转到 {session_id}，所以这个会话会在那里继续。"}
 {"k": "cli.session.stopped_bg", "src": "a1bda078", "v": "已停止持有该对话的 Claude Code 后台任务 {job}，以便在这里恢复它。"}
+{"k": "cli.session.stopped_terminal", "src": "049a0b65", "v": "已关闭打开此对话的 claude（pid {pid}），现在只有此会话拥有它。"}
+{"k": "cli.session.terminal_stop_failed", "src": "1a6c8693", "v": "无法关闭打开此对话的 claude：{error}"}
 {"k": "cmd.app", "src": "486dfc4e", "v": "打开 Mini App 控制面板"}
 {"k": "cmd.help", "src": "fb2dbad1", "v": "你可以做什么"}
 {"k": "cmd.language", "src": "9dc3a234", "v": "aipager 消息的语言"}

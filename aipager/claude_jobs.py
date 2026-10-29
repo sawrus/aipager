@@ -254,6 +254,7 @@ def _entry(data: dict, file_pid: int) -> dict | None:
         "procStart": _as_int(data.get("procStart")),
         "status": text("status"),
         "name": text("name"),
+        "tmux": text("tmux"),
         "spare": data.get("spare") is True,
     }
 
@@ -806,14 +807,137 @@ class ResumePlan:
     job: str = ""
     error: str = ""
     params: dict | None = None
+    #: Interactive claudes that had the conversation open and were closed
+    #: (one owner per conversation).
+    stopped_pids: tuple[int, ...] = ()
+
+
+# -- one owner per conversation -------------------------------------------------
+
+#: The signal sender for closing a holder (a test replaces it).
+_kill = os.kill
+
+
+def _own_line() -> set[int]:
+    """This process and its ancestors: never closed as a holder."""
+    out, pid = set(), os.getpid()
+    for _ in range(64):
+        if not pid or pid in out:
+            break
+        out.add(pid)
+        pid = _ppid(pid) or 0
+    return out
+
+
+def interactive_holders(session_id: str, entries: list[dict] | None = None) -> list[dict]:
+    """The live interactive claudes that have conversation *session_id*
+    open (a terminal, tmux or another aipager session), this process and
+    its ancestors left out. Empty when there are none or the registry
+    cannot be read."""
+    if not valid_session_id(session_id):
+        return []
+    if entries is None:
+        entries = read_registry()
+    own = _own_line()
+    return [e for e in entries or ()
+            if e.get("sessionId") == session_id and e.get("kind") == _INTERACTIVE
+            and e["pid"] not in own
+            and _pid_alive(e["pid"]) and _start_matches(e, e["pid"])]
+
+
+def _wait_gone(pids: list[int]) -> list[int]:
+    """*pids* still alive after up to :data:`HOLDER_WAIT` seconds."""
+    for _ in range(int(HOLDER_WAIT / HOLDER_POLL)):
+        pids = [p for p in pids if _pid_alive(p)]
+        if not pids:
+            return []
+        _sync_sleep(HOLDER_POLL)
+    return [p for p in pids if _pid_alive(p)]
+
+
+def stop_interactive_sync(session_id: str,
+                          entries: list[dict] | None = None) -> tuple[list[int], str]:
+    """Close every interactive claude that has conversation *session_id*
+    open, so the resume about to start is its only owner: SIGTERM, up to
+    :data:`HOLDER_WAIT` seconds, then SIGKILL and the same wait again.
+    ``(closed pids, "")``, or ``(closed pids, "terminal_still_running")``
+    when one outlived both signals."""
+    holders = interactive_holders(session_id, entries)
+    pids = [e["pid"] for e in holders]
+    for sig in (signal.SIGTERM, signal.SIGKILL):
+        if not pids:
+            break
+        for pid in pids:
+            try:
+                _kill(pid, sig)
+            except ProcessLookupError:
+                pass
+            except OSError as exc:
+                log.warning("conversation %s: pid %s not signalled: %s",
+                            session_id, pid, exc)
+        pids = _wait_gone(pids)
+    closed = [e["pid"] for e in holders if e["pid"] not in pids]
+    if closed:
+        log.info("conversation %s: closed interactive claude pid %s to resume it",
+                 session_id, ", ".join(map(str, closed)))
+    for e in holders:
+        if e["pid"] in closed and e.get("tmux"):
+            _close_tmux_pane(e["tmux"])
+    return closed, ("terminal_still_running" if pids else "")
+
+
+def _run_tmux(sock: str, *args: str) -> subprocess.CompletedProcess:
+    """One ``tmux -S <sock>`` command (a test replaces it)."""
+    return subprocess.run(["tmux", "-S", sock, *args], capture_output=True,
+                          text=True, timeout=5)
+
+
+def _tmux_sockets() -> list[str]:
+    """Every tmux server socket of this user (muxel uses its own)."""
+    root = Path(os.environ.get("TMUX_TMPDIR") or "/tmp") / f"tmux-{os.getuid()}"
+    try:
+        return sorted(str(p) for p in root.iterdir())
+    except OSError:
+        return []
+
+
+def _has_children(pid: int) -> bool:
+    try:
+        return bool(Path(f"/proc/{pid}/task/{pid}/children").read_text().split())
+    except OSError:
+        return True
+
+
+def _close_tmux_pane(where: str) -> None:
+    """Close the tmux pane a closed claude ran in (Claude's ``tmux`` field,
+    ``<session>:@<window>.%<pane>``) when only an idle shell is left in it,
+    so the conversation's old owner is gone from tmux too. Never raises."""
+    session, _, rest = where.partition(":")
+    pane = rest.rpartition(".")[2]
+    if not session or not pane.startswith("%"):
+        return
+    for sock in _tmux_sockets():
+        try:
+            r = _run_tmux(sock, "display-message", "-p", "-t", pane,
+                          "#{session_name}\t#{pane_pid}")
+            name, _, pid = r.stdout.strip().partition("\t")
+            if r.returncode != 0 or name != session:
+                continue
+            if pid.isdigit() and not _has_children(int(pid)):
+                _run_tmux(sock, "kill-pane", "-t", pane)
+                log.info("closed tmux pane %s (%s)", pane, where)
+        except (OSError, subprocess.SubprocessError):
+            log.debug("tmux pane %s not closed", where, exc_info=True)
+        return
 
 
 def prepare_resume_sync(session_id: str) -> ResumePlan:
     """Before the command line resumes conversation *session_id*: follow
-    ``continued-in`` (R1), then look for a live background holder of the
-    conversation (R2). An idle one is stopped (``claude stop <job>``) and
-    waited for, a busy one is left alone. Unreadable Claude files change
-    nothing: the id is resumed as asked. Never raises."""
+    ``continued-in`` (R1), close every interactive claude that has it open
+    (one owner per conversation), then look for a live background holder
+    of the conversation (R2). An idle one is stopped (``claude stop
+    <job>``) and waited for, a busy one is left alone. Unreadable Claude
+    files change nothing: the id is resumed as asked. Never raises."""
     try:
         return _prepare_resume_sync(session_id)
     except Exception:  # noqa: BLE001 - the command line resumes as before
@@ -828,6 +952,11 @@ def _prepare_resume_sync(session_id: str) -> ResumePlan:
     target = follow_continued(session_id, entries)
     plan = ResumePlan(target, moved=target != session_id)
     if entries is None:
+        return plan
+    closed, err = stop_interactive_sync(target, entries)
+    plan.stopped_pids = tuple(closed)
+    if err:
+        plan.action, plan.error, plan.params = "stop_failed", err, {}
         return plan
     holder = live_holder(target, entries)
     if holder is None:

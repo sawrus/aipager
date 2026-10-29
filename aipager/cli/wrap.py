@@ -105,7 +105,14 @@ def main() -> None:
         return
     if not _daemon_running():
         print("aipager is not running: plain claude", file=sys.stderr)
-        _exec_real(args)
+        # One owner per conversation here too: a resume closes the claudes
+        # that have the conversation open (aipager's own path does it in
+        # ``aipager session``).
+        from aipager.dtach.launcher import _prepare_resume_args
+        resumed, rc = _prepare_resume_args(args)
+        if resumed is None:
+            sys.exit(rc)
+        _exec_real(resumed)
         return
     name = session_name(os.getcwd(), _live_labels())
     exe = _aipager_bin()

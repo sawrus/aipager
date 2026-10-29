@@ -171,6 +171,7 @@
 {"k": "bg.err.still_running", "src": "5914ed5a", "v": "il job in background è ancora in esecuzione"}
 {"k": "bg.err.stop_exit", "src": "43459cfa", "v": "claude stop è terminato con il codice di uscita {code}"}
 {"k": "bg.err.stop_timeout", "src": "fc33b6ae", "v": "claude stop non ha risposto in tempo"}
+{"k": "bg.err.terminal_still_running", "src": "52cd4117", "v": "il claude che aveva aperta la conversazione è ancora in esecuzione"}
 {"k": "bg.failed", "src": "00860287", "v": "Non è stato possibile riportare qui <b>{session}</b> dal background di Claude Code: {error}"}
 {"k": "bg.halt_not_stopped", "src": "6866d8bb", "v": "⚠️ Non è stato possibile fermare il job in background di Claude Code di <b>{session}</b>, quindi il lavoro bloccato potrebbe essere ancora in esecuzione lì: {error}"}
 {"k": "bg.halt_not_stopped_plain", "src": "5810033d", "v": "⚠️ Non è stato possibile fermare il job in background di Claude Code di <b>{session}</b>, quindi il lavoro bloccato potrebbe essere ancora in esecuzione lì."}
@@ -272,6 +273,8 @@
 {"k": "cli.session.bg_stop_failed", "src": "1f4af338", "v": "Non è stato possibile fermare il job in background {job} di Claude Code: {error}"}
 {"k": "cli.session.continued", "src": "ae69418c", "v": "La conversazione si è spostata su {session_id}, quindi questa sessione continua lì."}
 {"k": "cli.session.stopped_bg", "src": "a1bda078", "v": "Ho fermato il job in background {job} di Claude Code, che teneva la conversazione, per riprenderla qui."}
+{"k": "cli.session.stopped_terminal", "src": "049a0b65", "v": "Chiuso il claude (pid {pid}) che aveva aperta la conversazione: ora ce l'ha solo questa sessione."}
+{"k": "cli.session.terminal_stop_failed", "src": "1a6c8693", "v": "Non è stato possibile chiudere il claude che ha aperta la conversazione: {error}"}
 {"k": "cmd.app", "src": "486dfc4e", "v": "Apri la dashboard della Mini App"}
 {"k": "cmd.help", "src": "fb2dbad1", "v": "Cosa puoi fare"}
 {"k": "cmd.language", "src": "9dc3a234", "v": "Lingua dei messaggi di aipager"}
