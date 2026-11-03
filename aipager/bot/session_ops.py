@@ -122,6 +122,8 @@ _kill = os.kill
 #: How long a takeover waits for the terminal claude to exit after SIGTERM,
 #: and how often it looks.
 _TAKEOVER_WAIT_SECONDS = 10.0
+#: An adopt's ``err`` when the conversation is aipager's or being adopted (a log word).
+_ALREADY_TRACKED = "already tracked"
 _TAKEOVER_POLL = 0.25
 #: A label is a Telegram bot command too: ``[a-z0-9_]{1,32}``.
 _ADOPT_LABEL_MAX = 32
@@ -2491,11 +2493,32 @@ class SessionOpsMixin:
         session with a fresh label is registered and resumed through
         :meth:`_do_resume_core`. CONTRACT: reasons in
         ``claude_catalog.ADOPT_REASONS``."""
-        from aipager import claude_catalog, claude_jobs
-        from aipager.scope import disambiguated_name
+        from aipager import claude_jobs
 
         if not claude_jobs.valid_session_id(session_id):
             return AdoptOutcome(ok=False, reason="not_found")
+        # One adopt per conversation at a time: a second tap while the
+        # first waits for the terminal claude to exit would pass the
+        # "already tracked" check below and run the conversation twice.
+        adopting = self.__dict__.setdefault("_adopting", set())
+        if session_id in adopting:
+            log.info("adopt %s: already in progress", session_id)
+            return AdoptOutcome(ok=False, reason="not_found",
+                                err=_ALREADY_TRACKED)
+        adopting.add(session_id)
+        try:
+            return await self._adopt_conversation(
+                session_id, chat_id=chat_id, user_id=user_id, confirm=confirm)
+        finally:
+            adopting.discard(session_id)
+
+    async def _adopt_conversation(self, session_id: str, *, chat_id: int,
+                                  user_id: int | None,
+                                  confirm: bool) -> AdoptOutcome:
+        """:meth:`adopt_conversation` without its in-progress guard."""
+        from aipager import claude_catalog, claude_jobs
+        from aipager.scope import disambiguated_name
+
         transcript = claude_jobs.find_transcript(session_id)
         if transcript is None:
             log.info("adopt %s: no transcript", session_id)
@@ -2507,7 +2530,7 @@ class SessionOpsMixin:
                               Path(tracked.transcript_path or "x").stem):
                 log.info("adopt %s: already tracked as %s", session_id, tracked.label)
                 return AdoptOutcome(ok=False, reason="not_found",
-                                    err="already tracked")
+                                    err=_ALREADY_TRACKED)
         if not self._may_adopt(user_id, chat_id):
             log.info("adopt %s: refused for user %s in chat %s",
                      session_id, user_id, chat_id)

@@ -4647,6 +4647,9 @@ class NotifyMixin:
                                     reply_to_message_id=(
                                         reply_to if not msg_id else None
                                     ),
+                                    # A deleted trigger must not lose the
+                                    # answer ("message to be replied not found").
+                                    allow_sending_without_reply=True,
                                 )
                                 _answer_landed = True
                                 # With no header, the first chunk that lands takes
