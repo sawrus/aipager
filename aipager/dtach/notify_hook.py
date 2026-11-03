@@ -533,6 +533,34 @@ def _foreign(worker: dict | None) -> bool:
     return worker is not None and worker.get("role") != "linked"
 
 
+#: Where :func:`_nested_claude` reads processes (a test seam).
+_PROC = "/proc"
+
+
+def _nested_claude(session: str) -> bool:
+    """Whether this hook runs in a ``claude`` started inside the session
+    (a tool, a test or a script that runs ``claude -p``): it inherits the
+    session's tag but is not the session's claude. The session's own
+    claude is started by a ``bash -c`` that exports the tag, so its
+    parent's ``/proc/<pid>/environ`` (the environment it was started
+    with) holds no tag. A nested claude's parent is a process of the
+    session's tool and holds it. Linux only; any failure reads as not
+    nested (the old behaviour)."""
+    pid = os.environ.get("CLAUDE_PID", "").strip()
+    if not session or not _CLAUDE_PID.fullmatch(pid):
+        return False
+    try:
+        with open(f"{_PROC}/{pid}/stat", "rb") as f:
+            stat = f.read()
+        ppid = int(stat.rsplit(b")", 1)[1].split()[1])
+        with open(f"{_PROC}/{ppid}/environ", "rb") as f:
+            env = f.read()
+    except (OSError, ValueError, IndexError):
+        return False
+    tag = b"CLAUDE_DTACH_SESSION=" + session.encode("utf-8", "replace")
+    return tag in env.split(b"\0")
+
+
 #: ``CLAUDE_PID`` as the hook forwards it (``claude_pid``): digits only.
 _CLAUDE_PID = re.compile(r"[0-9]{1,10}")
 
@@ -636,6 +664,11 @@ def main():
     # checked, read-only). Before the cap: its reads are bounded (a link
     # file, at most 64 small registry files).
     worker = _resolve_worker(session)
+    # A claude started inside the session (``claude -p`` from a tool or a
+    # test) counts as a foreign worker: its prompt must not rewrite the
+    # session's rights, and its turns are not the session's.
+    if worker is None and _nested_claude(session):
+        worker = {"role": "foreign", "job": "", "session": session}
     if worker is not None and worker.get("role") == "linked":
         session = worker["session"]
     foreign = _foreign(worker)

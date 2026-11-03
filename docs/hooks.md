@@ -89,6 +89,14 @@ tool calls against the session's rules it inherited and prints a deny
 `bg_job` event it cannot match to a parked session, and creates nothing
 for it.
 
+A `claude` that a tool, test or script starts inside a session (for
+example `claude -p` in a project's tests) also inherits the session name.
+The hook treats it as foreign too: its parent's start environment
+(`/proc/<pid>/environ`) already holds the session's
+`CLAUDE_DTACH_SESSION`, which is never true for the session's own claude.
+Its prompt therefore does not change the session's rights, and its answer
+does not reach the chat as the session's.
+
 ## Event reference
 
 The daemon's handlers are in `aipager/dtach/hook_receiver.py`; the

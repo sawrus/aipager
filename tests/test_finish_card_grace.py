@@ -389,3 +389,16 @@ def test_plain_text_fallback_sleeps_exactly_once(finish, run_async):
     # The answer still reached the chat, as plain text.
     fallback = [c.args[1] for c in h.bot._app.bot.send_message.await_args_list]
     assert any("Answer that must survive the fallback." in t for t in fallback)
+
+
+def test_plain_text_fallback_survives_a_deleted_trigger(finish, run_async):
+    """The rich send failed because the message it replies to is gone
+    (deleted queued line): the plain fallback must not fail the same way."""
+    h = finish(chat_id=811011, layout="card", build_cost=0.1,
+               send_raises=RichMessageFallbackRequired(
+                   "400: Bad Request: message to be replied not found"))
+    h.run(run_async, summary="Answer whose trigger was deleted.")
+
+    calls = h.bot._app.bot.send_message.await_args_list
+    assert calls
+    assert all(c.kwargs.get("allow_sending_without_reply") is True for c in calls)

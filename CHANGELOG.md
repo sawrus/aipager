@@ -21,6 +21,9 @@ Fork `sawrus/aipager`, based on 1.3.10 (the version stays 1.3.10: aipager's upda
 
 ### Fixed
 - **A claude aipager does not run no longer blocks its own terminal turns.** Every such session (no `CLAUDE_DTACH_SESSION`, e.g. a plain `claude` in tmux) shared one policy snapshot, `claude-policy-.json`. A message from another session in one of them held every other one to the floor: `Bash is in this role's deny_tools`, `Bash command blocked by safety policy`, `Read on protected path ~/.claude/**` on turns typed in the terminal. Such a session now has no snapshot; a turn from Telegram or from another session there is still held to the floor.
+- **A `claude -p` started inside a session no longer counts as that session.** A test, script or tool that runs `claude` inside an aipager session inherits `CLAUDE_DTACH_SESSION`. Its prompt held the session to the floor, so the session's next command was halted (`Bash is in this role's deny_tools`), and its answer (for example a JSON reply) came to the chat as the session's `Done` card. The hook now sees that the claude's parent already holds the session's tag and treats it as a foreign worker: its tool calls are still checked against the session's rules, nothing else is sent or written.
+- **One adopt per conversation.** A second tap on `Take over` while the first waited for the terminal claude to exit ran the conversation twice (`name` and `name_2`). The second tap now does nothing.
+- **An answer whose trigger message is gone still arrives.** The plain-text fallback after `message to be replied not found` no longer fails for the same reason.
 
 ## [1.3.10] - 2026-10-25
 
