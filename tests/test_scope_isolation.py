@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock
 
-from telegram import BotCommandScopeChat
+from telegram import BotCommandScopeChat, BotCommandScopeChatMember
 
 from aipager.bot.transport import resolve_chat_id
 from aipager.scope import Member, Scope
@@ -126,7 +126,9 @@ def test_autocomplete_isolated_per_scope(mk_bot, run_async):
     per_chat = {}
     for call in bot._app.bot.set_my_commands.await_args_list:
         scope_obj = call.kwargs["scope"]
-        assert isinstance(scope_obj, BotCommandScopeChat)
+        # A group's menu goes to its named members, never to the whole chat.
+        assert isinstance(scope_obj, BotCommandScopeChatMember if scope_obj.chat_id == G
+                          else BotCommandScopeChat)
         per_chat[scope_obj.chat_id] = {c.command for c in call.args[0]}
     assert "ana_only" in per_chat[A] and "ben_only" not in per_chat[A]
     assert "ben_only" in per_chat[B] and "team_only" not in per_chat[B]

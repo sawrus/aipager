@@ -19,7 +19,12 @@ from typing import TYPE_CHECKING
 
 from telegram import (
     BotCommand,
+    BotCommandScopeAllChatAdministrators,
+    BotCommandScopeAllGroupChats,
+    BotCommandScopeAllPrivateChats,
     BotCommandScopeChat,
+    BotCommandScopeChatMember,
+    BotCommandScopeDefault,
     LinkPreviewOptions,
     Update,
 )
@@ -665,6 +670,7 @@ class LifecycleMixin:
         )
         log.info("Telegram bot polling started")
         language_launch.note_started(self)
+        await self._clear_foreign_menus()
         await self._update_bot_commands()
         # The bot's description in each language (5.8): in the background,
         # never awaited here, lowest priority.
@@ -1306,6 +1312,58 @@ class LifecycleMixin:
         log.info("recovered %d sessions: %s%s", len(targets), summary, suffix)
         self.registry.mark_dirty()
 
+    async def _clear_foreign_menus(self) -> None:
+        """Once at start: empty every command list a chat of ours does not
+        own, so a stranger who opens the bot sees no menu.
+
+        Telegram shows a user the most specific list that matches, down to
+        Default. aipager now registers commands only for named chats (and,
+        in a group, named members), but older versions left lists in the
+        Default, all-private, all-group and all-administrators scopes.
+        Each is deleted here, once without a language and once per
+        language of the project. The bot's default menu button goes back
+        to the Telegram default. A group's own ``BotCommandScopeChat``
+        list is deleted too: it reached every member of the group, and
+        the menu now goes to each named member instead. Never raises."""
+        if not self._app:
+            return
+        from telegram import MenuButtonDefault
+
+        from aipager.i18n.locales import LOCALES, enabled_codes
+
+        langs: list[str | None] = [None]
+        for code in enabled_codes():
+            loc = LOCALES.get(code)
+            tg = getattr(loc, "telegram_code", None)
+            if tg and tg not in langs:
+                langs.append(tg)
+        scopes = [BotCommandScopeDefault(), BotCommandScopeAllPrivateChats(),
+                  BotCommandScopeAllGroupChats(),
+                  BotCommandScopeAllChatAdministrators()]
+        for lang in langs:
+            kwargs = {"language_code": lang} if lang else {}
+            for scope in scopes:
+                try:
+                    await self._app.bot.delete_my_commands(scope=scope, **kwargs)
+                except Exception:
+                    log.info("Could not clear the %s command list",
+                             type(scope).__name__, exc_info=True)
+        for sc in (self.scopes or ()):
+            if not group_intake.is_group_chat(sc.chat_id):
+                continue
+            try:
+                await self._app.bot.delete_my_commands(
+                    scope=BotCommandScopeChat(chat_id=sc.chat_id))
+            except ChatMigrated as e:
+                chat_migration.note_chat_migrated(sc.chat_id, e.new_chat_id)
+            except Exception:
+                log.info("Could not clear the group-wide command list of %s",
+                         sc.chat_id, exc_info=True)
+        try:
+            await self._app.bot.set_chat_menu_button(menu_button=MenuButtonDefault())
+        except Exception:
+            log.info("Could not reset the default menu button", exc_info=True)
+
     async def _update_bot_commands(self) -> None:
         """Register bot commands (/ menu) and update persistent keyboard.
 
@@ -1514,8 +1572,10 @@ class LifecycleMixin:
                 and tr.code == self._registered_lang):
             return  # no change
         try:
-            await self._app.bot.set_my_commands(self._command_list(
-                labels, group=group_intake.is_group_chat(CHAT_ID), tr=tr))
+            await self._app.bot.set_my_commands(
+                self._command_list(
+                    labels, group=group_intake.is_group_chat(CHAT_ID), tr=tr),
+                scope=BotCommandScopeChat(chat_id=CHAT_ID))
             self._registered_labels = labels
             self._registered_lang = tr.code
             log.info("Bot commands updated: status, stop + %s",
@@ -1880,11 +1940,18 @@ class LifecycleMixin:
                     and self._registered_scope_lang.get(scope.chat_id) == tr.code):
                 continue
             try:
-                await self._app.bot.set_my_commands(
-                    self._command_list(
-                        labels, group=group_intake.is_group_chat(scope.chat_id), tr=tr),
-                    scope=BotCommandScopeChat(chat_id=scope.chat_id),
-                )
+                commands = self._command_list(
+                    labels, group=group_intake.is_group_chat(scope.chat_id), tr=tr)
+                if group_intake.is_group_chat(scope.chat_id):
+                    # Named members only: a chat-wide list would show to
+                    # every stranger in the group.
+                    for member in scope.members:
+                        await self._app.bot.set_my_commands(
+                            commands, scope=BotCommandScopeChatMember(
+                                chat_id=scope.chat_id, user_id=member.id))
+                else:
+                    await self._app.bot.set_my_commands(
+                        commands, scope=BotCommandScopeChat(chat_id=scope.chat_id))
                 self._registered_scope_labels[scope.chat_id] = labels
                 self._registered_scope_lang[scope.chat_id] = tr.code
                 log.info("Bot commands for %s: status, stop + %s",
