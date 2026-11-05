@@ -196,11 +196,11 @@ def test_switching_reregisters_once(bot, run_async, monkeypatch):
     monkeypatch.setattr(locales, "_TEST_ENABLED", frozenset({"qps"}))
     tap(bot, run_async, "_:set:lang:qps", chat=GROUP, user=ALY)
     chats = [c.kwargs["scope"].chat_id for c in bot._app.bot.set_my_commands.await_args_list]
-    assert chats.count(GROUP) == 1
+    assert chats.count(GROUP) == 2  # one call per group member
     assert [c.kwargs.get("chat_id") for c in bot._send_keyboard.await_args_list] == [GROUP]
     tap(bot, run_async, "_:set:lang:qps", chat=GROUP, user=ALY)
     chats = [c.kwargs["scope"].chat_id for c in bot._app.bot.set_my_commands.await_args_list]
-    assert chats.count(GROUP) == 1
+    assert chats.count(GROUP) == 2  # unchanged: no new calls
     assert bot._send_keyboard.await_count == 1
 
 
