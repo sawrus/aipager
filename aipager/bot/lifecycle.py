@@ -29,7 +29,6 @@ from telegram import (
     Update,
 )
 from telegram.ext import (
-    ApplicationBuilder,
     CallbackQueryHandler,
     CommandHandler,
     Defaults,
@@ -48,6 +47,7 @@ from aipager.bot import (
 )
 from aipager.bot.flood import MUTE, FloodMuted, _key as _chat_key
 from aipager.bot import flood_state, idle_gate, language_launch
+from aipager.bot.ext_bot import DaemonApplicationBuilder
 from aipager.bot.flood_budget import BudgetRateLimiter, clear_backoff_signal
 from aipager.bot.rich_message import set_rate_limiter
 from aipager.config import (
@@ -428,8 +428,10 @@ class LifecycleMixin:
         """
         # The Bot API base: PTB's own defaults unless
         # AIPAGER_TELEGRAM_API_BASE names a (loopback) test server.
+        # DaemonApplicationBuilder: PTB's builder, but an empty text
+        # parameter goes out as "" and not as "[]" (aipager/bot/ext_bot.py).
         builder = (
-            ApplicationBuilder()
+            DaemonApplicationBuilder()
             .token(BOT_TOKEN)
             .base_url(telegram_endpoint.ptb_base_url())
             .base_file_url(telegram_endpoint.ptb_base_file_url())
