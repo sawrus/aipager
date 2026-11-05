@@ -58,6 +58,7 @@ from aipager import bidi_guard
 from aipager import i18n, preferences
 from aipager.i18n import Msg, Plural, Safe, Span
 from aipager.clockfmt import elapsed as clock
+from aipager.text_shape import shape
 from aipager.config import (
     COMPACT_CARD_TIMEOUT_SECONDS,
     COMPACT_DONE_PAUSE_SECONDS,
@@ -2418,7 +2419,7 @@ class NotifyMixin:
             self.registry.transition(sess.name, Status.BUSY)
             await self._send_busy_and_animate(sess)
         if ok:
-            log.info("[%s] Flushed queued: %s", sess.label, queued_text[:80])
+            log.info("[%s] Flushed queued: %s", sess.label, shape(queued_text))
         else:
             # Popped and not sent: this held message is gone (R3).
             await self._mark_not_delivered(sess, [{"msg_id": queued_trigger}])

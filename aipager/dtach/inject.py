@@ -21,6 +21,7 @@ from pathlib import Path
 
 from aipager import claude_launch, claude_resolve, daemon_secrets, instance, perm_modes
 from aipager.dtach import bg_jobs
+from aipager.text_shape import shape
 
 log = logging.getLogger(__name__)
 
@@ -544,7 +545,7 @@ async def send_text_and_enter(session: str, text: str) -> bool:
         await _key_gap_sleep(delay)
         ok, _ = await _run([_DTACH, "-p", sock], stdin=b"\r")
     if ok:
-        log.info("Sent text %r + Enter → %s", text[:50], session)
+        log.info("Sent text (%s) + Enter → %s", shape(text), session)
     return ok
 
 

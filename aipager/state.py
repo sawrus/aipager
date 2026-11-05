@@ -31,6 +31,7 @@ from aipager import agent_tree as _agent_tree
 from aipager import bg_shells as _bg_shells
 from aipager import perm_modes as _perm_modes
 from aipager._test_guard import check_write
+from aipager.text_shape import shape
 from aipager import prompt_stack as _prompt_stack
 from aipager.open_prompt import (
     snapshot as snapshot_open_prompt, validate as validate_open_prompt,
@@ -1659,8 +1660,8 @@ class TrackedSession:
         as belonging to THIS message.
         """
         if len(self.pending_queue) >= cap:
-            log.warning("[%s] queue full (cap=%d); rejecting prompt: %r",
-                        self.label, cap, text[:60])
+            log.warning("[%s] queue full (cap=%d); rejecting prompt (%s)",
+                        self.label, cap, shape(text))
             return False
         self.pending_queue.append(
             (text, msg_id, time.time(), reply_context, driver_user_id)
