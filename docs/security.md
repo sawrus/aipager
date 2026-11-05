@@ -630,7 +630,8 @@ What these checks do not cover: a process running as aipager's own OS user can w
 ## Audit log
 
 Every Allow / Deny tap, plus every `AskUserQuestion`
-answer, appends one JSON line to `~/.claude/aipager-audit.jsonl`:
+answer, appends one JSON line to `~/.claude/aipager-audit.jsonl`
+(mode `0600`):
 
 ```json
 {
@@ -1010,3 +1011,4 @@ Known limits:
 - [Architecture](architecture.md) - process model.
 - [Hook events](hooks.md) - what the daemon actually sees from claude.
 - [Bot commands](commands.md) - the user-driven side.
+- [Security audit, November 2026](security-audit-2026-11.md) - the fork's audit and what it left open.

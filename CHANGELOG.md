@@ -16,6 +16,12 @@ Fork `sawrus/aipager`, based on 1.3.10 (the version stays 1.3.10: aipager's upda
 - **`aipager wrap install`: every terminal `claude` starts under aipager.** An alias in `~/.bashrc` runs `aipager-claude`, which starts the session under aipager (in Telegram from the start) and runs the real claude directly for `-p`, `--version`, Claude Code's subcommands, non-terminal use, or when aipager is not running.
 - **Idle lock: a TOTP code after a quiet spell.** `aipager lock setup` makes a secret for an authenticator app, `aipager lock enable` turns the lock on. After 60 minutes (`--after-min`) without activity from a member, aipager deletes the messages it knows of, says `🔒 aipager is locked after a quiet spell. Send /start to unlock it.`, sends nothing from the sessions, takes no messages or taps, and the Mini App answers 423. `/start` and the 6-digit code in a private chat unlock it; five wrong codes in ten minutes pause the checks. See [idle lock](docs/idle-lock.md).
 
+### Security
+- **The idle lock clears the chat for real.** An edited message (a streaming card) is noted once and no longer pushes real messages out of the lock's list. In a private chat the lock deletes every message since its previous wipe, not only the ones it saw. A message it could not delete is tried again at the next lock, and the log says per chat how many were asked and how many failed. `aipager lock now` on a locked aipager clears the chats again and says so (it used to print "locks within 30 s" and do nothing). See [idle lock](docs/idle-lock.md).
+- **What you send no longer reaches the journal.** The log lines for a sent, held, queued, retried or voice message show its kind and length (`text, 42 chars`, `/model, 12 chars`) instead of its first 80 characters.
+- **`~/.config/aipager` and `~/.local/state/aipager` are owner-only (`0700`)**, also when an older install made them `0775`; `aipager start` narrows the config folder. The audit log `~/.claude/aipager-audit.jsonl` is `0600`.
+- The audit of the fork, with what is left and why: [security audit, November 2026](docs/security-audit-2026-11.md).
+
 ### Changed
 - **The fork's test suite is cut to under 5000 tests and runs in under a minute** (`-n 12`). The upstream test files that were slow or covered the same code again were removed; see `CLAUDE.md`.
 
