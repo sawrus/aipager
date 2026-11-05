@@ -11,9 +11,27 @@ written.
 from __future__ import annotations
 
 import os
+import stat
 from pathlib import Path
 
 from aipager._test_guard import check_write
+
+
+def secure_dir(path: Path, mode: int = 0o700) -> bool:
+    """Set an existing folder of ours to *mode* (``mkdir``'s mode applies
+    only when it creates the folder, and the umask narrows even that).
+    Whether the folder now has *mode*. Never raises ``OSError``: a folder
+    another user owns, or one that is gone, is left alone."""
+    try:
+        st = os.stat(path)
+        if not stat.S_ISDIR(st.st_mode) or st.st_uid != os.getuid():
+            return False
+        if stat.S_IMODE(st.st_mode) != mode:
+            check_write(Path(path))
+            os.chmod(path, mode)
+        return True
+    except OSError:
+        return False
 
 
 def write_private(target: Path, text: str, *, dir_mode: int | None = None) -> None:
@@ -22,7 +40,8 @@ def write_private(target: Path, text: str, *, dir_mode: int | None = None) -> No
     The temporary file beside it is created with ``O_EXCL``: a leftover
     from a crash (or anything planted there, a symlink included) is
     removed first and never written through. A missing parent folder is
-    created, with *dir_mode* when given. Raises ``OSError`` (and, under
+    created, with *dir_mode* when given; an existing one is narrowed to
+    *dir_mode* (:func:`secure_dir`). Raises ``OSError`` (and, under
     pytest, :class:`aipager._test_guard.RealHomeWriteError`)."""
     target = Path(target)
     check_write(target)
@@ -30,6 +49,7 @@ def write_private(target: Path, text: str, *, dir_mode: int | None = None) -> No
         target.parent.mkdir(parents=True, exist_ok=True)
     else:
         target.parent.mkdir(parents=True, exist_ok=True, mode=dir_mode)
+        secure_dir(target.parent, dir_mode)
     tmp = target.with_name(target.name + ".tmp")
     try:
         os.unlink(tmp)

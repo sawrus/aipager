@@ -644,6 +644,11 @@ def _cmd_start(args: argparse.Namespace) -> int:
         retire_v1()
     except Exception:
         log.warning("v2 config migration skipped (non-fatal)", exc_info=True)
+    # The config folder holds the bot token: owner-only, also when an
+    # older install made it wider.
+    from aipager import scope as _scope
+    from aipager.private_file import secure_dir
+    secure_dir(_scope.CONFIG_PATH.parent)
     _check_existing_daemon()   # fast socket-probe with friendly error
     _acquire_daemon_lock()     # airtight fcntl guard against startup races
     bot_username = _telegram_preflight()
