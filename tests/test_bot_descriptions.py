@@ -2,13 +2,17 @@
 
 Both the description and the short description go to an empty text for the
 default and for every language of the project; an error on one call never
-stops the rest; the start never waits for it. AsyncMock bots only.
+stops the rest; the start never waits for it. The last tests go through the
+daemon's real bot to a fake HTTP transport: an empty text leaves as "".
 """
 
 from __future__ import annotations
 
 import asyncio
+import urllib.parse
 from unittest.mock import AsyncMock, MagicMock
+
+import httpx
 
 from aipager.bot import bot_descriptions as bd
 from aipager.i18n.locales import LOCALES, enabled_codes
@@ -81,3 +85,55 @@ def test_start_returns_while_the_sync_is_still_pending(mk_bot, run_async, monkey
 
     pending, task = run_async(_go())
     assert pending and entered == [1] and task.cancelled()
+
+
+def _real_bot(mk_bot, monkeypatch):
+    """The daemon's own bot (``_make_builder``) with a fake HTTP transport.
+    Returns the bot and the list of (method, form fields) it sent."""
+    from aipager.bot import lifecycle
+    monkeypatch.setattr(lifecycle, "BOT_TOKEN", "123456:TEST")
+    app = mk_bot()._make_builder().build()
+    sent = []
+
+    def handler(req):
+        method = req.url.path.rsplit("/", 1)[-1]
+        sent.append((method, dict(urllib.parse.parse_qsl(
+            req.content.decode(), keep_blank_values=True))))
+        if method == "getMe":
+            return httpx.Response(200, json={"ok": True, "result": {
+                "id": 1, "is_bot": True, "first_name": "b", "username": "b"}})
+        return httpx.Response(200, json={"ok": True, "result": True})
+
+    for request in app.bot._request:
+        request._client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    return app.bot, sent
+
+
+def test_the_real_bot_sends_an_empty_description_not_brackets(mk_bot, run_async, monkeypatch):
+    bot, sent = _real_bot(mk_bot, monkeypatch)
+
+    async def _go():
+        await bot.initialize()
+        await bd.clear_descriptions(bot)
+
+    run_async(_go())
+    fields = [(m, f) for m, f in sent if m in ("setMyDescription", "setMyShortDescription")]
+    assert len(fields) == 2 * (1 + len(TG_CODES))
+    for method, form in fields:
+        key = "description" if method == "setMyDescription" else "short_description"
+        assert form[key] == ""
+    assert {f.get("language_code") for _, f in fields} == {None} | TG_CODES
+
+
+def test_any_empty_text_parameter_stays_empty(mk_bot, run_async, monkeypatch):
+    bot, sent = _real_bot(mk_bot, monkeypatch)
+
+    async def _go():
+        await bot.initialize()
+        await bot.set_my_name(name="")
+        await bot.answer_callback_query("1", text="")
+
+    run_async(_go())
+    forms = dict(sent)
+    assert forms["setMyName"]["name"] == ""
+    assert forms["answerCallbackQuery"]["text"] == ""

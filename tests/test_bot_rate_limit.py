@@ -37,7 +37,7 @@ def test_this_daemons_builder_installs_a_rate_limiter(mk_bot, monkeypatch):
                 return self
             return _chain
 
-    monkeypatch.setattr(lc, "ApplicationBuilder", _RecordingBuilder)
+    monkeypatch.setattr(lc, "DaemonApplicationBuilder", _RecordingBuilder)
     mk_bot()._make_builder()
 
     assert "limiter" in seen, "this daemon never calls .rate_limiter()"
