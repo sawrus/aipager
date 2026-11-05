@@ -992,17 +992,13 @@ an admin picks its language. The language only changes aipager's own text:
 Claude answers in the language you write to it, whatever aipager shows. See
 [Languages](commands.md#languages).
 
-## The bot description is not the one I wrote
+## The bot description I wrote in BotFather is gone
 
-aipager sets the bot's description and short description in each language it
-speaks, for people whose Telegram app is in that language, and Telegram shows
-that text to them instead of the one you wrote in BotFather. aipager does this
-only while you have no description of your own, so a description you write
-before installing this release reaches everyone. If you wrote it after aipager
-had set its own, people in those languages still see aipager's. To show them
-yours, clear aipager's text for each language through the Bot API
-(`setMyDescription` and `setMyShortDescription` with an empty text and that
-`language_code`); aipager never sets it again while yours is there.
+At every start aipager clears the bot's description and short description for
+the default and for each language (`setMyDescription` and
+`setMyShortDescription` with an empty text), so no text shows on the empty
+chat screen. This includes a text you wrote in BotFather. aipager has no
+setting to keep it. See [Languages](commands.md#languages).
 
 ## aipager says languages.json could not be used
 

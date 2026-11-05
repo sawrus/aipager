@@ -18,6 +18,16 @@ A tap runs the command as if you typed it alone (`/resume`, `/now`, `/mode`,
 `/settings`, `/language`, `/help`). The buttons follow the chat's language.
 A group keeps its keyboard as it was.
 
+## The `/` command menu is private
+
+aipager registers the `/` command list only for the chats it serves: each
+private chat, and in a group each named member (not the group as a whole).
+A person in another chat, or a group member who is not on the list, sees
+no commands. At every start aipager also deletes the lists in the Default,
+all-private-chats, all-group-chats and all-chat-administrators scopes (with
+no language and in each language of the project), deletes a group-wide
+list that an older version set, and resets the default menu button.
+
 ## A tap clears the chat
 
 A tap that opens a view (`status`, `new`, `Resume`, `Mode`, `Settings`,
