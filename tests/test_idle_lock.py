@@ -79,6 +79,22 @@ def test_parse_code():
     assert idle_lock.parse_code("/start") is None
 
 
+def test_the_secret_folder_is_narrowed_to_0700():
+    """``~/.config/aipager`` made 0775 by an older install: mkdir's mode
+    applies only when it creates the folder."""
+    idle_lock.TOTP_PATH.parent.mkdir(parents=True, exist_ok=True)
+    idle_lock.TOTP_PATH.parent.chmod(0o775)
+    idle_lock.write_secret(idle_lock.new_secret())
+    assert idle_lock.TOTP_PATH.parent.stat().st_mode & 0o777 == 0o700
+
+
+def test_writing_aipager_yaml_narrows_its_folder():
+    _config()
+    scope.CONFIG_PATH.parent.chmod(0o775)
+    scope.dump_idle_lock({"enabled": True, "after_min": 30})
+    assert scope.CONFIG_PATH.parent.stat().st_mode & 0o777 == 0o700
+
+
 def test_secret_round_trip_and_uri():
     secret = idle_lock.new_secret()
     idle_lock.write_secret(secret)
@@ -132,14 +148,82 @@ def test_due_after_the_quiet_spell(armed):
     assert not armed.due(now + 10 ** 6)  # already locked
 
 
-def test_lock_returns_young_messages_and_forgets_them(armed):
+def test_wipe_plan_takes_young_messages_and_wiped_forgets_them(armed):
     now = time.time()
     armed.note_message(CHAT, 1, now - 49 * 3600)
     armed.note_message(CHAT, 2, now - 3600)
     armed.note_message(-100, 3, now)
-    assert armed.lock(now) == {CHAT: [2], -100: [3]}
-    assert armed.is_locked()
-    assert armed.lock(now) == {}
+    armed.lock(now)
+    assert armed.is_locked() and armed.wipe_pending
+    plan = armed.wipe_plan(now=now)
+    assert plan == {CHAT: [2], -100: [3]}
+    armed.wiped(plan, now=now)
+    assert not armed.wipe_pending
+    assert armed.wipe_plan(now=now) == {}
+
+
+def test_lock_keeps_the_messages_until_they_are_wiped(armed):
+    """A wipe a stop cuts short must not lose what it was to delete."""
+    armed.note_message(-100, 3)
+    armed.lock()
+    fresh = idle_lock.IdleLock()
+    assert fresh.wipe_plan() == {-100: [3]}
+    assert fresh.wipe_pending
+
+
+def test_a_failed_delete_stays_for_the_next_wipe(armed):
+    armed.note_message(-100, 3)
+    armed.note_message(-100, 4)
+    armed.lock()
+    plan = armed.wipe_plan()
+    armed.wiped(plan, {-100: {4}})
+    assert armed.wipe_plan() == {-100: [4]}
+
+
+def test_seeing_a_message_again_neither_adds_nor_rejuvenates_it(armed):
+    """A streaming card edited a thousand times must not push real
+    messages out of the tracker, nor stay "young" for ever."""
+    now = time.time()
+    armed.note_message(-100, 1, now - 49 * 3600)
+    for _ in range(idle_lock.MAX_TRACKED + 1):
+        armed.note_message(-100, 1, now)
+    armed.note_message(-100, 2, now)
+    assert len(armed._state["sent"]) == 2
+    assert armed.wipe_plan(now=now) == {-100: [2]}
+
+
+def test_a_private_chat_is_wiped_as_a_whole_range(armed):
+    """A private chat numbers both sides' messages in one sequence: the
+    wipe deletes every id since the previous one, tracked or not."""
+    armed.note_message(CHAT, 10)
+    armed.note_message(CHAT, 15)
+    armed.note_message(-100, 30)
+    plan = armed.wipe_plan([CHAT])
+    assert plan == {CHAT: list(range(10, 16)), -100: [30]}
+    armed.wiped(plan, private=[CHAT])
+    armed.note_message(CHAT, 20)
+    assert armed.wipe_plan([CHAT]) == {CHAT: list(range(16, 21))}
+
+
+def test_a_private_range_is_capped(armed):
+    armed._state["wiped_upto"] = {str(CHAT): 1}
+    armed.note_message(CHAT, 10 ** 6)
+    ids = armed.wipe_plan([CHAT])[CHAT]
+    assert len(ids) == idle_lock.WIPE_SPAN and ids[-1] == 10 ** 6
+
+
+def test_a_reload_keeps_messages_noted_since_the_last_save(armed):
+    """`aipager lock now` writes the file while the daemon holds unsaved
+    notes: the reload must not drop them from the next wipe."""
+    armed.note_message(-100, 5)
+    assert armed._dirty
+    other = idle_lock.IdleLock()
+    other.load()
+    other.make_due()
+    time.sleep(0.01)
+    armed.reload_if_changed()
+    assert armed.due()
+    assert armed.wipe_plan() == {-100: [5]}
 
 
 def test_state_survives_a_restart(armed):
@@ -213,7 +297,24 @@ def test_limiter_lets_the_lock_itself_speak(armed):
 def test_limiter_records_sent_messages_for_the_wipe(armed):
     _limited_call("sendMessage", {"chat_id": CHAT, "text": "hi"},
                   result={"message_id": 42, "chat": {"id": CHAT}})
-    assert armed.lock() == {CHAT: [42]}
+    assert armed.wipe_plan() == {CHAT: [42]}
+
+
+def test_limiter_does_not_note_an_edit_again(armed):
+    old = time.time() - 49 * 3600
+    armed.note_message(-100, 42, old)
+    _limited_call("editMessageText", {"chat_id": -100, "message_id": 42, "text": "x"},
+                  result={"message_id": 42, "chat": {"id": -100}})
+    _limited_call("editMessageText", {"chat_id": -100, "message_id": 43, "text": "x"},
+                  result={"message_id": 43, "chat": {"id": -100}})
+    assert armed.wipe_plan() == {}
+
+
+def test_limiter_records_a_copy_under_the_calls_chat(armed):
+    """copyMessage returns only a MessageId, with no chat in it."""
+    _limited_call("copyMessage", {"chat_id": -100, "from_chat_id": CHAT, "message_id": 1},
+                  result={"message_id": 77})
+    assert armed.wipe_plan() == {-100: [77]}
 
 
 # ---- the inbound gate (Telegram updates) -------------------------------------
@@ -302,14 +403,51 @@ def test_gate_never_takes_a_code_in_a_group(armed):
     assert armed.is_locked()
 
 
-def test_tick_locks_wipes_and_tells(armed):
+def test_tick_locks_wipes_and_tells(armed, caplog):
     bot = _Bot()
     armed.note_message(CHAT, 7)
+    armed.note_message(CHAT, 9)
+    armed.make_due()
+    with caplog.at_level("INFO", logger="aipager.bot.idle_gate"):
+        _run(idle_gate.tick(bot))
+    assert armed.is_locked() and not armed.wipe_pending
+    bot._app.bot.delete_messages.assert_awaited_once_with(CHAT, [7, 8, 9])
+    assert bot.said() == ["🔒 aipager is locked after a quiet spell. Send /start to unlock it."]
+    assert f"cleared chat {CHAT}: 3 ids asked, 0 failed" in caplog.text
+
+
+def test_tick_keeps_what_one_by_one_deletes_could_not_take(armed, caplog):
+    bot = _Bot()
+    bot._app.bot.delete_messages.side_effect = RuntimeError("bulk refused")
+    bot._app.bot.delete_message.side_effect = [None, RuntimeError("gone")]
+    armed.note_message(-100, 3)
+    armed.note_message(-100, 4)
+    armed.make_due()
+    with caplog.at_level("INFO", logger="aipager.bot.idle_gate"):
+        _run(idle_gate.tick(bot))
+    assert "cleared chat -100: 2 ids asked, 1 failed" in caplog.text
+    assert armed.wipe_plan() == {-100: [4]}
+
+
+def test_lock_now_while_locked_wipes_again(armed, capsys):
+    """`aipager lock now` on a locked aipager clears the chats again at
+    the next tick, and says so instead of "locks within 30 s"."""
+    from aipager.cli import lock as lock_cli
+
+    bot = _Bot()
     armed.make_due()
     _run(idle_gate.tick(bot))
-    assert armed.is_locked()
-    bot._app.bot.delete_messages.assert_awaited_once_with(CHAT, [7])
-    assert bot.said() == ["🔒 aipager is locked after a quiet spell. Send /start to unlock it."]
+    armed.note_message(-100, 50)  # e.g. a message the first wipe missed
+    armed.save()
+    assert lock_cli.cmd_now(SimpleNamespace()) == 0
+    assert "already locked" in capsys.readouterr().out
+    time.sleep(0.01)
+    bot._app.bot.delete_messages.reset_mock()
+    _run(idle_gate.tick(bot))
+    bot._app.bot.delete_messages.assert_any_await(-100, [50])
+    assert not armed.wipe_pending
+    _run(idle_gate.tick(bot))  # done: the next tick deletes nothing
+    assert bot._app.bot.delete_messages.await_count == 1
 
 
 # ---- the Mini App --------------------------------------------------------------

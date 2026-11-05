@@ -2,7 +2,8 @@
 
 ``setup`` makes the TOTP secret and prints its ``otpauth://`` URI once;
 ``enable`` / ``disable`` edit ``security.idle_lock`` in ``aipager.yaml``;
-``now`` locks at the daemon's next tick; ``status`` shows the state.
+``now`` locks at the daemon's next tick (already locked: clears the chats
+again); ``status`` shows the state.
 The daemon reads the settings and the state file while it runs, so none
 of these needs a restart.
 """
@@ -86,6 +87,11 @@ def cmd_now(args: argparse.Namespace) -> int:
         print("The idle lock is off: `aipager lock enable` first.")
         return 1
     lock.load()
+    if lock.locked:
+        lock.request_wipe()
+        print("aipager is already locked. It clears the chats again within 30 s, "
+              "at the daemon's next tick.")
+        return 0
     lock.make_due()
     print("aipager locks within 30 s, at the daemon's next tick.")
     return 0
@@ -123,6 +129,6 @@ def add_parser(sub) -> argparse.ArgumentParser:
     enable_p.add_argument("--after-min", type=int, default=None,
                           help="minutes without activity before it locks (default 60)")
     lock_sub.add_parser("disable", help="turn the idle lock off (and unlock)")
-    lock_sub.add_parser("now", help="lock at the daemon's next tick")
+    lock_sub.add_parser("now", help="lock at the daemon's next tick (locked: clear the chats again)")
     lock_sub.add_parser("status", help="show the idle lock's settings and state")
     return lock_p

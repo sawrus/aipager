@@ -5,7 +5,8 @@ account (a lost phone, an open desktop session) can drive every Claude
 session. The idle lock bounds that window. When no member has done
 anything for ``after_min`` minutes, the daemon:
 
-- deletes the messages it knows of (Telegram allows it for 48 hours),
+- deletes the messages it knows of and, in a private chat, every id since
+  the previous wipe (Telegram allows it for 48 hours),
 - stops every outbound Bot API call that carries a chat (session output,
   cards, prompts) — :func:`refuses`, checked in the rate limiter, the one
   place every outbound call passes,
@@ -54,8 +55,12 @@ MAX_FAILS = 5
 FAIL_WINDOW = 600
 #: Telegram lets a bot delete a message for 48 hours after it was sent.
 WIPE_WINDOW = 48 * 3600
-#: Message ids kept for the wipe, newest last.
+#: Message ids kept for the wipe, oldest first.
 MAX_TRACKED = 3000
+#: Message ids a private chat's wipe looks back at most: a private chat
+#: numbers both sides' messages in one sequence, so the wipe deletes the
+#: whole range since the previous wipe, not only the ids it tracked.
+WIPE_SPAN = 3000
 
 #: Bot API methods that never carry session content: allowed while locked.
 #: Deleting is how the lock clears the chat; the rest have no chat.
@@ -129,16 +134,22 @@ def read_secret(path: Path | None = None) -> str:
 def write_secret(secret: str, path: Path | None = None) -> None:
     from aipager.private_file import write_private
 
+    # The folder holds the bot token too: owner-only, also when it exists.
     write_private(path or TOTP_PATH,
                   "# aipager idle lock: TOTP secret. Keep private.\n"
-                  f"{_SECRET_KEY}={secret}\n")
+                  f"{_SECRET_KEY}={secret}\n", dir_mode=0o700)
 
 
 # ---- state -------------------------------------------------------------------
 
 def _fresh_state() -> dict:
     return {"locked": False, "last_activity": 0.0, "last_step": 0,
-            "fails": [], "sent": []}
+            "fails": [], "sent": [], "wipe_pending": False, "wiped_upto": {}}
+
+
+def _valid_entry(entry) -> bool:
+    return (isinstance(entry, list) and len(entry) == 3
+            and all(isinstance(v, (int, float)) and not isinstance(v, bool) for v in entry))
 
 
 class IdleLock:
@@ -161,6 +172,7 @@ class IdleLock:
         self._loaded = False
         self._cached: tuple[float, bool, dict] | None = None
         self._warned = False
+        self._seen: set[tuple[int, int]] = set()
 
     # Paths resolve late, so a test that patches the module constants
     # reaches an instance built at import time.
@@ -219,7 +231,11 @@ class IdleLock:
         if not self._loaded:
             self.load()
 
-    def load(self) -> None:
+    def load(self, *, keep_unsaved: bool = False) -> None:
+        """Read the state file. With *keep_unsaved*, messages noted since
+        the last save stay tracked: another process (``aipager lock``)
+        wrote the file, and its write must not make the next wipe miss them."""
+        unsaved = list(self._state["sent"]) if keep_unsaved and self._dirty else []
         state = _fresh_state()
         try:
             raw = json.loads(self.state_path.read_text(encoding="utf-8"))
@@ -228,9 +244,23 @@ class IdleLock:
             self._mtime = self.state_path.stat().st_mtime
         except (OSError, ValueError):
             self._mtime = None
+        if not isinstance(state["wiped_upto"], dict):
+            state["wiped_upto"] = {}
+        state["sent"] = [e for e in state["sent"] if _valid_entry(e)] \
+            if isinstance(state["sent"], list) else []
         self._state = state
+        self._seen = {(int(c), int(m)) for c, m, _ts in state["sent"]}
         self._loaded = True
         self._dirty = False
+        merged = False
+        for chat_id, message_id, ts in unsaved:
+            if (chat_id, message_id) not in self._seen:
+                self._seen.add((chat_id, message_id))
+                state["sent"].append([chat_id, message_id, ts])
+                merged = True
+        if merged:
+            self._trim()
+            self._dirty = True
 
     def save(self) -> None:
         from aipager.private_file import write_private
@@ -254,7 +284,7 @@ class IdleLock:
         except OSError:
             return
         if mtime != self._mtime:
-            self.load()
+            self.load(keep_unsaved=True)
 
     # -- queries --
 
@@ -295,8 +325,32 @@ class IdleLock:
         self._state["last_activity"] = self._clock() if now is None else now
         self._dirty = True
 
+    @property
+    def wipe_pending(self) -> bool:
+        """Locked, and the chats are still to be cleared."""
+        self._ensure_loaded()
+        return bool(self._state["wipe_pending"])
+
+    def request_wipe(self) -> None:
+        """Clear the chats again at the daemon's next tick (``aipager lock
+        now`` while already locked)."""
+        self._ensure_loaded()
+        self._state["wipe_pending"] = True
+        self.save()
+
+    def _trim(self) -> None:
+        sent = self._state["sent"]
+        if len(sent) > MAX_TRACKED:
+            for chat_id, message_id, _ts in sent[:-MAX_TRACKED]:
+                self._seen.discard((chat_id, message_id))
+            self._state["sent"] = sent[-MAX_TRACKED:]
+
     def note_message(self, chat_id, message_id, now: float | None = None) -> None:
-        """Remember a message in a served chat, for the wipe at the next lock."""
+        """Remember a message in a served chat, for the wipe at the next lock.
+
+        A message is noted once, at its first sight: seeing it again (an
+        edit of a streaming card) neither adds an entry nor makes it
+        younger, so edits cannot push real messages out of the tracker."""
         if not isinstance(message_id, int) or isinstance(message_id, bool):
             return
         if not self.enabled:
@@ -306,23 +360,65 @@ class IdleLock:
         except (TypeError, ValueError):
             return
         self._ensure_loaded()
+        if (chat_id, message_id) in self._seen:
+            return
         now = self._clock() if now is None else now
-        self._state["sent"] = (self._state["sent"] + [[chat_id, message_id, int(now)]])[-MAX_TRACKED:]
+        self._seen.add((chat_id, message_id))
+        self._state["sent"].append([chat_id, message_id, int(now)])
+        self._trim()
         self._dirty = True
 
-    def lock(self, now: float | None = None) -> dict[int, list[int]]:
-        """Lock now. Returns the messages to delete, by chat (younger than
-        48 hours), and forgets them."""
+    def lock(self, now: float | None = None) -> None:
+        """Lock now. The chats are cleared next (:meth:`wipe_plan`, then
+        :meth:`wiped`); until then the tracked messages are kept."""
         self._ensure_loaded()
-        now = self._clock() if now is None else now
-        wipe: dict[int, list[int]] = {}
-        for chat_id, message_id, ts in self._state["sent"]:
-            if now - ts < WIPE_WINDOW:
-                wipe.setdefault(int(chat_id), []).append(int(message_id))
-        self._state.update(locked=True, sent=[], fails=[])
+        self._state.update(locked=True, fails=[], wipe_pending=True)
         self.save()
         log.info("idle lock: locked")
-        return {chat: sorted(set(ids)) for chat, ids in wipe.items()}
+
+    def wipe_plan(self, private=(), now: float | None = None) -> dict[int, list[int]]:
+        """The message ids to delete, by chat: every tracked message younger
+        than 48 hours and, in each chat of *private*, the whole id range from
+        the previous wipe (at most :data:`WIPE_SPAN` back) up to the newest
+        id tracked there. Changes nothing."""
+        self._ensure_loaded()
+        now = self._clock() if now is None else now
+        plan: dict[int, set[int]] = {}
+        for chat_id, message_id, ts in self._state["sent"]:
+            if now - ts < WIPE_WINDOW:
+                plan.setdefault(int(chat_id), set()).add(int(message_id))
+        upto = self._state["wiped_upto"]
+        for chat_id in {int(c) for c in private}:
+            ids = plan.get(chat_id)
+            if not ids:
+                continue
+            top = max(ids)
+            last = upto.get(str(chat_id))
+            start = last + 1 if isinstance(last, int) and not isinstance(last, bool) else min(ids)
+            ids.update(range(max(1, start, top - WIPE_SPAN + 1), top + 1))
+        return {chat: sorted(ids) for chat, ids in plan.items()}
+
+    def wiped(self, plan: dict[int, list[int]], failed=None, private=(),
+              now: float | None = None) -> None:
+        """The wipe of *plan* is done: forget its messages except the
+        *failed* ones (by chat; tried again at the next wipe while younger
+        than 48 hours), remember how far each chat of *private* was cleared,
+        and save."""
+        self._ensure_loaded()
+        now = self._clock() if now is None else now
+        failed = failed or {}
+        done = {(int(c), i) for c, ids in plan.items() for i in ids
+                if i not in failed.get(c, ())}
+        keep = [[c, m, ts] for c, m, ts in self._state["sent"]
+                if (int(c), int(m)) not in done and now - ts < WIPE_WINDOW]
+        self._state["sent"] = keep
+        self._seen = {(int(c), int(m)) for c, m, _ts in keep}
+        private = {int(c) for c in private}
+        for chat_id, ids in plan.items():
+            if chat_id in private and ids:
+                self._state["wiped_upto"][str(chat_id)] = max(ids)
+        self._state["wipe_pending"] = False
+        self.save()
 
     def unlock(self, now: float | None = None) -> None:
         self._ensure_loaded()
@@ -375,13 +471,20 @@ def refuses(endpoint: str, chat_id) -> bool:
     return LOCK.is_locked()
 
 
-def record_result(result) -> None:
-    """Remember the message(s) a Bot API call returned, for the next wipe."""
+def record_result(result, endpoint: str = "", chat_id=None) -> None:
+    """Remember the message(s) a Bot API call returned, for the next wipe.
+
+    An edit (``editMessage*``) returns a message that is already tracked
+    and is never noted again. A copy returns only ``message_id``: its chat
+    is the call's *chat_id*."""
+    if endpoint.startswith("edit"):
+        return
     if isinstance(result, dict) and "result" in result:  # a raw API response
         result = result["result"]
     items = result if isinstance(result, list) else [result]
     for item in items:
         if isinstance(item, dict) and "message_id" in item:
             chat = item.get("chat")
-            if isinstance(chat, dict):
-                LOCK.note_message(chat.get("id"), item["message_id"])
+            chat = chat.get("id") if isinstance(chat, dict) else chat_id
+            if chat is not None:
+                LOCK.note_message(chat, item["message_id"])

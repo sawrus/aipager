@@ -1968,13 +1968,13 @@ class BudgetRateLimiter(BaseRateLimiter):
         :meth:`_paced_request`): while locked, a call that carries a chat
         raises :class:`~aipager.bot.flood.IdleLocked` and is never made.
         Each message a call returns is remembered for the wipe at the
-        next lock."""
+        next lock; an edit's is not noted again."""
         chat_id = data.get("chat_id") if isinstance(data, dict) else None
         if idle_lock.refuses(endpoint, chat_id):
             raise IdleLocked(chat_id)
         result = await self._paced_request(
             callback, args, kwargs, endpoint, data, rate_limit_args)
-        idle_lock.record_result(result)
+        idle_lock.record_result(result, endpoint, chat_id)
         return result
 
     async def _paced_request(
