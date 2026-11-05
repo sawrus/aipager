@@ -193,3 +193,16 @@ def test_record_of_a_file_names_it(tmp_path):
                  file_name="chart.png", file_size=1234, path=log)
     record = json.loads(log.read_text())
     assert (record["file_name"], record["file_size"]) == ("chart.png", 1234)
+
+
+def test_append_keeps_the_log_owner_only(tmp_path):
+    """The summaries hold shell commands and answers: 0600 from the first
+    byte, and a log an older aipager left wider is narrowed."""
+    new = tmp_path / "new.jsonl"
+    audit.append(session="s", label="l", action="Allowed", path=new)
+    assert new.stat().st_mode & 0o777 == 0o600
+    old = tmp_path / "old.jsonl"
+    old.write_text("")
+    old.chmod(0o664)
+    audit.append(session="s", label="l", action="Allowed", path=old)
+    assert old.stat().st_mode & 0o777 == 0o600

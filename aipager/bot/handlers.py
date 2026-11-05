@@ -81,6 +81,7 @@ from aipager.config import (
     FILE_DOWNLOAD_DIR, KEYBOARD_PARENTS,
 )
 from aipager import uploads
+from aipager.text_shape import shape
 from aipager.state import QUEUE_CAP, Status, TrackedSession
 
 # Pure-function helpers and constants live in aipager.bot.transport
@@ -965,9 +966,9 @@ class CommandHandlersMixin:
             sess.model_hold = True
         await self._react(update, reactions.HANDED_OFF)
         if for_model:
-            log.info("[%s] Held (model check running): %s", sess.label, text[:80])
+            log.info("[%s] Held (model check running): %s", sess.label, shape(text))
         else:
-            log.info("[%s] Held (%s): %s", sess.label, held_reason, text[:80])
+            log.info("[%s] Held (%s): %s", sess.label, held_reason, shape(text))
         if for_dialog:
             await self._tell_held_for_dialog(update, sess)
         if for_park:
@@ -2537,7 +2538,7 @@ class CommandHandlersMixin:
                 return await self._send_text_to(update, chosen, text, bot_id=bot_id)
             if await self._ask_which_session(update, resend=resend):
                 return
-            log.warning("Dropped text %r — no session to route to", text[:80])
+            log.warning("Dropped a message (%s) — no session to route to", shape(text))
             await reply_text(update.message, i18n.for_update(update).text(
                 NO_SESSION, command=Command(LABEL_COMMAND)))
             return
@@ -2607,7 +2608,7 @@ class CommandHandlersMixin:
             await self._react(update, reactions.HANDED_OFF)
             self.registry.transition(sess.name, Status.BUSY)
             await self._card_for_injected(sess, was_busy=was_busy)
-            log.info("[%s] Sent text: %s", sess.label, text[:80])
+            log.info("[%s] Sent text: %s", sess.label, shape(text))
             return True
         if ok is PROMPT_REFUSED:
             await self._reply_needs_admin(update)
@@ -2788,7 +2789,7 @@ class CommandHandlersMixin:
             await self._react(update, reactions.HANDED_OFF)
             self.registry.transition(sess.name, Status.BUSY)
             await self._card_for_injected(sess, was_busy=was_busy)
-            log.info("[%s] Voice injected: %r", sess.label, transcript[:80])
+            log.info("[%s] Voice injected: %s", sess.label, shape(transcript))
             return True
         if ok is PROMPT_REFUSED:
             await self._reply_needs_admin(update)
@@ -3100,7 +3101,7 @@ class CommandHandlersMixin:
                 "📝", button or prompt_text, sess.label, tr))
             self.registry.transition(sess.name, Status.BUSY)
             await self._card_for_injected(sess, was_busy=was_busy)
-            log.info("[%s] Template sent: %s", sess.label, prompt_text[:80])
+            log.info("[%s] Template sent: %s", sess.label, shape(prompt_text))
         elif ok is PROMPT_REFUSED:
             await self._reply_needs_admin(update)
         else:
@@ -3332,7 +3333,7 @@ class CommandHandlersMixin:
                 await self._react(update, reactions.HANDED_OFF)
                 self.registry.transition(name, Status.BUSY)
                 await self._card_for_injected(sess, was_busy=was_busy)
-                log.info("[%s] Direct send: %s", target_label, prompt_text[:80])
+                log.info("[%s] Direct send: %s", target_label, shape(prompt_text))
             elif ok is PROMPT_REFUSED:
                 await self._reply_needs_admin(update)
             else:

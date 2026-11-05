@@ -316,6 +316,14 @@ def _raw_yaml(path: Path) -> dict:
     return raw if isinstance(raw, dict) else {}
 
 
+def _secure_config_dir(path: Path) -> None:
+    """``~/.config/aipager`` holds the bot token and the idle lock's secret:
+    keep it owner-only, also when it already existed wider."""
+    if Path(path).parent == CONFIG_PATH.parent:
+        from aipager.private_file import secure_dir
+        secure_dir(Path(path).parent)
+
+
 def _atomic_write_yaml(data: dict, path: Path) -> None:
     body = (
         _AIPAGER_YAML_HEADER
@@ -323,6 +331,7 @@ def _atomic_write_yaml(data: dict, path: Path) -> None:
     )
     check_write(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    _secure_config_dir(path)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(body, encoding="utf-8")
     try:
@@ -794,6 +803,7 @@ def _add_migration_line(text: str, old: int, new: int, current) -> str | None:
 def _atomic_write_text(body: str, path: Path) -> None:
     check_write(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    _secure_config_dir(path)
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(body, encoding="utf-8")
     try:

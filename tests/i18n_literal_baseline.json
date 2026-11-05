@@ -37,7 +37,7 @@
  "aipager/claude_resolve.py": 31,
  "aipager/cli/__init__.py": 57,
  "aipager/cli/daemon.py": 31,
- "aipager/cli/lock.py": 28,
+ "aipager/cli/lock.py": 29,
  "aipager/cli/policy.py": 3,
  "aipager/cli/report.py": 3,
  "aipager/cli/resume.py": 38,

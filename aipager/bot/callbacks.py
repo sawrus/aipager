@@ -71,6 +71,7 @@ from aipager.team import (
 # tests) keeps working without changes.
 from aipager.bot.dashboard import ALREADY_ANSWERED, PINNED_ANSWER_VERB, open_prompt_tokens
 from aipager.bot.flood import MUTE, clear_time
+from aipager.text_shape import shape
 from aipager.bot.transport import (  # noqa: F401
     _message_chat_id,
     resolve_chat_id,
@@ -549,7 +550,7 @@ class CallbackDispatchMixin:
             if ack.answered:
                 if text is not None:
                     log.debug("callback toast dropped, the query was "
-                              "already answered: %r", text)
+                              "already answered")
                 return
             ack.answered = True
         try:
@@ -1315,7 +1316,7 @@ class CallbackDispatchMixin:
                     pass
                 self.registry.transition(session_name, Status.BUSY)
                 await self._card_for_injected(sess, was_busy=was_busy)
-                log.info("[%s] Retry: %s", sess.label, prompt[:80])
+                log.info("[%s] Retry: %s", sess.label, shape(prompt))
             elif ok is PROMPT_REFUSED:
                 # A slash command that may not be resent (roadmap 8.74).
                 # Someone else's text runs with no sender, which may send

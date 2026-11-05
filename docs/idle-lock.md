@@ -13,8 +13,12 @@ aipager lock enable           # on; --after-min N to change the 60 minutes
 aipager lock status|now|disable
 ```
 
+`aipager lock now` on a locked aipager clears the chats again at the
+daemon's next tick and sends the lock notice again.
+
 The secret is in `~/.config/aipager/totp.env` (`0600`), the state in
-`~/.local/state/aipager/lock.json` (`0600`), the settings in `aipager.yaml`:
+`~/.local/state/aipager/lock.json` (`0600`), the settings in `aipager.yaml`.
+Both folders are kept `0700`, also when an older install made them wider:
 
 ```yaml
 security:
@@ -34,7 +38,11 @@ open must not keep aipager unlocked.
 **When the quiet spell is over** (checked every 30 seconds) aipager:
 
 - deletes the messages it knows of in every served chat (sent and
-  received; Telegram allows it for 48 hours),
+  received; each message once, edits are not counted again) and, in a
+  private chat, every message id since the previous wipe, in calls of
+  100 (Telegram allows it for 48 hours). A delete that fails is tried
+  again at the next wipe, and the log says per chat how many ids were
+  asked and how many failed (never their text),
 - sends `🔒 aipager is locked after a quiet spell. Send /start to unlock it.`
   to each private chat,
 - refuses every outbound Bot API call that carries a chat, in the rate

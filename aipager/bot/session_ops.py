@@ -30,6 +30,7 @@ from aipager.config import RESUME_GUARD_SECONDS
 from aipager.i18n import Command, Msg, Safe, Span
 from aipager.dtach import inject
 from aipager.bot import reactions
+from aipager.text_shape import shape
 from aipager.bot.sibling_text import shown
 from aipager.miniapp import sessions as _mini_sessions
 
@@ -1324,7 +1325,7 @@ class SessionOpsMixin:
         if self._command_needs_admin(text, explicit_driver_user_id,
                                      chat_id=role_chat_id):
             log.info("[%s] Refused a slash command from %s: %s",
-                     sess.label, explicit_driver_user_id, text[:80])
+                     sess.label, explicit_driver_user_id, shape(text))
             return PROMPT_REFUSED
         if driver_user_id is None:
             driver_user_id = sess.last_driver_user_id

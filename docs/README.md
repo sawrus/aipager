@@ -20,6 +20,7 @@ English page is right.
 | [Troubleshooting](troubleshooting.md) | Common failures and the `aipager doctor` fix table |
 | [Problem reports](problem-reports.md) | What a problem report contains, where it goes, and when aipager offers one |
 | [Security model](security.md) | Trust boundary, secrets, audit log, network surface |
+| [Security audit, November 2026](security-audit-2026-11.md) | The fork's audit: findings, severity, what is fixed and what is left |
 
 For getting started, see the top-level [README](../README.md). For
 release history, see [CHANGELOG](../CHANGELOG.md).

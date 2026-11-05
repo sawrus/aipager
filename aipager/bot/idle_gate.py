@@ -7,8 +7,9 @@ with the code prompt and checks a 6-digit code. A code is never accepted
 in a group: everyone there would see it.
 
 :func:`run` is the background tick: when the quiet spell is over it
-deletes the messages the lock knows of and sends the lock notice to each
-private chat.
+clears the chats (:func:`wipe`) and sends the lock notice to each private
+chat. A wipe asked again while locked (``aipager lock now``) runs at the
+next tick.
 """
 
 from __future__ import annotations
@@ -99,12 +100,15 @@ async def _say(bot, chat_id, msg, **params):
         return await send_text(bot._app.bot, chat_id, i18n.for_chat(chat_id).text(msg, **params))
 
 
-async def _delete(bot, chat_id, message_id) -> None:
+async def _delete(bot, chat_id, message_id) -> bool:
+    """Delete one message; whether Telegram took it. Never raises."""
     app = bot._app
     try:
         await app.bot.delete_message(chat_id, message_id)
+        return True
     except Exception:
         log.debug("idle lock: could not delete message %s", message_id, exc_info=True)
+        return False
 
 
 async def gate(bot, update: Update, context) -> None:
@@ -160,11 +164,16 @@ async def gate(bot, update: Update, context) -> None:
     raise ApplicationHandlerStop
 
 
-async def lock_now(bot) -> None:
-    """Lock, delete the known messages, send the notice."""
-    wipe = idle_lock.LOCK.lock()
+async def wipe(bot) -> None:
+    """Delete the messages the lock knows of and, in each private chat,
+    every id since the previous wipe; then log the outcome per chat (counts
+    only, never text) and forget what was deleted."""
+    lock = idle_lock.LOCK
+    private = private_chats(bot)
+    plan = lock.wipe_plan(private)
     app = bot._app
-    for chat_id, ids in wipe.items():
+    failed: dict[int, set[int]] = {}
+    for chat_id, ids in plan.items():
         for i in range(0, len(ids), _DELETE_CHUNK):
             chunk = ids[i:i + _DELETE_CHUNK]
             try:
@@ -173,7 +182,20 @@ async def lock_now(bot) -> None:
                 log.info("idle lock: bulk delete failed in %s; one by one", chat_id,
                          exc_info=True)
                 for message_id in chunk:
-                    await _delete(bot, chat_id, message_id)
+                    if not await _delete(bot, chat_id, message_id):
+                        failed.setdefault(chat_id, set()).add(message_id)
+    lock.wiped(plan, failed, private)
+    for chat_id, ids in plan.items():
+        log.info("idle lock: cleared chat %s: %d ids asked, %d failed",
+                 chat_id, len(ids), len(failed.get(chat_id, ())))
+    if not plan:
+        log.info("idle lock: cleared no chat: no message is known")
+
+
+async def lock_now(bot) -> None:
+    """Lock, clear the chats, send the notice."""
+    idle_lock.LOCK.lock()
+    await wipe(bot)
     for chat_id in private_chats(bot):
         await _say(bot, chat_id, LOCKED, command=_start())
 
@@ -184,6 +206,11 @@ async def tick(bot) -> None:
     lock.reload_if_changed()
     if lock.due():
         await lock_now(bot)
+    elif lock.is_locked() and lock.wipe_pending:
+        # `aipager lock now` while locked, or a wipe a stop cut short.
+        await wipe(bot)
+        for chat_id in private_chats(bot):
+            await _say(bot, chat_id, LOCKED, command=_start())
     lock.save_if_dirty()
 
 

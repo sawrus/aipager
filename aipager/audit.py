@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import stat
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -97,7 +99,13 @@ def append(*, session: str, label: str, action: str,
     check_write(target)
     try:
         target.parent.mkdir(parents=True, exist_ok=True)
-        with target.open("a", encoding="utf-8") as f:
+        # Owner-only from its first byte: the summaries hold shell
+        # commands and answers. An older, wider file is narrowed.
+        fd = os.open(target, os.O_WRONLY | os.O_APPEND | os.O_CREAT
+                     | getattr(os, "O_CLOEXEC", 0), 0o600)
+        with os.fdopen(fd, "a", encoding="utf-8") as f:
+            if stat.S_IMODE(os.fstat(fd).st_mode) != 0o600:
+                os.fchmod(fd, 0o600)
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
         return True
     except OSError as e:
