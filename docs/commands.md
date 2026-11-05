@@ -165,21 +165,10 @@ Tiếng Việt, each listed in its own name.
 - **Mode words.** `/mode` takes the mode's word in your language (`/mode demander`),
   and `ask`, `auto` and `full` always work. If a live session has exactly that name, the
   word names the session instead (see `/mode` above).
-- **Bot description.** At start, aipager writes the bot's description (the text on
-  its empty chat screen) and short description in each of these languages, for
-  people whose Telegram is in that language. Telegram shows such a text instead
-  of the one you wrote in BotFather, so aipager sets none while you have your
-  own (description and short description are checked apart). It never
-  overwrites a text of yours and never changes the English or default one.
-  When its current text is already set in every language, a start asks
-  Telegram nothing. Otherwise it first reads your BotFather text (one read
-  each for the description and the short description): if you have one, it
-  stops there, so with your own text every start costs those reads and no
-  more. If you have none, it reads each language that does not have its
-  current text yet, so a language where you wrote your own text is read again
-  at every start. If you write a description in BotFather after aipager has
-  set its own, readers of these languages keep aipager's (see
-  [troubleshooting](troubleshooting.md#the-bot-description-is-not-the-one-i-wrote)).
+- **Bot description.** aipager sets no bot description. At every start it clears the
+  description (the text on the empty chat screen) and the short description, for the
+  default and for each of these languages, so people see none of it before `/start`.
+  This also removes a text you wrote in BotFather. There is no setting to bring it back.
 
 ## The Mini App
 
