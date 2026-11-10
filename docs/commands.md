@@ -172,7 +172,7 @@ Tiếng Việt, each listed in its own name.
 
 ## The Mini App
 
-`/app` (and the Telegram menu button) opens a dashboard served by the daemon itself. It is on by default; manage it with `aipager miniapp enable|disable|status`. Every request is verified against Telegram's `initData` signature (see [security → Mini App tunnel](security.md#mini-app-tunnel)). The page loads nothing from anywhere else: no fonts, images or scripts from other sites.
+`/app` (and the Telegram menu button) opens a dashboard served by the daemon itself. It is off by default: only `MINIAPP_ENABLED=1` in `~/.config/aipager/.env` turns it on (fork). Manage it with `aipager miniapp enable|disable|status`. Every request is verified against Telegram's `initData` signature (see [security → Mini App tunnel](security.md#mini-app-tunnel)). The page loads nothing from anywhere else: no fonts, images or scripts from other sites.
 
 - **Chats.** The app shows one chat at a time. If you belong to more than one chat (your DM and a group, say), a row of chat names at the top switches between them; the app opens on your own DM and remembers your last choice on that phone. Everything below is for the chosen chat, with your role in it. With one chat the row is not shown. See [groups](groups.md).
 - **Sessions.** One sentence sums up the chat, for example "1 needs you, 2 working, 3 resting", with what has been spent beneath it. Each live session is a tile with a context ring, its folder, model and cost; working ones glow in the accent colour. Finished sessions rest on a collapsible **Finished** shelf. The **+** button starts a new session.
@@ -1163,8 +1163,8 @@ Run `aipager <command> --help` for the same list on your machine.
 | `aipager session ls [-a] [--json]` | List the sessions; `-a` includes ended ones. Also `aipager session list`. |
 | `aipager session kill <name> [-y]` | End a session, after a question unless `-y`. |
 | `aipager resume [name]` | Bring back an ended session with its conversation; without a name, a picker. It follows a moved conversation and handles a background job that holds it, as `aipager session --resume` does. |
-| `aipager miniapp enable [--port PORT] [--url URL]` | Turn the Mini App on, on `127.0.0.1:PORT` (default 8765), behind the managed tunnel or your own `https://` URL. Takes effect at the next daemon restart. |
-| `aipager miniapp disable\|status` | Turn it off (at the next restart), or show its settings and address. |
+| `aipager miniapp enable [--port PORT] [--url URL]` | Turn the Mini App on (`MINIAPP_ENABLED=1` in `~/.config/aipager/.env`), on `127.0.0.1:PORT` (default 8765, saved in `aipager.yaml`), behind the managed tunnel or your own `https://` URL. Takes effect at the next daemon restart. |
+| `aipager miniapp disable\|status` | Turn it off (`MINIAPP_ENABLED=0`, at the next restart), or show its settings and address. |
 | `aipager resume --claude` | Pick a Claude Code conversation started without aipager (last 14 days) and continue it under aipager; one still open in a terminal is taken over after `[y/N]` (fork, see [other sessions](foreign-sessions.md)). |
 | `aipager wrap install\|uninstall\|status` | Make `claude` in an interactive shell start under aipager (`alias claude=aipager-claude` in `~/.bashrc`) (fork, see [other sessions](foreign-sessions.md)). |
 | `aipager lock setup [--reset]` | Make the idle lock's TOTP secret and print its `otpauth://` URI once (fork, see [idle lock](idle-lock.md)). |
@@ -1445,7 +1445,7 @@ them is needed for normal use.
 |---|---|---|
 | `AIPAGER_WHISPER_MODEL` | `base` | The speech model for voice messages (`tiny`, `base`, `small`, `medium`, ...): bigger is more accurate and slower. |
 | `MINIAPP_PORT` | `8765` | The Mini App's port on `127.0.0.1` (`aipager miniapp enable --port` saves it instead). |
-| `MINIAPP_ENABLED` | from `aipager.yaml` | `0` turns the Mini App off and `1` on, whatever `aipager.yaml` says (`aipager miniapp enable\|disable` saves the choice instead). |
+| `MINIAPP_ENABLED` | off | `1` (or `true`, `yes`, `on`) turns the Mini App on; anything else, or unset, leaves it off. The only switch: `enabled` under `miniapp:` in `aipager.yaml` is ignored. `aipager miniapp enable\|disable` writes it to `~/.config/aipager/.env`, which the daemon reads on every start (fork). |
 | `MINIAPP_PUBLIC_URL` | none | Serve the Mini App at your own `https://` URL instead of the managed tunnel ([security](security.md#mini-app-tunnel)). |
 | `KEEP_FINISHED_CARD` | `1` | `0` makes "Replace with result" the message layout for chats that never chose one in `/settings`. |
 | `STALE_BUSY_TIMEOUT` | `7200` (2 hours) | Seconds a working session may go with no news before the chat gets a "still working (quiet for 120 min)" note. |

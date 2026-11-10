@@ -119,7 +119,7 @@ To set it up, add the bot to the group as an admin (so it can pin the group's st
 
 ### A dashboard inside Telegram
 
-`/app` opens the Mini App: your sessions with Stop, End, Restart, Rename and the mode switch, a diff viewer for every `Write` and `Edit`, the settings and, for the owner, Report a problem. It is served by the daemon itself and is on by default, and every request is checked against Telegram's signature. If you are in more than one chat, a row of chat names at the top switches between them. Turn it off with `aipager miniapp disable`, or point it at your own URL ([how](https://github.com/dev-aly3n/aipager/blob/main/docs/security.md#mini-app-tunnel)).
+`/app` opens the Mini App: your sessions with Stop, End, Restart, Rename and the mode switch, a diff viewer for every `Write` and `Edit`, the settings and, for the owner, Report a problem. It is served by the daemon itself and is off by default: turn it on with `aipager miniapp enable` (`MINIAPP_ENABLED=1` in `~/.config/aipager/.env`). Every request is checked against Telegram's signature. If you are in more than one chat, a row of chat names at the top switches between them. Turn it off with `aipager miniapp disable`, or point it at your own URL ([how](https://github.com/dev-aly3n/aipager/blob/main/docs/security.md#mini-app-tunnel)).
 
 ### Fifteen languages
 
@@ -299,7 +299,7 @@ To leave a session without stopping Claude, close the terminal or the tmux pane:
 ## Security
 
 - **No aipager server.** The daemon talks to the Telegram Bot API with your own bot token. There is no aipager account and no aipager service.
-- **No open port.** The daemon listens on loopback only. The Mini App goes out through a Cloudflare tunnel where every request must carry Telegram's signature, and `aipager miniapp disable` turns it off.
+- **No open port.** The daemon listens on loopback only. The Mini App goes out through a Cloudflare tunnel where every request must carry Telegram's signature, and it is off until you turn it on.
 - **Every answer on the record.** Each Allow, Deny and answer is appended to `~/.claude/aipager-audit.jsonl`, with who tapped it in a group.
 - **Claude Code still decides.** Your Claude Code settings say what needs asking. aipager relays the question and never elevates: no sudo, and everything runs as your user.
 

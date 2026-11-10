@@ -8,33 +8,61 @@ from aipager import instance as _instance
 
 _XDG_CONFIG = Path.home() / ".config" / "aipager" / "config.env"
 _PROJECT_DOTENV = Path(__file__).parent.parent / ".env"
+#: The operator's own switches (``MINIAPP_ENABLED=1``): read on every
+#: start and, unlike config.env, never retired. ``aipager miniapp
+#: enable/disable`` edits it.
+DOTENV_PATH = Path.home() / ".config" / "aipager" / ".env"
+
+
+def _apply_env_file(path: Path) -> bool:
+    """Set each ``KEY=value`` of *path* that the environment does not
+    already have. False when there is no such file."""
+    try:
+        text = path.read_text()
+    except OSError:
+        return False
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip().strip("\"'")
+        if key and key not in os.environ:
+            os.environ[key] = value
+    return True
 
 
 def _load_env_file() -> None:
     """Load environment variables.
 
-    Source priority (first existing file wins):
+    ``~/.config/aipager/.env`` (:data:`DOTENV_PATH`) always, then the
+    first existing file of:
       1. ~/.config/aipager/config.env (XDG, written by `aipager config`)
       2. <project-root>/.env (legacy / development checkouts)
 
-    An isolated instance (``AIPAGER_INSTANCE_DIR``) reads only the first:
-    a checkout's ``.env`` belongs to the operator's own install, and its
-    chat id or token must never leak into a test instance.
+    The environment wins over every file, and an earlier file over a
+    later one. An isolated instance (``AIPAGER_INSTANCE_DIR``) has its own
+    HOME and skips the second: a checkout's ``.env`` belongs to the
+    operator's own install, and its chat id or token must never leak into
+    a test instance.
     """
+    _apply_env_file(DOTENV_PATH)
     candidates = (_XDG_CONFIG,) if _instance.instance_dir() else (
         _XDG_CONFIG, _PROJECT_DOTENV)
     for candidate in candidates:
-        if candidate.exists():
-            for line in candidate.read_text().splitlines():
-                line = line.strip()
-                if not line or line.startswith("#") or "=" not in line:
-                    continue
-                key, _, value = line.partition("=")
-                key = key.strip()
-                value = value.strip().strip("\"'")
-                if key and key not in os.environ:
-                    os.environ[key] = value
+        if _apply_env_file(candidate):
             return
+
+
+#: What turns an on/off environment switch on; anything else is off.
+_TRUE_WORDS = ("1", "true", "yes", "on")
+
+
+def env_flag(name: str) -> bool:
+    """Whether environment switch *name* is on (``1``, ``true``, ``yes``,
+    ``on``, any case); unset, empty or anything else is off."""
+    return os.environ.get(name, "").strip().lower() in _TRUE_WORDS
 
 
 _load_env_file()
@@ -134,24 +162,26 @@ def _load_miniapp() -> dict:
 # ---- Mini App server (stage 1 — plumbing + auth) -----------------------
 #
 # Opt-in loopback HTTP server, embedded in the daemon, serving one
-# read-only Telegram Mini App page (daemon status + session list). Off
-# by default: no listener, no tunnel, until explicitly enabled. Toggling
-# requires a daemon restart — `aipager miniapp enable/disable` only
-# writes the file.
+# Telegram Mini App and, through a public tunnel, reachable from outside.
+# Off by default: no listener, no tunnel, until `MINIAPP_ENABLED=1` is in
+# the environment, normally from ~/.config/aipager/.env (DOTENV_PATH).
+# Nothing else turns it on: the `enabled` key of aipager.yaml's
+# `miniapp:` block is ignored, so neither a wizard nor a damaged or
+# hand-copied yaml can open the listener. Toggling requires a daemon
+# restart — `aipager miniapp enable/disable` only writes the file.
 #
-# Source of truth is the `miniapp:` block in aipager.yaml, NOT config.env:
-# `migrate.retire_v1()` renames config.env away on every daemon start once
-# aipager.yaml is authoritative, so a setting stored there survived exactly
-# one restart and then silently turned the Mini App off. Environment
-# variables still win, matching _load_env_file's setdefault semantics and
-# keeping one-off runs and tests overridable.
+# The port and the public URL still come from aipager.yaml's `miniapp:`
+# block, an environment variable winning over the file.
 _miniapp_file: dict = _load_miniapp()
 
-MINIAPP_ENABLED: bool = (
-    os.environ["MINIAPP_ENABLED"] not in ("0", "false", "no", "")
-    if "MINIAPP_ENABLED" in os.environ
-    else bool(_miniapp_file["enabled"])
-)
+
+
+def _miniapp_enabled() -> bool:
+    """The Mini App switch: ``MINIAPP_ENABLED`` alone, never aipager.yaml."""
+    return env_flag("MINIAPP_ENABLED")
+
+
+MINIAPP_ENABLED: bool = _miniapp_enabled()
 try:
     # `or` so an env var set to "" falls back to the file's port rather
     # than to the hardcoded default — consistent with MINIAPP_ENABLED and

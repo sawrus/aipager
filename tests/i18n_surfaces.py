@@ -589,6 +589,7 @@ def _settings_taps(env):
 @surface("menu.commands")
 def _menu(env):
     env.store(CHAT)
+    env.mp.setattr("aipager.config.MINIAPP_ENABLED", True)   # shows /app
     bot = env.mk_bot()
     _registered(bot, _sess())
     bot._app.bot.set_my_commands = AsyncMock()
