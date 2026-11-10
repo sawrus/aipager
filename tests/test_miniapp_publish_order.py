@@ -132,3 +132,30 @@ def test_managed_publish_probes_once(bot, run_async, monkeypatch):
     assert bot._miniapp_url == MANAGED
     assert table.probes == [MANAGED], "the URL was probed more than once"
     tunnel_mod.set_managed_tunnel_url("")
+
+
+@pytest.fixture
+def gated_bot(bot, monkeypatch):
+    """The menu button call goes through the idle lock's gate, locked."""
+    from aipager import idle_lock
+    from aipager.bot.flood import IdleLocked
+    monkeypatch.setattr(idle_lock.LOCK, "is_locked", lambda: True)
+
+    async def _set_menu(*, chat_id, menu_button):
+        if idle_lock.refuses("setChatMenuButton", chat_id):
+            raise IdleLocked(chat_id)
+        bot.menu_calls.append(
+            (chat_id, getattr(getattr(menu_button, "web_app", None), "url", None)))
+    bot._app.bot.set_chat_menu_button = _set_menu
+    return bot
+
+
+def test_a_locked_chat_still_loses_its_app_button(gated_bot, run_async):
+    gated_bot._miniapp_url = MANAGED
+    run_async(gated_bot._apply_miniapp_button(""))
+    assert gated_bot.menu_calls == [(1, None), (2, None), (3, None)]
+
+
+def test_a_locked_chat_gets_no_new_app_button(gated_bot, run_async):
+    run_async(gated_bot._apply_miniapp_button(MANAGED))
+    assert gated_bot.menu_calls == []

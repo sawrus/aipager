@@ -10,6 +10,7 @@ Single owner of all Telegram communication. Handles:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import functools
 import logging
 import os
@@ -1838,19 +1839,24 @@ class LifecycleMixin:
         if url:
             await self.release_deferred_keyboard()
 
-        for chat_id in chats:
-            try:
-                # chat_id is passed ALWAYS and BY KEYWORD — see
-                # _miniapp_button_chats for why the no-chat_id form is
-                # not an acceptable shortcut here.
-                await self._app.bot.set_chat_menu_button(
-                    chat_id=chat_id, menu_button=buttons[chat_id],
-                )
-            except Exception:
-                log.warning(
-                    "Failed to set the Mini App menu button for chat %s",
-                    chat_id, exc_info=True,
-                )
+        # Taking the button away shows nothing of a session, so the idle
+        # lock lets it through: a chat locked when the Mini App is turned
+        # off must not keep its App button (nothing would retry it).
+        from aipager import idle_lock
+        with contextlib.nullcontext() if url else idle_lock.service():
+            for chat_id in chats:
+                try:
+                    # chat_id is passed ALWAYS and BY KEYWORD — see
+                    # _miniapp_button_chats for why the no-chat_id form is
+                    # not an acceptable shortcut here.
+                    await self._app.bot.set_chat_menu_button(
+                        chat_id=chat_id, menu_button=buttons[chat_id],
+                    )
+                except Exception:
+                    log.warning(
+                        "Failed to set the Mini App menu button for chat %s",
+                        chat_id, exc_info=True,
+                    )
         log.info(
             "Mini App menu button %s for %d chat(s)",
             "published" if url else "cleared", len(chats),
