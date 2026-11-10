@@ -820,13 +820,7 @@ _kill = os.kill
 
 def _own_line() -> set[int]:
     """This process and its ancestors: never closed as a holder."""
-    out, pid = set(), os.getpid()
-    for _ in range(64):
-        if not pid or pid in out:
-            break
-        out.add(pid)
-        pid = _ppid(pid) or 0
-    return out
+    return _ancestors(os.getpid())
 
 
 def interactive_holders(session_id: str, entries: list[dict] | None = None) -> list[dict]:
@@ -864,6 +858,8 @@ def stop_interactive_sync(session_id: str,
     when one outlived both signals."""
     holders = interactive_holders(session_id, entries)
     pids = [e["pid"] for e in holders]
+    herdr = {e["pid"]: t for e in holders
+             if (t := _herdr_terminal(e["pid"])) is not None}
     for sig in (signal.SIGTERM, signal.SIGKILL):
         if not pids:
             break
@@ -883,6 +879,8 @@ def stop_interactive_sync(session_id: str,
     for e in holders:
         if e["pid"] in closed and e.get("tmux"):
             _close_tmux_pane(e["tmux"])
+        if e["pid"] in closed and e["pid"] in herdr:
+            _close_herdr_terminal(herdr[e["pid"]])
     return closed, ("terminal_still_running" if pids else "")
 
 
@@ -929,6 +927,131 @@ def _close_tmux_pane(where: str) -> None:
         except (OSError, subprocess.SubprocessError):
             log.debug("tmux pane %s not closed", where, exc_info=True)
         return
+
+
+# -- herdr ------------------------------------------------------------------
+
+#: The herdr terminal address ``HC_TERMINAL_ID`` names: ``t7``, ``t1b``
+#: (another machine's ``m/t7`` is never touched).
+_HERDR_ADDRESS = re.compile(r"t[0-9a-z]{1,12}")
+_HERDR_SESSION = re.compile(r"[A-Za-z0-9_.-]{1,64}")
+
+
+@dataclass
+class HerdrTerminal:
+    """The herdr terminal a claude ran in: its address, the ``HC_SESSION``
+    of its core (empty: the default one), the terminal's own program
+    and the claude's pid."""
+
+    address: str
+    session: str
+    pid: int
+    claude: int
+
+
+def _proc_environ(pid: int) -> dict[str, str]:
+    """*pid*'s environment from ``/proc/<pid>/environ``; empty when
+    unreadable (a test replaces it)."""
+    try:
+        raw = Path(f"/proc/{int(pid)}/environ").read_bytes()
+    except (OSError, ValueError):
+        return {}
+    out = {}
+    for item in raw.split(b"\0"):
+        key, sep, value = item.partition(b"=")
+        if sep:
+            out[key.decode("utf-8", "replace")] = value.decode("utf-8", "replace")
+    return out
+
+
+def _herdr_bin() -> str | None:
+    """herdr's ``hc`` client: ``herdr-core`` on PATH or in ``~/.local/bin``
+    (a service's PATH often lacks it). A test replaces it."""
+    import shutil
+    found = shutil.which("herdr-core")
+    if found:
+        return found
+    local = Path.home() / ".local" / "bin" / "herdr-core"
+    return str(local) if os.access(local, os.X_OK) else None
+
+
+def _run_hc(session: str, *args: str) -> dict | None:
+    """One ``herdr-core <args> --json`` call, its JSON output; None when it
+    failed. Never raises."""
+    exe = _herdr_bin()
+    if exe is None:
+        return None
+    env = dict(os.environ)
+    env.pop("HC_SESSION", None)
+    if session:
+        env["HC_SESSION"] = session
+    try:
+        r = _subprocess_run([exe, *args, "--json"], capture_output=True,
+                           text=True, timeout=5, env=env)
+        if r.returncode != 0:
+            return None
+        data = json.loads(r.stdout or "null")
+    except (OSError, subprocess.SubprocessError, ValueError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _ancestors(pid: int) -> set[int]:
+    """*pid* and its ancestors (at most 64)."""
+    out: set[int] = set()
+    for _ in range(64):
+        if not pid or pid in out:
+            break
+        out.add(pid)
+        pid = _ppid(pid) or 0
+    return out
+
+
+def _herdr_terminal(pid: int) -> HerdrTerminal | None:
+    """The herdr terminal claude *pid* runs in (its ``HC_TERMINAL_ID``),
+    looked up while it still runs; None when it runs in none, or the
+    terminal's program is not the claude or one of its ancestors (an
+    environment inherited past the terminal). Never raises."""
+    env = _proc_environ(pid)
+    address = env.get("HC_TERMINAL_ID", "")
+    session = env.get("HC_SESSION", "")
+    if not _HERDR_ADDRESS.fullmatch(address):
+        return None
+    if session and not _HERDR_SESSION.fullmatch(session):
+        return None
+    info = _run_hc(session, "get", address)
+    if not info or info.get("state") != "live":
+        return None
+    term_pid = _as_int(info.get("pid"))
+    if term_pid is None or term_pid not in _ancestors(pid):
+        return None
+    return HerdrTerminal(address, session, term_pid, pid)
+
+
+def _close_herdr_terminal(term: HerdrTerminal) -> None:
+    """Close the herdr terminal a closed claude ran in, so the
+    conversation's old owner is gone from herdr too: removed when it
+    finished, ended and removed when only an idle shell is left in it
+    (or the shell herdr's ``keep`` put in place of the claude). Never
+    raises."""
+    info = _run_hc(term.session, "get", term.address)
+    if not info:
+        return
+    state = info.get("state")
+    if state == "live":
+        pid = _as_int(info.get("pid"))
+        fg = info.get("foreground")
+        fg_pid = _as_int(fg.get("pid")) if isinstance(fg, dict) else None
+        if pid is None or fg_pid != pid or _has_children(pid):
+            return
+        if pid != term.pid and term.pid != term.claude:
+            return                      # another program took the terminal
+        if _run_hc(term.session, "kill", term.address) is None:
+            return
+    elif state != "finished":
+        return
+    if _run_hc(term.session, "rm", term.address) is not None:
+        log.info("closed herdr terminal %s", term.address)
 
 
 def prepare_resume_sync(session_id: str) -> ResumePlan:

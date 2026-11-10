@@ -43,6 +43,7 @@ NOT_AIPAGERS_DATA = {
     (".local", "bin", "claude"): "Claude Code's binary (read)",
     (".local", "bin"): "a folder looked up on PATH",
     (".local", "bin", "aipager"): "aipager's binary, removed by its installer",
+    (".local", "bin", "herdr-core"): "herdr's client, run to close a herdr terminal (not ours)",
     (".config", "systemd", "user", "aipager.service"):
         "the service unit, removed with the service as uninstall's first step",
 }

@@ -1478,6 +1478,17 @@ def _never_run_real_claude_commands(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _never_touch_real_herdr(monkeypatch):
+    """A resume closes the herdr terminal its old claude ran in: it reads
+    ``/proc/<pid>/environ`` of a test's fake pid (a real process of the
+    operator's could have that pid) and runs ``herdr-core kill`` and
+    ``rm``. Both seams read as "no herdr" in every test; a test of them
+    sets its own fakes."""
+    monkeypatch.setattr("aipager.claude_jobs._proc_environ", lambda pid: {})
+    monkeypatch.setattr("aipager.claude_jobs._herdr_bin", lambda: None)
+
+
+@pytest.fixture(autouse=True)
 def _no_live_dtach_sockets_at_load(monkeypatch):
     """``SessionRegistry.load`` asks which sessions have a live dtach
     socket (``inject.live_session_names``), and the real answer is the

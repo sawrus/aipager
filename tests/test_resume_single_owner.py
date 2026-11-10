@@ -166,6 +166,123 @@ def test_which_panes_stay(cfg, proc, tmux, case):
     assert killed(tmux) == []
 
 
+# ---- the herdr terminal ------------------------------------------------------------
+
+@pytest.fixture
+def herdr(monkeypatch, tmux):
+    """herdr terminals by address, the claudes' environments and parents,
+    and the ``herdr-core`` calls made. ``kill`` finishes a terminal."""
+    h = SimpleNamespace(terms={}, env={}, parents={}, calls=[])
+
+    def run(session, *args):
+        h.calls.append((session, args))
+        term = h.terms.get(args[1])
+        if term is None:
+            return None
+        if args[0] == "kill":
+            term["state"] = "finished"
+        elif args[0] == "rm":
+            del h.terms[args[1]]
+        return dict(term)
+
+    monkeypatch.setattr(claude_jobs, "_run_hc", run)
+    monkeypatch.setattr(claude_jobs, "_proc_environ", lambda pid: h.env.get(pid, {}))
+    monkeypatch.setattr(claude_jobs, "_ppid", lambda pid: h.parents.get(pid))
+    return h
+
+
+def shell_term(pid, fg=None):
+    return {"state": "live", "pid": pid, "foreground": {"pid": fg or pid}}
+
+
+def hc_verbs(herdr):
+    return [a[0] for _s, a in herdr.calls if a[0] in ("kill", "rm")]
+
+
+def test_the_idle_herdr_terminal_it_ran_in_is_closed(cfg, proc, herdr):
+    reg(cfg, proc, 4242)
+    herdr.env[4242] = {"HC_TERMINAL_ID": "t17", "HC_SESSION": "work"}
+    herdr.parents[4242] = 900
+    herdr.terms["t17"] = shell_term(900)
+    claude_jobs.prepare_resume_sync(X)
+    assert hc_verbs(herdr) == ["kill", "rm"]
+    assert {s for s, _a in herdr.calls} == {"work"}
+    assert "t17" not in herdr.terms
+
+
+def test_a_herdr_terminal_running_claude_itself_is_removed(cfg, proc, herdr, monkeypatch):
+    reg(cfg, proc, 4242)
+    herdr.env[4242] = {"HC_TERMINAL_ID": "t1b"}
+    herdr.terms["t1b"] = shell_term(4242)
+
+    def kill(pid, sig):
+        proc.alive.discard(pid)
+        herdr.terms["t1b"]["state"] = "finished"
+    monkeypatch.setattr(claude_jobs, "_kill", kill)
+    claude_jobs.prepare_resume_sync(X)
+    assert hc_verbs(herdr) == ["rm"]
+
+
+def test_the_shell_herdr_keep_put_in_place_is_closed(cfg, proc, herdr, monkeypatch):
+    reg(cfg, proc, 4242)
+    herdr.env[4242] = {"HC_TERMINAL_ID": "t1b"}
+    herdr.terms["t1b"] = shell_term(4242)
+
+    def kill(pid, sig):
+        proc.alive.discard(pid)
+        herdr.terms["t1b"] = shell_term(950)
+    monkeypatch.setattr(claude_jobs, "_kill", kill)
+    claude_jobs.prepare_resume_sync(X)
+    assert hc_verbs(herdr) == ["kill", "rm"]
+
+
+@pytest.mark.parametrize("case", ["busy_shell", "foreground_job", "not_ancestor",
+                                  "other_machine", "no_env", "other_program",
+                                  "recovering"])
+def test_which_herdr_terminals_stay(cfg, proc, tmux, herdr, case, monkeypatch):
+    reg(cfg, proc, 4242)
+    herdr.env[4242] = {"HC_TERMINAL_ID": "t17"}
+    herdr.parents[4242] = 900
+    herdr.terms["t17"] = shell_term(900)
+    if case == "busy_shell":
+        tmux.children.add(900)
+    elif case == "foreground_job":
+        herdr.terms["t17"] = shell_term(900, fg=960)
+    elif case == "not_ancestor":
+        herdr.parents[4242] = 901
+    elif case == "other_machine":
+        herdr.env[4242] = {"HC_TERMINAL_ID": "vps/t17"}
+        herdr.terms["vps/t17"] = shell_term(900)
+    elif case == "no_env":
+        herdr.env[4242] = {}
+    else:
+        new = (shell_term(970) if case == "other_program"
+               else {"state": "recovering", "pid": 900})
+
+        def kill(pid, sig):
+            proc.alive.discard(pid)
+            herdr.terms["t17"] = new
+        monkeypatch.setattr(claude_jobs, "_kill", kill)
+    claude_jobs.prepare_resume_sync(X)
+    assert hc_verbs(herdr) == []
+    assert "t17" in herdr.terms
+
+
+@pytest.mark.parametrize("session", ["", "work"])
+def test_herdr_calls_reach_the_claudes_own_core(monkeypatch, session):
+    seen = []
+
+    def run(argv, **kw):
+        seen.append((argv, kw["env"].get("HC_SESSION")))
+        return subprocess.CompletedProcess(argv, 0, '{"state": "live"}', "")
+
+    monkeypatch.setenv("HC_SESSION", "mine")
+    monkeypatch.setattr(claude_jobs, "_herdr_bin", lambda: "/bin/hc")
+    monkeypatch.setattr(claude_jobs, "_subprocess_run", run)
+    assert claude_jobs._run_hc(session, "get", "t7") == {"state": "live"}
+    assert seen == [(["/bin/hc", "get", "t7", "--json"], session or None)]
+
+
 # ---- the bot ------------------------------------------------------------------------
 
 def test_the_bot_closes_the_terminal_copy(mk_bot, run_async, cfg, proc, tmux):
