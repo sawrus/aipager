@@ -49,6 +49,12 @@ its transcript. So every resume closes the other copies first:
   and a pid whose start time no longer matches are left alone;
 - when that claude ran in a tmux pane (the registry's `tmux` field) and only
   an idle shell is left in it, the pane is closed too;
+- when that claude ran in a herdr terminal (its
+  `HC_TERMINAL_ID`, and the terminal's program is the claude or one of its
+  ancestors), the terminal is closed too with `herdr-core kill` and `rm`:
+  when it finished, when only an idle shell is left in it, or when herdr's
+  `keep` put a fresh shell in place of the claude. A terminal on another
+  machine (`vps/t7`) or one busy with another program stays;
 - a claude that outlives both signals stops the resume: nothing is launched.
 
 The other direction works the same: a resume of the conversation in a tmux
