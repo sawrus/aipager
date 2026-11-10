@@ -147,6 +147,9 @@ def _pin_single_chat_config(monkeypatch):
     own later ``monkeypatch`` (a later patch wins).
     """
     monkeypatch.setattr("aipager.config.CHAT_ID", "256113222")
+    # The operator's ~/.config/aipager/.env may turn the Mini App on at
+    # import; every test starts with it off, the default.
+    monkeypatch.setattr("aipager.config.MINIAPP_ENABLED", False)
     # Modules that copied it at their own import (``from aipager.config
     # import CHAT_ID`` at module level) keep the import-time value, which on
     # this box happens to equal the pin and on CI is ``""``: pin the copies
@@ -324,6 +327,8 @@ def _isolate_home_paths(tmp_path, monkeypatch):
         # to recover Mini App settings — without a redirect it would read
         # the operator's real config.env.
         "aipager.config._XDG_CONFIG": config_env,
+        # The Mini App switch `aipager miniapp enable/disable` writes.
+        "aipager.config.DOTENV_PATH": cfg / ".env",
         # daemon_secrets.build_session_env() reads this on every
         # launch_session() call. Without a redirect, any test reaching
         # that path (directly or via launch_session) would read the

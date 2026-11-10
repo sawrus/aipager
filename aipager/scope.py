@@ -40,7 +40,10 @@ _KINDS = ("dm", "group")
 # aipager.yaml is authoritative — a setting written there survives exactly
 # one restart. aipager.yaml is never retired.
 _MINIAPP_KEY = "miniapp"
-_MINIAPP_DEFAULTS: dict = {"enabled": True, "port": 8765, "public_url": ""}
+# Only the port and the public URL: whether the Mini App runs is the
+# ``MINIAPP_ENABLED`` switch of ~/.config/aipager/.env alone, and an
+# ``enabled`` key in this block is ignored (``aipager.config``).
+_MINIAPP_DEFAULTS: dict = {"port": 8765, "public_url": ""}
 
 # claude_path override — see claude_resolve.py's precedence chain (tier 1).
 # Same rebuild-vs-surgical-write split as miniapp: dump_claude_path() is the
@@ -342,35 +345,19 @@ def _atomic_write_yaml(data: dict, path: Path) -> None:
 
 
 def load_miniapp(path: Path = CONFIG_PATH) -> dict:
-    """Return the Mini App block: ``{enabled: bool, port: int, public_url: str}``.
+    """Return the Mini App block: ``{port: int, public_url: str}``.
 
     Missing file, missing key, or a malformed value each fall back to the
-    built-in default for that field — **on**, 8765, no override.
-
-    That default used to be *off*, and this docstring used to say a
-    damaged config "can never turn the listener ON by accident". That is
-    no longer true and pretending otherwise would be worse than the
-    change itself: a missing or unreadable config now starts the Mini App
-    and, with it, a public tunnel. The trade was made deliberately — an
-    opt-in nobody discovers is a feature that does not exist — but it is
-    a real widening of what a broken config can do.
-
-    What is preserved is the strictness for **explicit** values: the
-    ``is True`` test below means a hand-edited ``enabled: "no"`` (or
-    ``"false"``, or ``"off"``) is still a string, still not ``True``, and
-    still reads as OFF. Anyone who has deliberately turned this off keeps
-    it off; only the absent-or-corrupt case flipped.
+    built-in default for that field: 8765, no override. Whether the Mini
+    App runs is not read here: only ``MINIAPP_ENABLED=1`` in the
+    environment (~/.config/aipager/.env) turns it on, and an ``enabled``
+    key in this block is ignored, so no yaml (a damaged one, a copied one,
+    one a wizard wrote) can open the listener and its public tunnel.
     """
     block = _raw_yaml(path).get(_MINIAPP_KEY)
     out = dict(_MINIAPP_DEFAULTS)
     if not isinstance(block, dict):
         return out
-    # `is True`, not bool(): a hand-edited `enabled: "no"` (or "false",
-    # or "off") is a non-empty string, and bool() would read all three as
-    # True — opening a listening socket for a config that plainly says
-    # not to. Only a real YAML boolean enables the server. YAML's own
-    # `yes`/`on` already parse to True before reaching here.
-    out["enabled"] = block.get("enabled", out["enabled"]) is True
     try:
         out["port"] = int(block.get("port", out["port"]))
     except (TypeError, ValueError):
@@ -386,14 +373,14 @@ def dump_miniapp(settings: dict, path: Path = CONFIG_PATH) -> None:
 
     Deliberately NOT built on :func:`dump_scopes`, which rebuilds the file
     from a parsed scope list — round-tripping the whole config just to
-    flip a boolean would risk dropping any key that function doesn't know
-    about. Same atomic-write + 0600 discipline as dump_scopes.
+    change a port would risk dropping any key that function doesn't know
+    about. Same atomic-write + 0600 discipline as dump_scopes. An old
+    ``enabled`` key is dropped: it no longer means anything.
     """
     raw = _raw_yaml(path)
     if not raw:
         raise ScopeConfigError(_NO_CONFIG)
     raw[_MINIAPP_KEY] = {
-        "enabled": settings.get("enabled", False) is True,
         "port": int(settings.get("port", _MINIAPP_DEFAULTS["port"])),
         "public_url": str(settings.get("public_url", "") or ""),
     }
@@ -407,8 +394,8 @@ def load_idle_lock(path: Path | None = None) -> dict:
     """Return the idle lock block: ``{enabled: bool, after_min: int}``.
 
     Absent, malformed or out-of-range values fall back to the default for
-    that field: **off**, 60 minutes. Only a real YAML boolean turns it on,
-    as for the Mini App. Never raises."""
+    that field: **off**, 60 minutes. Only a real YAML boolean turns it on.
+    Never raises."""
     block = _raw_yaml(path or CONFIG_PATH).get(_SECURITY_KEY)
     block = block.get("idle_lock") if isinstance(block, dict) else None
     out = dict(_IDLE_LOCK_DEFAULTS)

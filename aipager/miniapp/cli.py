@@ -1,19 +1,21 @@
 """``aipager miniapp enable|disable|status`` — CLI toggle for the
 self-hosted Mini App server (see design.md).
 
-Only ever edits the ``miniapp:`` block of ``~/.config/aipager/aipager.yaml``;
-it never starts or stops a listener itself. A running daemon picks up the
-change only after a restart.
+The switch is ``MINIAPP_ENABLED`` in ``~/.config/aipager/.env``
+(``config.DOTENV_PATH``): the Mini App is off unless it says ``1``. The
+port and the public URL stay in the ``miniapp:`` block of
+``~/.config/aipager/aipager.yaml``, or in the same ``.env`` on an install
+that has no aipager.yaml yet. It never starts or stops a listener itself:
+a running daemon picks up the change only after a restart.
 
-Deliberately NOT ``config.env``, which is where these settings lived
-originally: ``migrate.retire_v1()`` renames config.env away on every daemon
-start once aipager.yaml is authoritative, so a value written there survived
-exactly one restart before the Mini App silently turned itself off.
+Deliberately NOT ``config.env``: ``migrate.retire_v1()`` renames it away on
+every daemon start once aipager.yaml is authoritative.
 """
 
 from __future__ import annotations
 
 import argparse
+import os
 
 from aipager._test_guard import check_write
 from aipager.errors import friendly_error, friendly_warn
@@ -22,15 +24,18 @@ from aipager.ui import console
 _DEFAULT_PORT = 8765
 
 
-def _read_config_env_lines() -> list[str]:
-    # Imported here, not at module scope: `_isolate_home_paths` patches
-    # `aipager.wizard._constants.CONFIG_ENV` for tests, and a by-value
-    # top-level import would bake in the original path before the patch
-    # ever runs (same reasoning as the fixture's own docstring).
-    from aipager.wizard._constants import CONFIG_ENV
-    if not CONFIG_ENV.exists():
+def _dotenv_path():
+    # Read late, not imported by value: `_isolate_home_paths` redirects
+    # `aipager.config.DOTENV_PATH` for tests.
+    from aipager import config
+    return config.DOTENV_PATH
+
+
+def _read_dotenv_lines() -> list[str]:
+    try:
+        return _dotenv_path().read_text().splitlines()
+    except OSError:
         return []
-    return CONFIG_ENV.read_text().splitlines()
 
 
 def _parse_env_lines(lines: list[str]) -> dict[str, str]:
@@ -44,23 +49,14 @@ def _parse_env_lines(lines: list[str]) -> dict[str, str]:
     return values
 
 
-def _write_config_env(updates: dict[str, str]) -> None:
-    """Read-modify-write ``config.env``: update/add only ``updates``'
-    keys, leave every other line (including comments and unrelated keys
-    like ``CLAUDE_TG_BOT_TOKEN``) untouched.
-
-    Only used on a **v1 install that has no aipager.yaml yet** — see
-    ``_save_miniapp_config``. `migrate.upgrade_to_v3()` moves whatever
-    lands here into aipager.yaml the first time the daemon starts.
-    """
-    import os
-
-    from aipager.wizard._constants import CONFIG_DIR, CONFIG_ENV
-
-    lines = _read_config_env_lines()
+def _write_dotenv(updates: dict[str, str]) -> None:
+    """Read-modify-write ``~/.config/aipager/.env``: update/add only
+    ``updates``' keys, leave every other line (comments, other keys)
+    untouched. Mode 0600."""
+    path = _dotenv_path()
     seen: set[str] = set()
     out: list[str] = []
-    for line in lines:
+    for line in _read_dotenv_lines():
         stripped = line.strip()
         if stripped and not stripped.startswith("#") and "=" in stripped:
             key = stripped.partition("=")[0].strip()
@@ -73,11 +69,13 @@ def _write_config_env(updates: dict[str, str]) -> None:
         if key not in seen:
             out.append(f"{key}={value}")
 
-    check_write(CONFIG_ENV)
-    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    CONFIG_ENV.write_text("\n".join(out) + "\n")
+    check_write(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w") as f:
+        f.write("\n".join(out) + "\n")
     try:
-        os.chmod(CONFIG_ENV, 0o600)
+        os.chmod(path, 0o600)
     except OSError:
         pass
 
@@ -89,52 +87,44 @@ def _current_miniapp_config() -> dict:
     job is to change that file. ``status`` deliberately doesn't require
     the daemon to be running, so this must work from a cold process too.
 
-    aipager.yaml wins when it exists; config.env is only consulted for a
-    v1 install that has not been migrated yet.
-
-    Imported inside the function, not at module scope: `_isolate_home_paths`
-    patches these path constants for tests, and a by-value top-level
-    import would bake in the original path before the patch ever runs.
+    ``enabled`` is the ``.env`` switch; the port and URL come from
+    aipager.yaml when it exists, else from the ``.env``.
     """
-    from aipager import scope
+    from aipager import config, scope
+    env = _parse_env_lines(_read_dotenv_lines())
+    enabled = env.get("MINIAPP_ENABLED", "").strip().lower() in config._TRUE_WORDS
     if scope.CONFIG_PATH.exists():
-        return scope.load_miniapp(scope.CONFIG_PATH)
-
-    env = _parse_env_lines(_read_config_env_lines())
+        return {"enabled": enabled, **scope.load_miniapp(scope.CONFIG_PATH)}
     try:
         port = int(env.get("MINIAPP_PORT", _DEFAULT_PORT))
     except ValueError:
         port = _DEFAULT_PORT
     return {
-        "enabled": env.get("MINIAPP_ENABLED", "0") not in ("0", "false", "no", ""),
+        "enabled": enabled,
         "port": port,
         "public_url": env.get("MINIAPP_PUBLIC_URL", ""),
     }
 
 
 def _save_miniapp_config(settings: dict) -> None:
-    """Persist to aipager.yaml, falling back to config.env on a v1 install.
+    """Write the switch to ``.env``, and the port and URL to aipager.yaml
+    (or to ``.env`` when there is no aipager.yaml yet).
 
     `dump_miniapp` edits an existing document and will not invent one — a
     file holding only a `miniapp:` block would have no bot_token, and
     `load_scopes` rejects that outright, which would take the daemon down.
-    So when there is no aipager.yaml yet (a fresh install where `aipager
-    config` has not run), keep writing config.env exactly as before;
-    `migrate.upgrade_to_v3()` moves it across on the first daemon start,
-    before `retire_v1()` can delete it.
+    The port and URL go first, so a failure there leaves the switch as
+    it was.
     """
     from aipager import scope
+    updates = {"MINIAPP_ENABLED": "1" if settings.get("enabled") else "0"}
     if scope.CONFIG_PATH.exists():
         scope.dump_miniapp(settings, scope.CONFIG_PATH)
-        return
-
-    updates = {
-        "MINIAPP_ENABLED": "1" if settings.get("enabled") else "0",
-        "MINIAPP_PORT": str(settings.get("port", _DEFAULT_PORT)),
-    }
-    if settings.get("public_url"):
-        updates["MINIAPP_PUBLIC_URL"] = settings["public_url"]
-    _write_config_env(updates)
+    else:
+        updates["MINIAPP_PORT"] = str(settings.get("port", _DEFAULT_PORT))
+        if settings.get("public_url"):
+            updates["MINIAPP_PUBLIC_URL"] = settings["public_url"]
+    _write_dotenv(updates)
 
 
 def _cmd_miniapp_enable(args: argparse.Namespace) -> int:
@@ -160,7 +150,7 @@ def _cmd_miniapp_enable(args: argparse.Namespace) -> int:
     except Exception as e:
         friendly_error(
             f"Could not write the Mini App settings: {e}",
-            "  Run `aipager config` first to create ~/.config/aipager/aipager.yaml.",
+            "  Check that ~/.config/aipager/ and its aipager.yaml can be written.",
         )
         return 2
 
@@ -216,7 +206,7 @@ def _cmd_miniapp_disable(args: argparse.Namespace) -> int:
     except Exception as e:
         friendly_error(
             f"Could not write the Mini App settings: {e}",
-            "  Run `aipager config` first to create ~/.config/aipager/aipager.yaml.",
+            "  Check that ~/.config/aipager/ and its aipager.yaml can be written.",
         )
         return 2
     console.print("[ok]✓[/ok]  Mini App disabled")

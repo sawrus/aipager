@@ -708,7 +708,7 @@ tunnel described below. Outbound:
   does not redistribute the script: nothing is bundled in the
   package, and when the daemon has no copy the page loads it from
   `telegram.org` directly, as it did before.
-- The Mini App tunnel to Cloudflare, while enabled (the default).
+- The Mini App tunnel to Cloudflare, while enabled (off by default).
   The `cloudflared` binary it runs is downloaded once from
   `github.com/cloudflare/cloudflared` releases, checked against a
   pinned SHA-256, and cached under
@@ -767,13 +767,14 @@ a link preview for one has not been checked against the live service.
 
 ## Mini App tunnel
 
-**The Mini App is on by default**, so on a stock install aipager opens
-this tunnel without being asked. That is a deliberate trade - an opt-in
-nobody discovered was a feature that did not exist - but it means a
-fresh install reaches the internet. Turn it off with `aipager miniapp
-disable`, or set `enabled: false` under `miniapp:` in `aipager.yaml`;
-an explicit `false` is always respected. Note that a **missing or
-corrupt** `miniapp:` block now falls back to ON rather than OFF.
+**The Mini App is off by default** (fork): a stock install opens no
+listener and no tunnel. Only `MINIAPP_ENABLED=1` (or `true`, `yes`,
+`on`) in the environment turns it on, normally from
+`~/.config/aipager/.env`, which `aipager miniapp enable` writes (mode
+0600) and the daemon reads on every start. `enabled` under `miniapp:` in
+`aipager.yaml` is ignored, so neither a wizard nor a missing, corrupt or
+copied `aipager.yaml` can open the tunnel. `aipager miniapp disable`
+writes `MINIAPP_ENABLED=0`.
 
 The Mini App (unless a `--url` override is set) spawns a managed
 [Cloudflare quick

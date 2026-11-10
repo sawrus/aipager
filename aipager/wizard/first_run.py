@@ -202,8 +202,8 @@ def _completion_screen() -> None:
         "  Start the daemon:    [path]aipager start[/path]",
         "  Launch a session:    [path]aipager session dev[/path]",
         "  Health check:        [path]aipager doctor[/path]",
-        "  Mini App:             on - opens a public tunnel "
-        "([path]aipager miniapp disable[/path] to turn off)",
+        "  Mini App:             off "
+        "([path]aipager miniapp enable[/path] to turn on - it opens a public tunnel)",
         "",
         f"  {NEW_SESSIONS_LINE}",
     ]
@@ -219,8 +219,8 @@ def _completion_screen() -> None:
         console.print("  Start the daemon:    aipager start")
         console.print("  Launch a session:    aipager session dev")
         console.print("  Health check:        aipager doctor")
-        console.print("  Mini App:             on - opens a public tunnel "
-                      "(aipager miniapp disable to turn off)")
+        console.print("  Mini App:             off "
+                      "(aipager miniapp enable to turn on - it opens a public tunnel)")
         console.print()
         console.print(f"  {NEW_SESSIONS_LINE}")
 
