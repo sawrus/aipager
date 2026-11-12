@@ -1975,6 +1975,7 @@
   "\ud83c\udf93 Vocabulary level: Don't apply any rule",
   "\ud83c\udfa8 Appearance",
   "\ud83c\udd95 New sessions",
+  "\ud83d\udd12 Idle lock: 1 h, lock off",
   "\ud83d\udc64 Per-session preferences",
   "\ud83d\udc1e Problem reports: Ask me",
   "\u2716\ufe0f Close",
@@ -1988,6 +1989,7 @@
   "\ud83c\udf93 Vocabulary level: Don't apply any rule",
   "\ud83c\udfa8 Appearance",
   "\ud83c\udd95 New sessions",
+  "\ud83d\udd12 Idle lock: 1 h, lock off",
   "\ud83d\udc64 Per-session preferences",
   "\ud83d\udc1e Problem reports: Off",
   "\u2716\ufe0f Close",
@@ -2001,6 +2003,7 @@
   "\ud83c\udf93 Vocabulary level: Don't apply any rule",
   "\ud83c\udfa8 Appearance",
   "\ud83c\udd95 New sessions",
+  "\ud83d\udd12 Idle lock: 1 h, lock off",
   "\ud83d\udc64 Per-session preferences",
   "\ud83d\udc1e Problem reports: offers off",
   "\u2716\ufe0f Close"
@@ -2090,6 +2093,7 @@
   "\ud83c\udf93 Vocabulary level: Simple words \u2705",
   "\ud83c\udfa8 Appearance",
   "\ud83c\udd95 New sessions",
+  "\ud83d\udd12 Idle lock: 1 h, lock off",
   "\ud83d\udc64 Per-session preferences",
   "\u2716\ufe0f Close"
  ],

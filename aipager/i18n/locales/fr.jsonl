@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>Apparence</b>\n\nL'aspect des boutons d'aipager dans cette discussion. Telegram permet à un bot de colorer un bouton en bleu, vert ou rouge, ou de le laisser normal. Les apps qui ne gèrent pas les couleurs affichent tous les boutons normaux."}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 Apparence"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ Fermer"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 Nouvelles sessions"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 Dossier : {folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 Modèle : {model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "Aucune consigne de vocabulaire."}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "Rédaction technique ordinaire."}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "Mots courants, phrases courtes."}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 Verrouillage auto"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 Affichage de la réponse"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 Longueur des réponses"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 Niveau de vocabulaire"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "Activé - un diff par modification"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "Désactivé - mise en forme normale"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "Activé - texte simple uniquement"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "personnalisé : {n} min"}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} h"}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}, verrouillage désactivé"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "Carte + réponse à part"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "Réponse dans la carte"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "Réponse seule (sans carte)"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "Désactivé"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} a modifié ceci.</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "Fermé."}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>Verrouillage auto</b>\n\nLe verrouillage est désactivé. La durée choisie est conservée jusqu'à son activation avec <code>aipager lock enable</code>."}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>Verrouillage auto</b>\n\nCombien de temps aipager reste inactif avant de demander un code de votre application d'authentification."}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "À quelle fréquence la carte d'activité se met à jour pendant une tâche LONGUE. Activé : elle se met à jour moins souvent quand la tâche dure et son horloge avance par 30 s, ce qui garde une discussion très active bien dans les limites de Telegram. Désactivé : le rythme des premières minutes pendant toute la tâche."}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "Si chaque modification de fichier est envoyée dans un message de diff séparé, sous la carte d'activité. Désactivé garde une carte et une réponse : la carte montre toujours chaque modification, et la Mini App a un visualiseur de diffs."}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "Quand c'est ACTIVÉ, les réponses n'utilisent que du texte simple et des listes à tirets, sans tableaux, blocs de code, titres, gras ni italique."}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "Compactage de la conversation [{session}]"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "Ce bouton appartient à une autre discussion."}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "Votre rôle dans cette discussion ne le permet pas."}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "Seul un administrateur peut modifier le verrouillage auto."}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "Impossible d'enregistrer la durée du verrouillage."}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "Je ne reconnais pas ce bouton"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "Cette valeur n'est pas autorisée"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "Ce bouton est ancien : renvoyez /kill"}

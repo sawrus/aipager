@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>Aparência</b>\n\nComo os botões do aipager aparecem neste chat. O Telegram deixa um bot pintar um botão de azul, verde ou vermelho, ou deixá-lo normal. Apps que não aceitam cores mostram todos os botões normais."}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 Aparência"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ Fechar"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 Novas sessões"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 Pasta: {folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 Modelo: {model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "Sem nenhuma orientação de vocabulário."}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "Escrita técnica comum."}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "Palavras do dia a dia, frases curtas."}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 Bloqueio automático"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 Como a resposta aparece"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 Tamanho da resposta"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 Nível de vocabulário"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "Ligado - um diff por edição"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "Desligado - formatação normal"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "Ligado - só texto simples"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "personalizado: {n} min"}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} h"}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}, bloqueio desativado"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "Cartão + resposta separada"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "Resposta dentro do cartão"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "Só a resposta (sem cartão)"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "Desligado"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} mudou isto.</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "Fechado."}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>Bloqueio automático</b>\n\nO bloqueio está desativado. O tempo escolhido fica guardado até ele ser ativado com <code>aipager lock enable</code>."}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>Bloqueio automático</b>\n\nPor quanto tempo o aipager fica inativo antes de pedir um código do seu app autenticador."}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "Com que frequência o cartão de atividade é atualizado durante uma tarefa LONGA. Ligado: ele atualiza menos conforme a tarefa avança e o relógio anda de 30 em 30 s, o que mantém um chat com muita atividade bem dentro dos limites do Telegram. Desligado: o ritmo dos primeiros minutos durante a tarefa toda."}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "Se cada edição de arquivo é enviada como uma mensagem de diff separada, abaixo do cartão de atividade. Desligado deixa um cartão e uma resposta: o cartão continua mostrando cada edição, e o Mini App tem um visualizador de diffs."}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "Quando LIGADO, as respostas usam só texto simples e listas simples com hífens, sem tabelas, blocos de código, títulos nem negrito ou itálico."}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "Compactando a conversa [{session}]"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "Este botão pertence a outro chat."}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "Sua função neste chat não permite isso."}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "Só um administrador pode alterar o bloqueio automático."}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "Não foi possível salvar o tempo do bloqueio."}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "Não reconheço este botão"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "Esse valor não é permitido"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "Este botão está velho: envie /kill de novo"}

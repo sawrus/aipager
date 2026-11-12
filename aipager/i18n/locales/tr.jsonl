@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>Görünüm</b>\n\naipager düğmelerinin bu sohbette nasıl göründüğü. Telegram, bir botun düğmeyi maviye, yeşile ya da kırmızıya boyamasına veya normal bırakmasına izin verir. Renkleri desteklemeyen uygulamalar tüm düğmeleri normal gösterir."}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 Görünüm"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ Kapat"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 Yeni oturumlar"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 Klasör: {folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 Model: {model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "Kelime seçimi için hiçbir yönlendirme yok."}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "Olağan teknik yazım."}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "Gündelik kelimeler, kısa cümleler."}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 Otomatik kilit"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 Yanıt nasıl görünsün"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 Yanıt uzunluğu"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 Kelime düzeyi"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "Açık - her düzenleme için bir diff"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "Kapalı - normal biçim"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "Açık - yalnızca düz metin"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "özel: {n} dk"}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} sa"}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}, kilit kapalı"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "Kart + ayrı yanıt"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "Yanıt kartın içinde"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "Yalnızca yanıt (kartsız)"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "Kapalı"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} bunu değiştirdi.</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "Kapatıldı."}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>Otomatik kilit</b>\n\nKilit kapalı. Seçtiğiniz süre, <code>aipager lock enable</code> ile açılana kadar saklanır."}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>Otomatik kilit</b>\n\naipager, kimlik doğrulama uygulamanızdan kod istemeden önce ne kadar süre sessiz kalır."}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "UZUN bir görev sırasında kartın ne sıklıkla yenilendiği. Açık: görev uzadıkça daha seyrek yenilenir ve saati 30 sn'lik adımlarla ilerler; böylece çok hareketli bir sohbet bile Telegram sınırlarının rahatça içinde kalır. Kapalı: görev boyunca ilk dakikaların hızı."}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "Her dosya düzenlemesinin çalışma kartının altında ayrı bir diff mesajı olarak gelip gelmeyeceği. Kapalı: bir kart ve bir yanıt; kart yine her düzenlemeyi listeler ve Mini App'te bir diff görüntüleyici var."}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "AÇIK olduğunda yanıtlar yalnızca düz metin ve basit tireli listelerden oluşur: tablo, kod bloğu, başlık, kalın ya da italik yok."}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "[{session}] konuşması sıkıştırılıyor"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "Bu düğme başka bir sohbete ait."}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "Bu sohbetteki rolün buna izin vermiyor."}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "Otomatik kilidi yalnızca bir yönetici değiştirebilir."}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "Kilit süresi kaydedilemedi."}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "Bilinmeyen düğme"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "Geçersiz değer"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "Bu düğme eskidi: /kill komutunu tekrar gönder"}

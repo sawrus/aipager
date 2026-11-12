@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>Giao diện</b>\n\nCác nút của aipager trông thế nào trong chat này. Telegram cho bot tô nút màu xanh dương, xanh lá hoặc đỏ, hoặc để bình thường. Ứng dụng không hỗ trợ màu sẽ hiện mọi nút bình thường."}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 Giao diện"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ Đóng"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 Phiên mới"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 Thư mục: {folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 Mô hình: {model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "Không có quy tắc nào về từ ngữ."}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "Văn phong kỹ thuật thông thường."}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "Từ ngữ hằng ngày, câu ngắn."}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 Khóa tự động"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 Bố cục tin nhắn"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 Độ dài câu trả lời"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 Mức từ vựng"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "Bật - mỗi lần sửa một tin diff"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "Tắt - định dạng thường"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "Bật - chỉ văn bản thường"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "tùy chỉnh: {n} phút"}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} giờ"}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}, khóa đang tắt"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "Thẻ làm việc + câu trả lời riêng"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "Câu trả lời nằm trong thẻ"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "Chỉ câu trả lời, xóa thẻ"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "Tắt"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} đã thay đổi.</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "Đã đóng."}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>Khóa tự động</b>\n\nKhóa đang tắt. Thời gian đã chọn được giữ lại cho đến khi bật bằng <code>aipager lock enable</code>."}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>Khóa tự động</b>\n\naipager im lặng bao lâu thì hỏi mã từ ứng dụng xác thực của bạn."}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "Thẻ làm việc được làm mới bao lâu một lần trong một việc DÀI. Bật: việc càng kéo dài, thẻ càng ít được làm mới và đồng hồ nhảy theo bước 30 giây, để chat chạy lâu vẫn nằm xa giới hạn của Telegram. Tắt: giữ nhịp của những phút đầu suốt cả việc."}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "Có gửi mỗi chỉnh sửa file thành một tin nhắn diff riêng dưới thẻ làm việc hay không. Tắt: chỉ một thẻ làm việc và một câu trả lời - thẻ vẫn liệt kê mọi chỉnh sửa, và Mini App có chỗ xem diff."}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "Khi BẬT, câu trả lời chỉ có văn bản thường và danh sách gạch đầu dòng đơn giản - không bảng, khối mã, tiêu đề hay chữ đậm/nghiêng."}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "Đang thu gọn cuộc trò chuyện [{session}]"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "Nút này thuộc về một chat khác."}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "Vai trò của bạn không được làm việc đó trong chat này."}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "Chỉ quản trị viên mới đổi được khóa tự động."}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "Không lưu được thời gian khóa."}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "Không nhận ra nút này"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "Giá trị này không được phép"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "Nút này đã cũ - hãy gửi lại /kill"}

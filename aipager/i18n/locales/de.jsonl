@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>Aussehen</b>\n\nWie die Buttons von aipager in diesem Chat aussehen. Telegram lässt einen Bot einen Button blau, grün oder rot färben oder normal lassen. Apps, die keine Farben können, zeigen alle Buttons normal."}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 Aussehen"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ Schließen"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 Neue Sitzungen"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 Ordner: {folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 Modell: {model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "Keine Vorgabe zum Wortschatz."}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "Übliche Fachsprache."}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "Alltagswörter, kurze Sätze."}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 Auto-Sperre"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 So sieht die Antwort aus"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 Antwortlänge"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 Wortschatz"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "An - eine Diff-Nachricht pro Änderung"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "Aus - normale Formatierung"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "An - nur einfacher Text"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "eigene Zeit: {n} Min."}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} Std."}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}, Sperre aus"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "Arbeitskarte + eigene Antwort"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "Antwort in der Karte"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "Nur die Antwort (ohne Karte)"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "Aus"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} hat das geändert.</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "Geschlossen."}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>Auto-Sperre</b>\n\nDie Sperre ist aus. Die gewählte Zeit bleibt erhalten, bis sie mit <code>aipager lock enable</code> eingeschaltet wird."}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>Auto-Sperre</b>\n\nWie lange aipager ruhig bleibt, bevor es nach einem Code aus Ihrer Authenticator-App fragt."}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "Wie oft sich die Karte während einer LANGEN Aufgabe aktualisiert. An: Je länger die Aufgabe dauert, desto seltener, und die Uhr springt in 30-s-Schritten, so bleibt auch ein sehr aktiver Chat gut innerhalb der Limits von Telegram. Aus: das Tempo der ersten Minuten für die ganze Aufgabe."}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "Ob jede Dateiänderung zusätzlich als eigene Diff-Nachricht unter der Arbeitskarte kommt. Aus: eine Karte und eine Antwort; die Karte listet trotzdem jede Änderung, und die Mini App hat eine Diff-Ansicht."}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "Wenn AN, nutzen Antworten nur einfachen Text und einfache Listen mit Bindestrichen: keine Tabellen, Codeblöcke, Überschriften, Fett- oder Kursivschrift."}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "Die Unterhaltung von [{session}] wird komprimiert"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "Dieser Button gehört zu einem anderen Chat."}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "Deine Rolle in diesem Chat erlaubt das nicht."}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "Nur ein Admin kann die Auto-Sperre ändern."}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "Die Zeit der Auto-Sperre konnte nicht gespeichert werden."}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "Unbekannter Button"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "Ungültiger Wert"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "Dieser Button ist veraltet: Sende /kill noch einmal"}
