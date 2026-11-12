@@ -301,6 +301,11 @@ def render_settings_root(
     # own defaults, kept out of SECTIONS on purpose (new_flow.py).
     rows.append([InlineKeyboardButton(
         tr.text(NEW_SESSIONS), callback_data="_:set:ns")])
+    # The idle lock's time (idle_lock_menu.py): install-wide, so also kept
+    # out of SECTIONS.
+    from aipager.bot import idle_lock_menu
+    rows.append([InlineKeyboardButton(
+        idle_lock_menu.button_text(tr), callback_data="_:set:il")])
     # Per-session overrides live behind their own picker — the Mini App
     # can set these per session and chat could not reach them at all.
     rows.append([InlineKeyboardButton(

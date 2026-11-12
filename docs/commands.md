@@ -1168,7 +1168,7 @@ Run `aipager <command> --help` for the same list on your machine.
 | `aipager resume --claude` | Pick a Claude Code conversation started without aipager (last 14 days) and continue it under aipager; one still open in a terminal is taken over after `[y/N]` (fork, see [other sessions](foreign-sessions.md)). |
 | `aipager wrap install\|uninstall\|status` | Make `claude` in an interactive shell start under aipager (`alias claude=aipager-claude` in `~/.bashrc`) (fork, see [other sessions](foreign-sessions.md)). |
 | `aipager lock setup [--reset]` | Make the idle lock's TOTP secret and print its `otpauth://` URI once (fork, see [idle lock](idle-lock.md)). |
-| `aipager lock enable [--after-min N]\|disable\|now\|status` | Turn the idle lock on (default 60 minutes) or off, lock at the next tick, or show its state. No restart needed. |
+| `aipager lock enable [--after-min 60\|480\|960]\|disable\|now\|status` | Turn the idle lock on (after 60, 480 or 960 minutes: 1, 8 or 16 hours; default 60) or off, lock at the next tick, or show its state. No restart needed. |
 | `aipager policy validate` | Check `policy.yaml` (and `policy.d`); exits non-zero on a problem. |
 | `aipager update` | Upgrade aipager through the installer that owns it (uv, pipx, Homebrew, pip). It never restarts the daemon; restart it yourself, or use `/update` in Telegram, which can (see [Update](#update)). |
 | `aipager report [--note TEXT]` | Show a problem report and send it if you say yes (see [below](#command-line-aipager-report)). |

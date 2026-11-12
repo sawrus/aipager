@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>ظاهر</b>\n\nدکمه‌های aipager در این چت چه شکلی باشند. Telegram به ربات اجازه می‌دهد دکمه را آبی، سبز یا قرمز کند یا ساده بگذارد. اپ‌هایی که رنگ دکمه را پشتیبانی نمی‌کنند همهٔ دکمه‌ها را ساده نشان می‌دهند."}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 ظاهر"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ بستن"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 سشن‌های جدید"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 پوشه: {folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 مدل: {model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "هیچ قیدی برای کلمه‌ها نیست."}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "نوشتهٔ فنی معمولی."}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "کلمه‌های روزمره، جمله‌های کوتاه."}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 قفل خودکار"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 شکل جواب در چت"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 طول جواب"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 سطح زبان"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "روشن - برای هر ویرایش یک پیام diff"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "خاموش - قالب‌بندی معمول"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "روشن - فقط متن ساده"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "سفارشی: {n} دقیقه"}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} ساعت"}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}، قفل خاموش است"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "کارت + جواب جدا"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "جواب داخل همان کارت"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "فقط جواب، جای کارت"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "خاموش"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} تغییرش داد.</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "بسته شد."}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>قفل خودکار</b>\n\nقفل خاموش است. زمانی که انتخاب می‌کنید تا روشن شدن با <code>aipager lock enable</code> نگه داشته می‌شود."}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>قفل خودکار</b>\n\naipager چقدر ساکت بماند تا از شما کدی از برنامهٔ احراز هویت بخواهد."}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "کارت در حال کار، در یک نوبت طولانی هر چند وقت یک بار آپدیت شود. روشن: هرچه نوبت جلوتر برود کارت کندتر آپدیت می‌شود و ساعتش ۳۰ ثانیه ۳۰ ثانیه جلو می‌رود؛ این‌طور یک چت پرکار راحت زیر سقف Telegram می‌ماند. خاموش: همان سرعت دقیقه‌های اول تا آخر نوبت."}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "هر ویرایش فایل جداگانه به شکل پیام diff زیر کارت در حال کار بیاید یا نه. خاموش یعنی یک کارت و یک جواب - کارت همچنان همهٔ ویرایش‌ها را فهرست می‌کند و Mini App هم نمایشگر diff دارد."}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "وقتی روشن است، جواب‌ها فقط متن ساده و فهرست ساده با خط تیره دارند - بدون جدول، بلوک کد، تیتر یا متن پررنگ و کج."}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "در حال کامپکت کردن گفتگو [{session}]"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "این دکمه مال یک چت دیگر است."}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "نقش شما در این چت اجازهٔ این کار را نمی‌دهد."}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "فقط ادمین می‌تواند قفل خودکار را تغییر دهد."}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "زمان قفل ذخیره نشد."}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "این دکمه را نمی‌شناسم"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "این مقدار مجاز نیست"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "این دکمه قدیمی است - دوباره /kill بفرستید"}

@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>Aspetto</b>\n\nCome appaiono i pulsanti di aipager in questa chat. Telegram permette a un bot di colorare un pulsante di blu, verde o rosso, o di lasciarlo normale. Le app che non supportano i colori mostrano tutti i pulsanti normali."}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 Aspetto"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ Chiudi"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 Nuove sessioni"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 Cartella: {folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 Modello: {model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "Nessuna indicazione sul vocabolario."}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "Scrittura tecnica normale."}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "Parole di tutti i giorni, frasi brevi."}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 Blocco automatico"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 Come appare la risposta"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 Lunghezza delle risposte"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 Livello di vocabolario"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "Attivo - un diff per ogni modifica"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "Disattivo - formattazione normale"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "Attivo - solo testo semplice"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "personalizzato: {n} min"}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} h"}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}, blocco disattivato"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "Scheda + risposta a parte"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "Risposta dentro la scheda"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "Solo la risposta (senza scheda)"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "Disattivo"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} l'ha cambiato.</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "Chiuso."}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>Blocco automatico</b>\n\nIl blocco è disattivato. Il tempo scelto viene conservato fino all'attivazione con <code>aipager lock enable</code>."}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>Blocco automatico</b>\n\nPer quanto tempo aipager resta inattivo prima di chiedere un codice dalla tua app di autenticazione."}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "Quanto spesso si aggiorna la scheda durante un'attività LUNGA di Claude. Attivo: si aggiorna sempre meno spesso e l'orologio avanza di 30 s alla volta, così anche una chat molto attiva resta ben dentro i limiti di Telegram. Disattivo: il ritmo dei primi minuti per tutta l'attività."}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "Se ogni modifica a un file arriva anche come messaggio di diff a parte, sotto la scheda di attività. Disattivo: una scheda e una risposta; la scheda elenca comunque ogni modifica, e la Mini App ha un visualizzatore di diff."}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "Se è ATTIVO, le risposte usano solo testo semplice ed elenchi con trattini: niente tabelle, blocchi di codice, titoli, grassetto o corsivo."}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "Compattazione della conversazione [{session}]"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "Questo pulsante appartiene a un'altra chat."}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "Il tuo ruolo in questa chat non lo consente."}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "Solo un amministratore può cambiare il blocco automatico."}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "Impossibile salvare il tempo del blocco."}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "Pulsante non riconosciuto"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "Valore non valido"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "Questo pulsante è vecchio: invia di nuovo /kill"}

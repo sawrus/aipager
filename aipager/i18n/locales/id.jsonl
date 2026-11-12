@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>Tampilan</b>\n\nCara tombol aipager terlihat di chat ini. Telegram membolehkan bot mewarnai tombol biru, hijau, atau merah, atau membiarkannya biasa. Aplikasi yang tidak mendukung warna menampilkan semua tombol biasa."}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 Tampilan"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ Tutup"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 Sesi baru"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 Folder: {folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 Model: {model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "Tanpa panduan kosakata sama sekali."}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "Tulisan teknis biasa."}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "Kata sehari-hari, kalimat pendek."}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 Kunci otomatis"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 Tata letak pesan"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 Panjang jawaban"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 Tingkat kosakata"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "Nyala - satu pesan diff tiap edit"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "Mati - format biasa"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "Nyala - teks biasa saja"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "khusus: {n} mnt"}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} jam"}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}, kunci mati"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "Kartu kerja + jawaban terpisah"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "Jawaban di dalam kartu kerja"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "Hanya jawaban, kartu dihapus"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "Mati"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} mengubahnya.</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "Ditutup."}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>Kunci otomatis</b>\n\nKunci mati. Waktu yang dipilih tetap tersimpan sampai kunci dinyalakan dengan <code>aipager lock enable</code>."}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>Kunci otomatis</b>\n\nBerapa lama aipager diam sebelum meminta kode dari aplikasi autentikator Anda."}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "Seberapa sering kartu kerja diperbarui selama tugas yang PANJANG. Nyala: makin lama tugas berjalan, makin jarang kartu diperbarui, dan jamnya maju per 30 dtk, supaya chat yang berjalan lama tetap jauh di bawah batas Telegram. Mati: laju menit-menit pertama dipakai sepanjang tugas."}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "Apakah setiap edit file dikirim sebagai pesan diff tersendiri di bawah kartu kerja. Mati: hanya satu kartu kerja dan satu jawaban - kartunya tetap mencantumkan setiap edit, dan Mini App punya tampilan diff."}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "Saat NYALA, jawaban hanya berisi teks biasa dan daftar strip sederhana - tanpa tabel, blok kode, judul, atau huruf tebal/miring."}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "Meringkas percakapan [{session}]"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "Tombol ini milik chat lain."}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "Peranmu tidak boleh melakukan itu di chat ini."}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "Hanya admin yang dapat mengubah kunci otomatis."}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "Waktu kunci tidak dapat disimpan."}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "Tombol ini tidak dikenali"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "Nilai ini tidak diizinkan"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "Tombol ini sudah usang - kirim /kill lagi"}

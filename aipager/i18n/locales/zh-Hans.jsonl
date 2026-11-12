@@ -858,6 +858,7 @@
 {"k": "set.ap.text", "src": "b16481f8", "v": "🎨 <b>外观</b>\n\naipager 的按钮在这个聊天里的样子。Telegram 允许机器人把按钮设成蓝色、绿色或红色，也可以保持普通样式。不支持颜色的应用会把所有按钮都显示为普通样式。"}
 {"k": "set.btn.appearance", "src": "be0e75bb", "v": "🎨 外观"}
 {"k": "set.btn.close", "src": "d7bfbcc3", "v": "✖️ 关闭"}
+{"k": "set.btn.idle_lock", "src": "b98927cc", "v": "{title}: {value}"}
 {"k": "set.btn.new_sessions", "src": "0b5194d8", "v": "🆕 新会话"}
 {"k": "set.btn.ns_folder", "src": "ac85a8cc", "v": "📁 文件夹：{folder} ›"}
 {"k": "set.btn.ns_model", "src": "6fb2e9a4", "v": "🧠 模型：{model} ›"}
@@ -886,6 +887,7 @@
 {"k": "set.help.level.none", "src": "643f8019", "v": "不限制用词。"}
 {"k": "set.help.level.normal", "src": "530e152e", "v": "普通的技术写作。"}
 {"k": "set.help.level.simple", "src": "748c89ff", "v": "日常用词，句子简短。"}
+{"k": "set.il.title", "src": "278c644b", "v": "🔒 空闲锁定"}
 {"k": "set.layout.title", "src": "415df682", "v": "🖼 消息布局"}
 {"k": "set.length.title", "src": "0b4f4428", "v": "📏 回答长度"}
 {"k": "set.level.title", "src": "4e19b762", "v": "🎓 词汇水平"}
@@ -896,6 +898,9 @@
 {"k": "set.opt.diffs.on", "src": "3c616425", "v": "开 - 每次编辑一条 diff 消息"}
 {"k": "set.opt.formatting.off", "src": "a779e619", "v": "关 - 默认格式"}
 {"k": "set.opt.formatting.on", "src": "4321e58a", "v": "开 - 只用普通文字"}
+{"k": "set.opt.il.custom", "src": "c956aadd", "v": "自定义：{n} 分钟"}
+{"k": "set.opt.il.hours", "src": "3025ccd4", "v": "{n} 小时"}
+{"k": "set.opt.il.off", "src": "b1b632c8", "v": "{value}，锁定已关闭"}
 {"k": "set.opt.layout.card", "src": "cb54ae30", "v": "工作卡片 + 单独的回答"}
 {"k": "set.opt.layout.merged", "src": "732da229", "v": "回答放在卡片里"}
 {"k": "set.opt.layout.replace", "src": "1f8e1a41", "v": "只留回答，删除卡片"}
@@ -916,6 +921,8 @@
 {"k": "set.opt.reports.off", "src": "e3de5ab0", "v": "关"}
 {"k": "set.text.changed_by", "src": "63c7cabd", "v": "<i>{person} 修改了。</i>"}
 {"k": "set.text.closed", "src": "731152a0", "v": "已关闭。"}
+{"k": "set.text.il.off", "src": "c6230ac1", "v": "🔒 <b>空闲锁定</b>\n\n锁定已关闭。所选时间会保留，直到用 <code>aipager lock enable</code> 开启。"}
+{"k": "set.text.il.on", "src": "6c6d3cfd", "v": "🔒 <b>空闲锁定</b>\n\naipager 安静多久后，会要求输入验证器应用中的验证码。"}
 {"k": "set.text.intro.cadence", "src": "c2f74acd", "v": "在很长的任务中，工作卡片多久刷新一次。开启时，任务越长刷新越慢，计时以 30 秒为一步，让长时间运行的聊天远离 Telegram 的限制。关闭时，整个任务都保持最初几分钟的频率。"}
 {"k": "set.text.intro.diffs", "src": "7a426bb1", "v": "是否把每次文件编辑作为单独的 diff 消息发在工作卡片下方。关闭时只有一张工作卡片和一条回答：卡片仍会列出每次编辑，Mini App 里也能查看 diff。"}
 {"k": "set.text.intro.formatting", "src": "71988826", "v": "开启时，回复只用普通文字和简单的短横线列表：不用表格、代码块、标题或粗体/斜体。"}
@@ -971,6 +978,8 @@
 {"k": "toast.compact_sending", "src": "afcbfe26", "v": "正在压缩 [{session}] 的对话"}
 {"k": "toast.gate_other_chat", "src": "fcc9d88a", "v": "这个按钮属于另一个聊天。"}
 {"k": "toast.gate_refused", "src": "c6436f0e", "v": "你的角色不能在这个聊天里这样做。"}
+{"k": "toast.il_admin_only", "src": "b527d51c", "v": "只有管理员可以更改空闲锁定。"}
+{"k": "toast.il_not_saved", "src": "42d4a0ea", "v": "无法保存锁定时间。"}
 {"k": "toast.invalid_callback", "src": "19c5c4a4", "v": "无法识别这个按钮"}
 {"k": "toast.invalid_value", "src": "7e5ba817", "v": "这个值不被允许"}
 {"k": "toast.kill_stale", "src": "90e64cd6", "v": "这个按钮已过时，请重新发送 /kill"}

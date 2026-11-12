@@ -54,8 +54,8 @@ def cmd_enable(args: argparse.Namespace) -> int:
     settings = load_idle_lock()
     settings["enabled"] = True
     if args.after_min is not None:
-        if args.after_min < 1:
-            print("--after-min must be at least 1.")
+        if args.after_min not in idle_lock.AFTER_MIN_CHOICES:
+            print("--after-min must be one of 60 (1 h), 480 (8 h) or 960 (16 h).")
             return 2
         settings["after_min"] = args.after_min
     lock = idle_lock.LOCK
@@ -127,7 +127,8 @@ def add_parser(sub) -> argparse.ArgumentParser:
                          help="replace an existing secret (old codes stop working)")
     enable_p = lock_sub.add_parser("enable", help="turn the idle lock on")
     enable_p.add_argument("--after-min", type=int, default=None,
-                          help="minutes without activity before it locks (default 60)")
+                          metavar="{60,480,960}",
+                          help="minutes without activity before it locks: 60 (1 h, default), 480 (8 h) or 960 (16 h)")
     lock_sub.add_parser("disable", help="turn the idle lock off (and unlock)")
     lock_sub.add_parser("now", help="lock at the daemon's next tick (locked: clear the chats again)")
     lock_sub.add_parser("status", help="show the idle lock's settings and state")

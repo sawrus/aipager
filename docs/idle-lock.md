@@ -9,7 +9,7 @@ Set it up once:
 
 ```
 aipager lock setup            # makes the TOTP secret, prints its otpauth:// URI (and a QR code with qrencode) once
-aipager lock enable           # on; --after-min N to change the 60 minutes
+aipager lock enable           # on; --after-min 60|480|960 for 1, 8 or 16 hours (default 60)
 aipager lock status|now|disable
 ```
 
@@ -26,6 +26,16 @@ security:
     enabled: true
     after_min: 60
 ```
+
+**The time** is one of three: 1 hour (`60`, the default), 8 hours (`480`) or
+16 hours (`960`). `aipager lock enable --after-min N` takes only those and
+refuses any other number. In Telegram, `/settings` -> **🔒 Idle lock** shows
+the three times with ✅ on the current one; an owner or admin taps one, also
+in a private chat, because the time is for the whole install, not one chat.
+The tap writes `after_min` and takes effect at once, with no restart. A lock
+that is off keeps the picked time for when it is turned on. A value written
+by hand in `aipager.yaml` outside the three stays in effect and shows as
+`custom: N min` with no ✅ until one of the three is picked.
 
 Only a real YAML `true` turns it on, and `aipager config` keeps the block.
 The daemon reads all three while it runs: no restart is needed.

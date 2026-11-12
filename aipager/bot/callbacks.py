@@ -39,6 +39,7 @@ from aipager.bot import (
     card_owner,
     card_rows,
     held_message,
+    idle_lock_menu,
     keyboards,
     language_menu,
     language_offer,
@@ -1080,6 +1081,9 @@ class CallbackDispatchMixin:
             return
         # `_:set:ap...`: /settings → Appearance (a change is admin-gated inside).
         if await appearance.handle_callback(self, update, query, session_name, action):
+            return
+        # `_:set:il...`: /settings -> Idle lock (a change needs an owner or admin).
+        if await idle_lock_menu.handle_callback(self, update, query, session_name, action):
             return
         if await session_parity.handle_callback(self, update, query, session_name, action):
             return

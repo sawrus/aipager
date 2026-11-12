@@ -72,6 +72,10 @@ ALWAYS_ALLOWED = frozenset({
 _CODE_RE = re.compile(r"^\s*(\d{3})\s?(\d{3})\s*$")
 _SECRET_KEY = "TOTP_SECRET"
 
+#: The quiet times a person may pick (minutes): 1 h, 8 h, 16 h. The first
+#: is the default. ``aipager lock enable --after-min`` and /settings use it.
+AFTER_MIN_CHOICES = (60, 480, 960)
+
 # Set while the lock itself talks to Telegram (the lock notice, the code
 # prompt): those calls pass the gate. A ContextVar, so a session task that
 # runs at the same moment never inherits it.
