@@ -283,3 +283,26 @@ def test_holder_other_session_ignored(config):
 def test_holder_without_registry(tmp_path, monkeypatch):
     monkeypatch.setattr(claude_jobs, "config_dir", lambda: tmp_path / "nope")
     assert claude_catalog.holder(SID) is None
+
+
+def _fake_environ(monkeypatch, pid: int, env: bytes) -> None:
+    real = Path.read_bytes
+
+    def read_bytes(self):
+        if str(self) == f"/proc/{pid}/environ":
+            return env
+        return real(self)
+    monkeypatch.setattr(Path, "read_bytes", read_bytes)
+
+
+def test_holder_skips_a_claude_aipager_runs_under_dtach(config, monkeypatch):
+    _registry(config, os.getpid())
+    _fake_environ(monkeypatch, os.getpid(),
+                  b"HOME=/h\0CLAUDE_DTACH_SESSION=claude-work\0")
+    assert claude_catalog.holder(SID) is None
+
+
+def test_holder_keeps_a_terminal_claude_without_the_tag(config, monkeypatch):
+    _registry(config, os.getpid())
+    _fake_environ(monkeypatch, os.getpid(), b"HOME=/h\0")
+    assert claude_catalog.holder(SID)["pid"] == os.getpid()

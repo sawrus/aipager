@@ -92,10 +92,9 @@ def test_a_sweep_during_the_launch_cannot_strand_the_resume(
     assert sess.scope_chat_id == CHAT
     assert sess.perm_mode == "full"
     assert sess.gone_at is None
-    # `claude_session_id` is deliberately left empty by a SUCCESSFUL resume
-    # (cleared before the launch so a repeat failure cannot loop; the hook
-    # repopulates it) — the corruption showed up in the fields above.
-    assert sess.claude_session_id == ""
+    # A SUCCESSFUL resume puts the id back (cleared only during the launch
+    # so a repeat failure cannot loop): hooks may be off and never set it.
+    assert sess.claude_session_id == "uuid-1234"
     assert registry.get_session_by_msg(MSG, CHAT) is sess
 
 
@@ -197,3 +196,20 @@ def test_resuming_until_is_not_persisted(tmp_state_file):
     assert back is not None, "the guard must not have been persisted into a swept entry"
     assert back.resuming_until == 0.0
     assert back.is_resuming() is False
+
+
+def test_the_id_is_cleared_only_during_the_launch(
+    mk_bot, run_async, monkeypatch,
+):
+    """With hooks off nothing sets the id later: the resume must."""
+    registry = SessionRegistry()
+    sess = _aged_gone_session(registry, past_cutoff_by=1.0)
+    bot = _bot(mk_bot, registry)
+    seen: list[str] = []
+
+    async def _launch(*a, **kw):
+        seen.append(sess.claude_session_id)
+        return True, ""
+    monkeypatch.setattr(inject, "launch_session", _launch)
+    assert run_async(bot._do_resume_core(sess)).ok
+    assert seen == [""] and sess.claude_session_id == "uuid-1234"
