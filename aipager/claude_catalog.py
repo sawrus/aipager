@@ -252,8 +252,20 @@ def list_foreign(days: int = 14, limit: int = 200) -> list[ForeignConversation]:
     return out
 
 
+def _runs_under_aipager(pid: int) -> bool:
+    """Whether *pid* is a claude aipager launched: its environment holds
+    ``CLAUDE_DTACH_SESSION`` (set by the launch shell). Not a terminal."""
+    try:
+        env = Path(f"/proc/{int(pid)}/environ").read_bytes()
+    except (OSError, ValueError):
+        return False
+    return any(item.startswith(b"CLAUDE_DTACH_SESSION=")
+               for item in env.split(b"\0"))
+
+
 def holder(session_id: str) -> dict | None:
-    """The live interactive claude holding *session_id*:
+    """The live interactive terminal claude holding *session_id* (one aipager
+    runs under dtach is not a holder):
     ``{"pid": int, "status": str, "name": str}``, or None."""
     try:
         entries = claude_jobs.read_registry() or []
@@ -263,7 +275,8 @@ def holder(session_id: str) -> dict | None:
         if (e.get("sessionId") == session_id
                 and e.get("kind") == claude_jobs._INTERACTIVE
                 and claude_jobs._pid_alive(e["pid"])
-                and claude_jobs._start_matches(e, e["pid"])):
+                and claude_jobs._start_matches(e, e["pid"])
+                and not _runs_under_aipager(e["pid"])):
             return {"pid": e["pid"], "status": e.get("status", ""),
                     "name": e.get("name", "")}
     return None

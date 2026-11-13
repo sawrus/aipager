@@ -2433,7 +2433,11 @@ class SessionOpsMixin:
                 self.registry.mark_dirty()
                 return ResumeOutcome(ok=False, reason="launch_failed", err=err)
 
-            # Resume succeeded — recover state.
+            # Resume succeeded — recover state. The id goes back at once:
+            # the SessionStart hook would set it, but a project with hooks
+            # off never sends one, and a session without its id is missed by
+            # the "already tracked" checks (adopt, the foreign list).
+            sess.claude_session_id = resume_id
             sess.gone_at = None
             sess.note_moved_handled(resume_id if stale_job else "", stale_job)
             # A resumed claude starts with an empty input queue: a target the
