@@ -661,7 +661,9 @@
 {"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> зараз працює в терміналі. Спробуй ще раз, коли вона чекатиме."}
 {"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
 {"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 Продовжувати ці розмови може лише власник чату або адмін."}
+{"k": "resume.foreign.hooks_disabled", "src": "ff62844b", "v": "🙈 Хуки для цієї розмови вимкнено в <code>{file}</code>, тож aipager її не бачив би, і нічого не змінилося."}
 {"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ Не вдалося продовжити <b>{title}</b>: {error}"}
+{"k": "resume.foreign.no_hooks", "src": "4da1c9f3", "v": "🙈 aipager не бачить хуків <b>{title}</b>, тож закрив свою копію; продовж її в терміналі командою <code>{command}</code>."}
 {"k": "resume.foreign.none", "src": "699cb115", "v": "📭 За останні два тижні інших розмов Claude Code немає."}
 {"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ Цієї розмови вже немає."}
 {"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}

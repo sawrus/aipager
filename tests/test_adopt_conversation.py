@@ -73,8 +73,12 @@ def seams(monkeypatch):
     return state
 
 
-def _bot(mk_bot, registry=None, *, scopes=None, outcome=None):
+def _bot(mk_bot, registry=None, *, scopes=None, outcome=None, hooks=True):
+    """*hooks*: the launched session's hooks arrive (True), or the real
+    wait runs (None)."""
     bot = mk_bot(registry or SessionRegistry(), scopes=scopes)
+    if hooks is not None:
+        bot._adopt_hooks_arrive = AsyncMock(return_value=hooks)
     if scopes is not None:
         bot.policy = policy.load_policy(Path("/nonexistent/p.yaml"),
                                         Path("/nonexistent/p.d"))
@@ -421,3 +425,99 @@ def test_through_the_real_resume_core(mk_bot, run_async, transcript, seams,
     sess = bot.registry.find_by_label("my_proj", OWNER)
     assert sess.status == Status.IDLE
     assert sess.last_driver_user_id == OWNER
+
+
+# ===== hooks: off in settings, or never arriving =========================
+
+def _transcript_in(tmp_path, monkeypatch, folder):
+    path = tmp_path / f"{SID}.jsonl"
+    path.write_text(json.dumps({"type": "user", "cwd": str(folder)}) + "\n")
+    monkeypatch.setattr(claude_jobs, "find_transcript",
+                        lambda sid, **kw: path if sid == SID else None)
+
+
+def test_hooks_off_in_the_folder_close_and_launch_nothing(
+        mk_bot, run_async, tmp_path, monkeypatch, seams):
+    """The incident: a settings.local.json with disableAllHooks. Without
+    the preflight the terminal claude was SIGTERMed and a blind session
+    launched."""
+    folder = tmp_path / "proj"
+    local = folder / ".claude" / "settings.local.json"
+    local.parent.mkdir(parents=True)
+    local.write_text(json.dumps({"disableAllHooks": True}))
+    _transcript_in(tmp_path, monkeypatch, folder)
+    bot = _bot(mk_bot)
+    seams["holders"] = [{"pid": 4242, "status": "idle", "name": ""}] * 2
+    seams["alive"] = {4242}
+    out = _adopt(bot, run_async, confirm=True)
+    assert (out.ok, out.reason) == (False, "hooks_disabled")
+    assert out.settings_file == str(local)
+    assert seams["kills"] == [] and seams["holders"]       # never even looked
+    bot._do_resume_core.assert_not_called()
+    assert bot.registry.all_sessions() == {}
+
+
+def _blind_bot(mk_bot, monkeypatch, seams, *, hook_at_sleep=None, killed=True,
+               alive=False):
+    """A real hook wait after a launch that worked; the hook receiver
+    stamps the entry at sleep number *hook_at_sleep* (never when None)."""
+    bot = _bot(mk_bot, hooks=None)
+    kills = []
+
+    async def _kill_session(name):
+        kills.append(name)
+        return killed
+
+    monkeypatch.setattr(inject, "kill_session", _kill_session)
+    monkeypatch.setattr(inject, "is_alive", AsyncMock(return_value=alive))
+    counter = {"n": 0}
+
+    async def _sleep(_s):
+        counter["n"] += 1
+        if counter["n"] == hook_at_sleep:
+            for sess in bot.registry.all_sessions().values():
+                sess.last_hook_at += 1.0
+
+    monkeypatch.setattr(session_ops, "_sleep", _sleep)
+    return bot, kills, counter
+
+
+def test_no_hook_after_the_launch_stops_and_drops_it(mk_bot, run_async,
+                                                     transcript, seams,
+                                                     monkeypatch):
+    bot, kills, counter = _blind_bot(mk_bot, monkeypatch, seams)
+    out = _adopt(bot, run_async)
+    assert (out.ok, out.reason) == (False, "no_hooks")
+    assert kills == [f"claude-my_proj__d{OWNER}"]
+    assert bot.registry.all_sessions() == {}
+    assert counter["n"] == int(session_ops._ADOPT_HOOK_WAIT_SECONDS
+                               / session_ops._ADOPT_HOOK_POLL)
+
+
+def test_a_hook_during_the_wait_keeps_the_adopt(mk_bot, run_async, transcript,
+                                                seams, monkeypatch):
+    bot, kills, counter = _blind_bot(mk_bot, monkeypatch, seams, hook_at_sleep=3)
+    out = _adopt(bot, run_async)
+    assert out.ok and out.label == "my_proj"
+    assert kills == [] and counter["n"] == 3
+    assert bot.registry.get(f"claude-my_proj__d{OWNER}") is not None
+
+
+def test_a_blind_copy_that_does_not_stop_keeps_its_entry(
+        mk_bot, run_async, transcript, seams, monkeypatch):
+    bot, kills, _ = _blind_bot(mk_bot, monkeypatch, seams, killed=False,
+                               alive=True)
+    out = _adopt(bot, run_async)
+    assert (out.ok, out.reason, out.err) == (False, "launch_failed", "still_running")
+    assert len(kills) == 1
+    assert bot.registry.get(f"claude-my_proj__d{OWNER}") is not None
+
+
+def test_a_blind_copy_already_gone_is_dropped_too(mk_bot, run_async, transcript,
+                                                   seams, monkeypatch):
+    """The kill finds no process (it died by itself): its entry still goes."""
+    bot, kills, _ = _blind_bot(mk_bot, monkeypatch, seams, killed=False,
+                               alive=False)
+    out = _adopt(bot, run_async)
+    assert (out.ok, out.reason) == (False, "no_hooks")
+    assert len(kills) == 1 and bot.registry.all_sessions() == {}

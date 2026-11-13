@@ -50,6 +50,8 @@ ADOPT_REASONS = frozenset({
     "forbidden",       # the caller is not the chat's owner or an admin
     "not_found",       # no such conversation (or no transcript left)
     "launch_failed",   # the resume under dtach did not start (``err`` says why)
+    "hooks_disabled",  # a settings file turns hooks off there (``settings_file``): nothing done
+    "no_hooks",        # launched, but no hook came: aipager's copy stopped, entry dropped
 })
 
 
@@ -91,6 +93,8 @@ class AdoptOutcome:
     holder_status: str = ""
     #: Free-form detail for logs (``launch_failed``, ``takeover_failed``).
     err: str = ""
+    #: The settings file that turns hooks off (``hooks_disabled``), else "".
+    settings_file: str = ""
 
 
 # Record types that carry a title, best first: a title the person chose,

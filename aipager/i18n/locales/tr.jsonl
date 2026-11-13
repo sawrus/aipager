@@ -661,7 +661,9 @@
 {"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> şu an terminalde çalışıyor. Beklemeye geçince tekrar dene."}
 {"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
 {"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 Bu konuşmalara yalnızca sohbetin sahibi veya bir yönetici devam edebilir."}
+{"k": "resume.foreign.hooks_disabled", "src": "ff62844b", "v": "🙈 Bu konuşma için hook'lar <code>{file}</code> içinde kapalı, bu yüzden aipager onu göremezdi ve hiçbir şey değişmedi."}
 {"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ <b>{title}</b> sürdürülemedi: {error}"}
+{"k": "resume.foreign.no_hooks", "src": "4da1c9f3", "v": "🙈 aipager <b>{title}</b> hook'larını göremiyor, bu yüzden kendi kopyasını kapattı; terminalde <code>{command}</code> ile devam et."}
 {"k": "resume.foreign.none", "src": "699cb115", "v": "📭 Son iki haftada başka Claude Code konuşması yok."}
 {"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ Bu konuşma artık yok."}
 {"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}

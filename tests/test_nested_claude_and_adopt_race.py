@@ -160,6 +160,7 @@ def test_a_second_adopt_during_the_takeover_runs_nothing(
     bot._update_bot_commands = AsyncMock()
     bot._do_resume_core = AsyncMock(
         return_value=ResumeOutcome(ok=True, reason="resumed"))
+    bot._adopt_hooks_arrive = AsyncMock(return_value=True)
 
     async def _both():
         return await asyncio.gather(

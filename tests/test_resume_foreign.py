@@ -358,6 +358,12 @@ def test_cancel_shows_the_list_again(mk_bot, listing, run_async):
     (AdoptOutcome(False, "forbidden"),
      "Only the chat's owner or an admin can continue these conversations."),
     (AdoptOutcome(False, "not_found"), "That conversation is no longer there."),
+    (AdoptOutcome(False, "hooks_disabled", settings_file="/srv/p/.claude/settings.json"),
+     "Hooks are turned off for this conversation in "
+     "<code>/srv/p/.claude/settings.json</code>, so aipager would not see it"),
+    (AdoptOutcome(False, "no_hooks"),
+     "aipager cannot see the hooks of <b>task number 0</b>, so it closed its copy; "
+     "continue it in a terminal with <code>claude --resume "),
     (AdoptOutcome(False, "launch_failed", err="dtach is sad"),
      "Couldn't continue <b>task number 0</b>: dtach is sad"),
 ])
@@ -482,6 +488,7 @@ def cli(monkeypatch, listing):
     monkeypatch.setattr("aipager.dtach.inject.launch_session", _launch)
     monkeypatch.setattr("aipager.dtach.launcher.prepare_resume", _prepare)
     monkeypatch.setattr("aipager.status._live_sessions", lambda: set())
+    monkeypatch.setattr(cli_resume, "_hooks_disabled_file", lambda cwd: "")
     return state
 
 
@@ -593,4 +600,19 @@ def test_cli_launch_failure_is_an_error(cli, listing, monkeypatch):
     monkeypatch.setattr("aipager.dtach.inject.launch_session", _fail)
     cli["inputs"] = ["1"]
     assert _run() == 1
+
+
+
+def test_cli_hooks_off_refuses_before_asking_or_closing(cli, listing, monkeypatch,
+                                                         capsys):
+    seen = []
+    monkeypatch.setattr(cli_resume, "_hooks_disabled_file",
+                        lambda cwd: seen.append(cwd) or "/srv/p/.claude/settings.local.json")
+    cli["holder"] = [{"pid": 41, "status": "idle", "name": ""}] * 2
+    cli["inputs"] = ["1", "y"]
+    assert _run() == 1
+    assert seen == [listing["items"][0].cwd]
+    assert cli["inputs"] == ["y"]            # never asked
+    assert cli["terminated"] == [] and cli["launched"] == []
+    assert "/srv/p/.claude/settings.local.json" in capsys.readouterr().err
 
