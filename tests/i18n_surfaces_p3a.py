@@ -1950,7 +1950,10 @@ def _notice_waiting_reminder(env):
 @surface("notice.not_taken")
 def _notice_not_taken(env):
     bot, tg, x1 = _notice_world(env)
-    env.run(bot.notify(x1, "prompt_not_taken", {"grace": 45.0}))
+    for hook_at, slash in ((0.0, False), (1.0, True), (1.0, False)):
+        x1.turn_hook_at = hook_at
+        x1.prompt_sent_slash = slash
+        env.run(bot.notify(x1, "prompt_not_taken", {"grace": 45.0}))
     return tg.out
 
 

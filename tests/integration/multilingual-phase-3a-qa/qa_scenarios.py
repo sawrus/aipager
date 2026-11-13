@@ -544,7 +544,10 @@ def notice_misc(h, lang):
     from aipager.bot import report_flow
     bot, tg, x1 = _notice_world(h, lang)
     for grace in (1.0, 45.0, 120.0):
-        h.run(bot.notify(x1, "prompt_not_taken", {"grace": grace}))
+        for hook_at, slash in ((0.0, False), (1.0, True), (1.0, False)):
+            x1.turn_hook_at = hook_at
+            x1.prompt_sent_slash = slash
+            h.run(bot.notify(x1, "prompt_not_taken", {"grace": grace}))
     for preview in ("fix x1 & <b>", ""):
         h.run(bot.notify(x1, "queue_pickup", {"consumed": [], "expired": [
             {"raw_text": preview}]}))

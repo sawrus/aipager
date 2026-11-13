@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>Si esto se repite, ejecuta {command} en una terminal para enviar un informe al creador de aipager.</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>Si esto se repite, el propietario puede tocar «Informar de esto» para enviar un informe al creador de aipager.</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "<code>{hook}</code> pasó su límite de memoria de {limit} GB, así que se saltó una actualización de la línea de estado. La sesión sigue funcionando."}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · Claude Code no recibió el mensaje\n\nNo llegó ningún hook en los {grace} s después del envío. Un mensaje que empieza con «/» se toma como comando: revisa la terminal."}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · Ningún hook de Claude Code\n\nNo llegó ningún hook en los {grace} s después del envío, así que aipager no sabe si Claude Code recibió el mensaje. Quizá los hooks están desactivados en el proyecto (disableAllHooks en .claude/settings.json o .claude/settings.local.json). Revisa la terminal."}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · Ningún hook de Claude Code\n\nNo llegó ningún hook en los {grace} s después del envío, y esta sesión no ha enviado ninguno desde que empezó. Lo más probable es que los hooks estén desactivados en el proyecto (disableAllHooks en .claude/settings.json o .claude/settings.local.json). Revisa la terminal."}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · Ningún hook de Claude Code\n\nNo llegó ningún hook en los {grace} s después del envío. Un mensaje que empieza con «/» se toma como comando y no envía hook. Revisa la terminal."}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "Esta tarea vino de <b>{session}</b>."}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "Un mensaje de otra sesión se sumó a esta tarea y le quitó permisos."}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "Esta tarea vino de otra sesión que aipager no pudo verificar."}

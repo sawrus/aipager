@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>إذا تكرر هذا، يمكنك تشغيل {command} في الطرفية لإرسال تقرير إلى مطوّر aipager.</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>إذا تكرر هذا، يمكن للمالك الضغط على «الإبلاغ عن هذا» لإرسال تقرير إلى مطوّر aipager.</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "تجاوز <code>{hook}</code> حد الذاكرة البالغ {limit} غيغابايت، ففات تحديث واحد لسطر الحالة. الجلسة مستمرة في العمل."}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · لم يستلم Claude Code الرسالة\n\nلم يصل أي هوك خلال {grace} ثانية من الإرسال. الرسالة التي تبدأ بـ «/» تُقرأ كأمر - يمكنك التحقق من الطرفية."}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · لا يوجد هوك من Claude Code\n\nلم يصل أي هوك خلال {grace} ثانية من الإرسال، لذلك لا يعرف aipager إن كان Claude Code قد استلم الرسالة. ربما الهوكس معطّلة في المشروع (disableAllHooks في .claude/settings.json أو .claude/settings.local.json). يمكنك التحقق من الطرفية."}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · لا يوجد هوك من Claude Code\n\nلم يصل أي هوك خلال {grace} ثانية من الإرسال، ولم ترسل هذه الجلسة أي هوك منذ بدايتها. على الأرجح الهوكس معطّلة في المشروع (disableAllHooks في .claude/settings.json أو .claude/settings.local.json). يمكنك التحقق من الطرفية."}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · لا يوجد هوك من Claude Code\n\nلم يصل أي هوك خلال {grace} ثانية من الإرسال. الرسالة التي تبدأ بـ «/» تُقرأ كأمر ولا ترسل هوك. يمكنك التحقق من الطرفية."}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "جاءت هذه المهمة من <b>{session}</b>."}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "انضمت إلى هذه المهمة رسالة من جلسة أخرى فضيّقت صلاحياتها."}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "جاءت هذه المهمة من جلسة أخرى لم يستطع aipager التحقق منها."}

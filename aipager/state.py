@@ -807,6 +807,8 @@ class TrackedSession:
     # SubagentStop.
     prompt_sent_at: float = 0.0
     prompt_sent_msg: tuple[int, int] | None = None
+    # The same send's text began with "/" (picks the wording of the notice).
+    prompt_sent_slash: bool = False
     # Monotonic deadline of an outstanding `/model` switch (roadmap
     # 8.35): set when one is typed, cleared when the statusline reports
     # the new model. While it holds, a second switch is refused — the

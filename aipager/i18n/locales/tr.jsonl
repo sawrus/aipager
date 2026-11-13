@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>Bu tekrarlanırsa aipager geliştiricisine rapor göndermek için bir terminalde {command} çalıştır.</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>Bu tekrarlanırsa sahip, aipager geliştiricisine rapor göndermek için “Bunu bildir” düğmesine dokunabilir.</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "<code>{hook}</code> {limit} GB bellek sınırını aştı, bu yüzden bir durum satırı güncellemesi atlandı. Oturum çalışmaya devam ediyor."}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · Claude Code mesajı almadı\n\nGönderimden sonraki {grace} sn içinde hiçbir hook gelmedi. “/” ile başlayan bir mesaj komut sayılır - terminale bak."}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · Claude Code'dan hook gelmedi\n\nGönderimden sonraki {grace} sn içinde hiçbir hook gelmedi, bu yüzden aipager Claude Code'un mesajı alıp almadığını bilmiyor. Projede hook'lar kapalı olabilir (disableAllHooks, .claude/settings.json veya .claude/settings.local.json içinde). Terminale bak."}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · Claude Code'dan hook gelmedi\n\nGönderimden sonraki {grace} sn içinde hiçbir hook gelmedi ve bu oturum başladığından beri hiç hook göndermedi. Büyük olasılıkla projede hook'lar kapalı (disableAllHooks, .claude/settings.json veya .claude/settings.local.json içinde). Terminale bak."}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · Claude Code'dan hook gelmedi\n\nGönderimden sonraki {grace} sn içinde hiçbir hook gelmedi. “/” ile başlayan bir mesaj komut sayılır ve hook göndermez. Terminale bak."}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "Bu görev <b>{session}</b> oturumundan geldi."}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "Başka bir oturumdan gelen bir mesaj bu göreve katıldı ve yetkilerini daralttı."}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "Bu görev, aipager'ın doğrulayamadığı başka bir oturumdan geldi."}
