@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>Se isso se repetir, execute {command} em um terminal para enviar um relatório ao criador do aipager.</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>Se isso se repetir, o dono pode tocar em “Relatar isto” para enviar um relatório ao criador do aipager.</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "<code>{hook}</code> passou do limite de memória de {limit} GB, então uma atualização da linha de status ficou de fora. A sessão continua rodando."}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · O Claude Code não recebeu a mensagem\n\nNenhum hook chegou em até {grace} s depois do envio. Uma mensagem que começa com “/” é lida como comando: confira o terminal."}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · Nenhum hook do Claude Code\n\nNenhum hook chegou em até {grace} s depois do envio, então o aipager não sabe se o Claude Code recebeu a mensagem. Talvez os hooks estejam desativados no projeto (disableAllHooks em .claude/settings.json ou .claude/settings.local.json). Confira o terminal."}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · Nenhum hook do Claude Code\n\nNenhum hook chegou em até {grace} s depois do envio, e esta sessão não enviou nenhum desde que começou. Provavelmente os hooks estão desativados no projeto (disableAllHooks em .claude/settings.json ou .claude/settings.local.json). Confira o terminal."}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · Nenhum hook do Claude Code\n\nNenhum hook chegou em até {grace} s depois do envio. Uma mensagem que começa com “/” é lida como comando e não envia hook. Confira o terminal."}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "Esta tarefa veio de <b>{session}</b>."}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "Uma mensagem de outra sessão entrou nesta tarefa e reduziu as permissões dela."}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "Esta tarefa veio de outra sessão que o aipager não conseguiu verificar."}

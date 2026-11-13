@@ -1439,6 +1439,7 @@ class SessionOpsMixin:
             sess.files_turn_opened(typed_wall)
         if ok and was_idle:
             sess.prompt_sent_at = time.monotonic()
+            sess.prompt_sent_slash = reactions.is_slash_command(text)
             sess.prompt_sent_msg = (
                 (msg_id, chat_id)
                 if msg_id is not None and chat_id is not None else None

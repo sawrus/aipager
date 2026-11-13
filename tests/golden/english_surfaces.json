@@ -1104,7 +1104,9 @@
   "\u26a0\ufe0f <b>x1</b> \u00b7 memory cap hit\n\n<code>aipager-statusline</code> ran out of its 1 GB memory limit, so one status line update was skipped. The session keeps running.\n\n<i>If this keeps happening, the owner can tap Report this to send the maintainer a report.</i>"
  ],
  "notice.not_taken": [
-  "\u26a0\ufe0f <b>x1</b> \u00b7 Not taken by Claude Code\n\nNo hook arrived within 45 s of the send. A message that starts with \"/\" is read as a slash command - check the terminal."
+  "\u26a0\ufe0f <b>x1</b> \u00b7 No hook from Claude Code\n\nNo hook arrived within 45 s of the send, and this session has sent none since it started. Hooks are probably off for this project (disableAllHooks in .claude/settings.json or .claude/settings.local.json). Check the terminal.",
+  "\u26a0\ufe0f <b>x1</b> \u00b7 No hook from Claude Code\n\nNo hook arrived within 45 s of the send. A message that starts with \"/\" is read as a command and sends no hook. Check the terminal.",
+  "\u26a0\ufe0f <b>x1</b> \u00b7 No hook from Claude Code\n\nNo hook arrived within 45 s of the send, so aipager cannot tell if Claude Code took the message. Hooks may be off for this project (disableAllHooks in .claude/settings.json or .claude/settings.local.json). Check the terminal."
  ],
  "notice.queue_timeout": [
   "\u23f3 <b>x1</b> \u00b7 a queued message wasn't confirmed picked up in time: \"x1\" - Claude may still process it.",

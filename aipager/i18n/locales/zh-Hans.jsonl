@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>如果这种情况反复出现，可以在终端运行 {command}，把报告发给 aipager 开发者。</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>如果这种情况反复出现，所有者可以点“报告这个问题”，把报告发给 aipager 开发者。</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "<code>{hook}</code> 超出了 {limit} GB 的内存上限，因此跳过了一次状态行更新。会话会继续运行。"}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · Claude Code 没有收到消息\n\n发送后 {grace} 秒内没有收到任何 hook。以“/”开头的消息会被当成命令，请看一下终端。"}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · 没有收到 Claude Code 的 hook\n\n发送后 {grace} 秒内没有收到任何 hook，所以 aipager 无法确定 Claude Code 是否收到了消息。项目里的 hook 可能被关闭了（disableAllHooks，位于 .claude/settings.json 或 .claude/settings.local.json）。请看一下终端。"}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · 没有收到 Claude Code 的 hook\n\n发送后 {grace} 秒内没有收到任何 hook，而且这个会话自启动以来没有发送过 hook。项目里的 hook 很可能被关闭了（disableAllHooks，位于 .claude/settings.json 或 .claude/settings.local.json）。请看一下终端。"}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · 没有收到 Claude Code 的 hook\n\n发送后 {grace} 秒内没有收到任何 hook。以“/”开头的消息会被当成命令，不会发送 hook。请看一下终端。"}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "这项任务来自 <b>{session}</b>。"}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "另一个会话的消息加入了这次任务，并缩小了它的权限。"}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "这项任务来自另一个会话，aipager 无法验证它。"}

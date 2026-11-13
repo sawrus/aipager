@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>Если это повторяется, выполни {command} в терминале, чтобы отправить отчёт разработчику aipager.</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>Если это повторяется, владелец может нажать «Сообщить об этом», чтобы отправить отчёт разработчику aipager.</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "<code>{hook}</code> превысил свой лимит памяти в {limit} ГБ, поэтому одно обновление строки состояния пропущено. Сессия продолжает работать."}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · Claude Code не принял сообщение\n\nЗа {grace} с после отправки не пришёл ни один hook. Сообщение, которое начинается с «/», считается командой - проверь терминал."}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · Нет hook от Claude Code\n\nЗа {grace} с после отправки не пришёл ни один hook, поэтому aipager не знает, принял ли Claude Code сообщение. Возможно, hooks выключены в проекте (disableAllHooks в .claude/settings.json или .claude/settings.local.json). Проверь терминал."}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · Нет hook от Claude Code\n\nЗа {grace} с после отправки не пришёл ни один hook, и эта сессия не присылала их с запуска. Скорее всего, hooks выключены в проекте (disableAllHooks в .claude/settings.json или .claude/settings.local.json). Проверь терминал."}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · Нет hook от Claude Code\n\nЗа {grace} с после отправки не пришёл ни один hook. Сообщение, которое начинается с «/», считается командой и hook не шлёт. Проверь терминал."}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "Эта задача пришла от <b>{session}</b>."}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "Сообщение от другой сессии попало в эту задачу и урезало её права."}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "Эта задача пришла от другой сессии, которую aipager не смог проверить."}

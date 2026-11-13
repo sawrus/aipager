@@ -3111,9 +3111,10 @@ class NotifyMixin:
         if event == "prompt_not_taken":
             # The session monitor saw a turn-starting Telegram send go
             # PROMPT_HOOK_GRACE_SECONDS without any hook (roadmap 8.11):
-            # Claude Code refused the input outright — an unknown slash
-            # command, a built-in that only opens a dialog — and printed
-            # its error in the terminal where nobody in chat can see it.
+            # Claude Code refused the input outright (an unknown slash
+            # command, a built-in that only opens a dialog), or hooks are
+            # off for the project (disableAllHooks) so the prompt may
+            # have been taken without aipager seeing it.
             # Modelled on _stop_session_core: settle the card into a
             # warning, drop the message's own note (it would otherwise
             # be matched by a later pick-up), and put the session back
@@ -3130,7 +3131,17 @@ class NotifyMixin:
             sess.close_turn()  # no card for this turn from here (8.57)
             self._stop_animation(sess)
             tr = i18n.for_sess(sess)
-            warn_text = tr.html(NOT_TAKEN, session=label, grace=tr.num(f"{grace:.0f}"))
+            # Which cause to name: no hook ever from this session
+            # (hooks are probably off), else a send that began with "/"
+            # (a command sends none), else the generic text.
+            if sess.turn_hook_at <= 0.0:
+                not_taken_msg = NOT_TAKEN_NO_HOOKS
+            elif sess.prompt_sent_slash:
+                not_taken_msg = NOT_TAKEN_SLASH
+            else:
+                not_taken_msg = NOT_TAKEN
+            warn_text = tr.html(not_taken_msg, session=label,
+                                grace=tr.num(f"{grace:.0f}"))
             # Written and retired under the card-edit lock
             # (`_settle_card_text`): a merely late hook's card edit must
             # not land after the warning and put "Working" back.
@@ -4936,11 +4947,27 @@ WAITING_PERMISSION = Msg("notice.waiting_permission", "Permission: {summary}",
                          note="Under notice.waiting: what wants permission",
                          eg={"summary": "Bash: ls"})
 NOT_TAKEN = Msg("notice.not_taken",
-                "⚠️ <b>{session}</b> · Not taken by Claude Code\n\nNo hook arrived within "
-                "{grace} s of the send. A message that starts with \"/\" is read as a slash "
-                "command - check the terminal.",
-                note="A message sent to Claude Code that it never took; {grace} is seconds",
+                "⚠️ <b>{session}</b> · No hook from Claude Code\n\nNo hook arrived within "
+                "{grace} s of the send, so aipager cannot tell if Claude Code took the "
+                "message. Hooks may be off for this project (disableAllHooks in "
+                ".claude/settings.json or .claude/settings.local.json). Check the terminal.",
+                note="No hook after a send, cause unknown; {grace} is seconds",
                 eg={"session": "x1", "grace": "45"})
+NOT_TAKEN_SLASH = Msg("notice.not_taken_slash",
+                      "⚠️ <b>{session}</b> · No hook from Claude Code\n\nNo hook arrived "
+                      "within {grace} s of the send. A message that starts with \"/\" is read "
+                      "as a command and sends no hook. Check the terminal.",
+                      note="No hook after a send that started with a slash; {grace} is seconds",
+                      eg={"session": "x1", "grace": "45"})
+NOT_TAKEN_NO_HOOKS = Msg("notice.not_taken_no_hooks",
+                         "⚠️ <b>{session}</b> · No hook from Claude Code\n\nNo hook arrived "
+                         "within {grace} s of the send, and this session has sent none since "
+                         "it started. Hooks are probably off for this project (disableAllHooks "
+                         "in .claude/settings.json or .claude/settings.local.json). Check the "
+                         "terminal.",
+                         note="No hook after a send, none ever from this session; {grace} is "
+                              "seconds",
+                         eg={"session": "x1", "grace": "45"})
 CONTEXT_WARNING = Msg("notice.context",
                       "⚠️ <b>{session}</b> · Context at {percent} - auto-compact soon",
                       note="The session's context is nearly full", eg={"session": "x1",

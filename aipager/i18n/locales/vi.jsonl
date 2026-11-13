@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>Nếu chuyện này cứ lặp lại, hãy chạy {command} trong terminal để gửi báo cáo cho nhà phát triển aipager.</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>Nếu chuyện này cứ lặp lại, chủ sở hữu có thể chạm “Báo cáo sự cố này” để gửi báo cáo cho nhà phát triển aipager.</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "<code>{hook}</code> đã vượt giới hạn bộ nhớ {limit} GB, nên một lần cập nhật dòng trạng thái bị bỏ qua. Phiên vẫn tiếp tục chạy."}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · Claude Code chưa nhận tin nhắn\n\nKhông có hook nào đến trong {grace} giây sau khi gửi. Tin nhắn bắt đầu bằng “/” được hiểu là lệnh - hãy kiểm tra terminal."}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · Không có hook từ Claude Code\n\nKhông có hook nào đến trong {grace} giây sau khi gửi, nên aipager không biết Claude Code đã nhận tin nhắn chưa. Có thể hook bị tắt trong dự án (disableAllHooks trong .claude/settings.json hoặc .claude/settings.local.json). Hãy kiểm tra terminal."}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · Không có hook từ Claude Code\n\nKhông có hook nào đến trong {grace} giây sau khi gửi, và phiên này chưa gửi hook nào từ khi bắt đầu. Nhiều khả năng hook bị tắt trong dự án (disableAllHooks trong .claude/settings.json hoặc .claude/settings.local.json). Hãy kiểm tra terminal."}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · Không có hook từ Claude Code\n\nKhông có hook nào đến trong {grace} giây sau khi gửi. Tin nhắn bắt đầu bằng “/” được hiểu là lệnh và không gửi hook. Hãy kiểm tra terminal."}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "Việc này đến từ <b>{session}</b>."}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "Một tin nhắn từ phiên khác đã nhập vào việc này và thu hẹp quyền của nó."}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "Việc này đến từ một phiên khác mà aipager không xác minh được."}

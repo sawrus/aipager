@@ -981,9 +981,13 @@ If Claude Code refuses a message outright - an unknown slash command,
 or a built-in that only opens a dialog in the terminal - no hook fires,
 so nothing would ever end the turn the daemon just announced. After
 8 s without any hook (`PROMPT_HOOK_GRACE_SECONDS`) the busy card
-becomes `⚠️ name · Not taken by Claude Code` with a one-line
-explanation and the session is idle again; the reason is on the
-terminal, and the message gets 🤷 (a slash command gets 👌 instead: a
+becomes `⚠️ name · No hook from Claude Code` with a short
+explanation and the session is idle again. aipager cannot tell if
+Claude Code took the message: a message starting with "/" is a command
+that sends no hook, and `disableAllHooks` in `.claude/settings.json` or
+`.claude/settings.local.json` turns every hook off (the notice names
+that cause first when the session has sent no hook since it started).
+The reason is on the terminal, and the message gets 🤷 (a slash command gets 👌 instead: a
 built-in that opens a dialog fires no hook either). Only a message that
 started a turn
 is judged this way - one queued behind a running turn keeps its 👀
@@ -1449,7 +1453,7 @@ them is needed for normal use.
 | `MINIAPP_PUBLIC_URL` | none | Serve the Mini App at your own `https://` URL instead of the managed tunnel ([security](security.md#mini-app-tunnel)). |
 | `KEEP_FINISHED_CARD` | `1` | `0` makes "Replace with result" the message layout for chats that never chose one in `/settings`. |
 | `STALE_BUSY_TIMEOUT` | `7200` (2 hours) | Seconds a working session may go with no news before the chat gets a "still working (quiet for 120 min)" note. |
-| `PROMPT_HOOK_GRACE_SECONDS` | `8` | Seconds before a message Claude Code never took is marked "Not taken by Claude Code" ([free messages](#text)). |
+| `PROMPT_HOOK_GRACE_SECONDS` | `8` | Seconds before a message Claude Code never took is marked "No hook from Claude Code" ([free messages](#text)). |
 | `FINISH_CARD_GRACE_SECONDS` | `0.8` | How long the finished card leads the answer in the card layout; `0` sends both at once. |
 | `GONE_SESSION_MAX_AGE_DAYS` | `14` | Days an ended session stays in `/resume`; `0` keeps them. |
 | `STREAM_EDIT_INTERVAL`, `BUSY_EDIT_INTERVAL` | `1.2`, `3.0` | The busy card's refresh while streaming text and while quiet, in seconds; Telegram's per-chat limit still wins ([troubleshooting](troubleshooting.md#busy-cards-got-slower)). |

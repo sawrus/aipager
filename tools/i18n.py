@@ -617,6 +617,9 @@ GLOSSARY_EXEMPT: dict[str, dict[str, str]] = {
     "rep.offer.off": {"turn": "the verb (turn them back on), not a turn of Claude's"},
     "ui.report.label.stops": {"stop": "how aipager last exited, not the Stop action"},
     "ui.report.stops": {"stop": "how aipager last exited, not the Stop action"},
+    "notice.not_taken": {"settings": "file names (.claude/settings.json), not the settings view"},
+    "notice.not_taken_no_hooks": {
+        "settings": "file names (.claude/settings.json), not the settings view"},
     "media.brew_footer": {"stop": "stops working (breaks), not the Stop action"},
 }
 

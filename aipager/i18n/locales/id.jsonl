@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>Kalau ini terus terjadi, jalankan {command} di terminal untuk mengirim laporan ke pembuat aipager.</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>Kalau ini terus terjadi, pemilik bisa mengetuk “Laporkan ini” untuk mengirim laporan ke pembuat aipager.</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "<code>{hook}</code> melewati batas memori {limit} GB, jadi satu pembaruan baris status dilewati. Sesi tetap berjalan."}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · Claude Code tidak menerima pesan\n\nTidak ada hook yang datang dalam {grace} dtk setelah dikirim. Pesan yang diawali “/” dianggap perintah - periksa terminal."}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · Tidak ada hook dari Claude Code\n\nTidak ada hook yang datang dalam {grace} dtk setelah dikirim, jadi aipager tidak tahu apakah Claude Code menerima pesan. Mungkin hook dimatikan di proyek (disableAllHooks di .claude/settings.json atau .claude/settings.local.json). Periksa terminal."}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · Tidak ada hook dari Claude Code\n\nTidak ada hook yang datang dalam {grace} dtk setelah dikirim, dan sesi ini belum mengirim hook sejak dimulai. Kemungkinan besar hook dimatikan di proyek (disableAllHooks di .claude/settings.json atau .claude/settings.local.json). Periksa terminal."}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · Tidak ada hook dari Claude Code\n\nTidak ada hook yang datang dalam {grace} dtk setelah dikirim. Pesan yang diawali “/” dianggap perintah dan tidak mengirim hook. Periksa terminal."}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "Tugas ini datang dari <b>{session}</b>."}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "Pesan dari sesi lain masuk ke tugas ini dan mempersempit haknya."}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "Tugas ini datang dari sesi lain yang tidak bisa diverifikasi aipager."}

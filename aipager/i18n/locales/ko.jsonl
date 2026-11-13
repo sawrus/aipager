@@ -540,7 +540,9 @@
 {"k": "notice.memcap_nudge_cli", "src": "726ab6ea", "v": "<i>이런 일이 계속되면 터미널에서 {command} 명령을 실행해 aipager 개발자에게 보고서를 보내 주세요.</i>"}
 {"k": "notice.memcap_nudge_owner", "src": "446f75d0", "v": "<i>이런 일이 계속되면 소유자가 “이 문제 신고”를 눌러 aipager 개발자에게 보고서를 보낼 수 있어요.</i>"}
 {"k": "notice.memcap_statusline", "src": "e223e66d", "v": "<code>{hook}</code> hook이 메모리 한도 {limit}GB를 넘어서 상태 표시줄 업데이트를 한 번 건너뛰었어요. 세션은 계속 실행돼요."}
-{"k": "notice.not_taken", "src": "26215b09", "v": "⚠️ <b>{session}</b> · Claude Code가 메시지를 받지 않았어요\n\n보낸 뒤 {grace}초 안에 hook이 하나도 오지 않았어요. “/”로 시작하는 메시지는 명령으로 처리돼요. 터미널을 확인해 주세요."}
+{"k": "notice.not_taken", "src": "29e7d196", "v": "⚠️ <b>{session}</b> · Claude Code에서 hook이 오지 않았어요\n\n보낸 뒤 {grace}초 안에 hook이 하나도 오지 않아서 aipager는 Claude Code가 메시지를 받았는지 알 수 없어요. 프로젝트에서 hook이 꺼져 있을 수 있어요(disableAllHooks, .claude/settings.json 또는 .claude/settings.local.json). 터미널을 확인해 주세요."}
+{"k": "notice.not_taken_no_hooks", "src": "30b86cac", "v": "⚠️ <b>{session}</b> · Claude Code에서 hook이 오지 않았어요\n\n보낸 뒤 {grace}초 안에 hook이 하나도 오지 않았고, 이 세션은 시작한 뒤로 hook을 보낸 적이 없어요. 프로젝트에서 hook이 꺼져 있을 가능성이 커요(disableAllHooks, .claude/settings.json 또는 .claude/settings.local.json). 터미널을 확인해 주세요."}
+{"k": "notice.not_taken_slash", "src": "b3de718f", "v": "⚠️ <b>{session}</b> · Claude Code에서 hook이 오지 않았어요\n\n보낸 뒤 {grace}초 안에 hook이 하나도 오지 않았어요. “/”로 시작하는 메시지는 명령으로 처리되고 hook을 보내지 않아요. 터미널을 확인해 주세요."}
 {"k": "notice.peer.halt_from", "src": "61e473d1", "v": "이 작업은 <b>{session}</b> 세션에서 왔어요."}
 {"k": "notice.peer.halt_narrowed", "src": "be630ab5", "v": "다른 세션의 메시지가 이 작업에 합류해 권한을 줄였어요."}
 {"k": "notice.peer.halt_unverified", "src": "e3cb70d4", "v": "이 작업은 aipager가 확인하지 못한 다른 세션에서 왔어요."}
