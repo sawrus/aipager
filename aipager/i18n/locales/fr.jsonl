@@ -661,7 +661,9 @@
 {"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> travaille dans le terminal en ce moment. Réessayez quand elle sera en attente."}
 {"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
 {"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 Seul le propriétaire ou un admin de la discussion peut reprendre ces conversations."}
+{"k": "resume.foreign.hooks_disabled", "src": "ff62844b", "v": "🙈 Les hooks sont désactivés pour cette conversation dans <code>{file}</code>, donc aipager ne la verrait pas et rien n'a changé."}
 {"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ Impossible de reprendre <b>{title}</b> : {error}"}
+{"k": "resume.foreign.no_hooks", "src": "4da1c9f3", "v": "🙈 aipager ne voit pas les hooks de <b>{title}</b>, il a donc fermé sa copie ; reprends-la dans un terminal avec <code>{command}</code>."}
 {"k": "resume.foreign.none", "src": "699cb115", "v": "📭 Aucune autre conversation Claude Code ces deux dernières semaines."}
 {"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ Cette conversation n'existe plus."}
 {"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}

@@ -1169,7 +1169,7 @@ Run `aipager <command> --help` for the same list on your machine.
 | `aipager resume [name]` | Bring back an ended session with its conversation; without a name, a picker. It follows a moved conversation and handles a background job that holds it, as `aipager session --resume` does. |
 | `aipager miniapp enable [--port PORT] [--url URL]` | Turn the Mini App on (`MINIAPP_ENABLED=1` in `~/.config/aipager/.env`), on `127.0.0.1:PORT` (default 8765, saved in `aipager.yaml`), behind the managed tunnel or your own `https://` URL. Takes effect at the next daemon restart. |
 | `aipager miniapp disable\|status` | Turn it off (`MINIAPP_ENABLED=0`, at the next restart), or show its settings and address. |
-| `aipager resume --claude` | Pick a Claude Code conversation started without aipager (last 14 days) and continue it under aipager; one still open in a terminal is taken over after `[y/N]` (fork, see [other sessions](foreign-sessions.md)). |
+| `aipager resume --claude` | Pick a Claude Code conversation started without aipager (last 14 days) and continue it under aipager; one still open in a terminal is taken over after `[y/N]`; refused when a settings file has `disableAllHooks` (fork, see [other sessions](foreign-sessions.md)). |
 | `aipager wrap install\|uninstall\|status` | Make `claude` in an interactive shell start under aipager (`alias claude=aipager-claude` in `~/.bashrc`) (fork, see [other sessions](foreign-sessions.md)). |
 | `aipager lock setup [--reset]` | Make the idle lock's TOTP secret and print its `otpauth://` URI once (fork, see [idle lock](idle-lock.md)). |
 | `aipager lock enable [--after-min 60\|480\|960]\|disable\|now\|status` | Turn the idle lock on (after 60, 480 or 960 minutes: 1, 8 or 16 hours; default 60) or off, lock at the next tick, or show its state. No restart needed. |
@@ -1454,6 +1454,7 @@ them is needed for normal use.
 | `KEEP_FINISHED_CARD` | `1` | `0` makes "Replace with result" the message layout for chats that never chose one in `/settings`. |
 | `STALE_BUSY_TIMEOUT` | `7200` (2 hours) | Seconds a working session may go with no news before the chat gets a "still working (quiet for 120 min)" note. |
 | `PROMPT_HOOK_GRACE_SECONDS` | `8` | Seconds before a message Claude Code never took is marked "No hook from Claude Code" ([free messages](#text)). |
+| `ADOPT_HOOK_WAIT_SECONDS` | `30` | Seconds a conversation taken over from **Other Claude sessions** may run without any hook before aipager stops its copy and drops it ([other sessions](foreign-sessions.md)). |
 | `FINISH_CARD_GRACE_SECONDS` | `0.8` | How long the finished card leads the answer in the card layout; `0` sends both at once. |
 | `GONE_SESSION_MAX_AGE_DAYS` | `14` | Days an ended session stays in `/resume`; `0` keeps them. |
 | `STREAM_EDIT_INTERVAL`, `BUSY_EDIT_INTERVAL` | `1.2`, `3.0` | The busy card's refresh while streaming text and while quiet, in seconds; Telegram's per-chat limit still wins ([troubleshooting](troubleshooting.md#busy-cards-got-slower)). |

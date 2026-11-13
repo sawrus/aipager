@@ -661,7 +661,9 @@
 {"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> قيد العمل في الطرفية الآن، لذا حاول مرة أخرى عندما تنتظر."}
 {"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
 {"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 مالك الدردشة أو المشرف فقط يمكنه متابعة هذه المحادثات."}
+{"k": "resume.foreign.hooks_disabled", "src": "ff62844b", "v": "🙈 الخطافات معطّلة لهذه المحادثة في <code>{file}</code>، لذا لن يراها aipager ولم يتغير شيء."}
 {"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ تعذرت متابعة <b>{title}</b>: {error}"}
+{"k": "resume.foreign.no_hooks", "src": "4da1c9f3", "v": "🙈 لا يرى aipager خطافات <b>{title}</b>، لذا أغلق نسخته؛ تابعها في الطرفية بالأمر <code>{command}</code>."}
 {"k": "resume.foreign.none", "src": "699cb115", "v": "📭 لا توجد محادثات أخرى في Claude Code خلال آخر أسبوعين."}
 {"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ هذه المحادثة لم تعد موجودة."}
 {"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}

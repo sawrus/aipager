@@ -34,6 +34,26 @@ conversation by then, aipager asks again.
 
 A conversation aipager already runs is never picked up a second time.
 
+**Hooks must run there.** aipager sees a session only through its hooks. So
+before it closes anything or starts anything, aipager reads the Claude Code
+settings files that can turn hooks off for the conversation's folder:
+managed settings (`/etc/claude-code/managed-settings.json` and
+`managed-settings.d/`), `~/.claude/settings.json` (or the one
+`CLAUDE_CONFIG_DIR` points to), `<folder>/.claude/settings.json` and
+`<folder>/.claude/settings.local.json`. Precedence is Claude Code's: managed,
+then local, then project, then user. When the file that decides says
+`"disableAllHooks": true`, aipager refuses and names that file; the terminal
+claude stays open and nothing is started. `aipager resume --claude` does the
+same check before its `[y/N]`.
+
+A session can still come up with no hooks for another reason (a hook command
+that fails, a settings layer aipager does not read). So after the start
+aipager waits up to 30 seconds (`ADOPT_HOOK_WAIT_SECONDS`) for the first hook
+(Claude Code's `SessionStart`). If none comes, aipager stops its copy, drops
+the session and says so. The terminal claude is already closed at that
+point: continue the conversation in a terminal with `claude --resume <id>`.
+A plain `/resume` of a session aipager already ran does not do these checks.
+
 ## One owner per conversation
 
 `claude --resume <id>` starts a new process; it does not join the one that

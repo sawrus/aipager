@@ -661,7 +661,9 @@
 {"k": "resume.foreign.busy", "src": "586c1660", "v": "⚙️ <b>{title}</b> está trabalhando no terminal agora. Tente de novo quando ela estiver aguardando."}
 {"k": "resume.foreign.folder", "src": "7c293686", "v": "📁 {folder}"}
 {"k": "resume.foreign.forbidden", "src": "ae0cb7bf", "v": "🔒 Só o dono ou um admin do chat pode continuar essas conversas."}
+{"k": "resume.foreign.hooks_disabled", "src": "ff62844b", "v": "🙈 Os hooks estão desligados para esta conversa em <code>{file}</code>, então o aipager não a veria e nada mudou."}
 {"k": "resume.foreign.launch_failed", "src": "19d3bb21", "v": "❌ Não foi possível continuar <b>{title}</b>: {error}"}
+{"k": "resume.foreign.no_hooks", "src": "4da1c9f3", "v": "🙈 O aipager não vê os hooks de <b>{title}</b>, então fechou a cópia dele; continue em um terminal com <code>{command}</code>."}
 {"k": "resume.foreign.none", "src": "699cb115", "v": "📭 Não há outras conversas do Claude Code nas últimas duas semanas."}
 {"k": "resume.foreign.not_found", "src": "7dba8cbc", "v": "❓ Essa conversa não existe mais."}
 {"k": "resume.foreign.row", "src": "0436ac89", "v": "🔘 <b>{title}</b> (<i>{when}</i>)"}

@@ -349,6 +349,23 @@ RESUME_FOREIGN_LAUNCH_FAILED = Msg("resume.foreign.launch_failed",
                                         "is technical text, as it is",
                                    eg={"title": "fix the login bug",
                                        "error": "dtach exited"})
+RESUME_FOREIGN_HOOKS_DISABLED = Msg("resume.foreign.hooks_disabled",
+                                    "🙈 Hooks are turned off for this conversation in "
+                                    "<code>{file}</code>, so aipager would not see it and "
+                                    "nothing changed.",
+                                    note="Other Claude sessions: disableAllHooks is set in "
+                                         "that settings file; nothing was closed or started",
+                                    eg={"file": "/srv/app/.claude/settings.local.json"})
+RESUME_FOREIGN_NO_HOOKS = Msg("resume.foreign.no_hooks",
+                              "🙈 aipager cannot see the hooks of <b>{title}</b>, so it "
+                              "closed its copy; continue it in a terminal with "
+                              "<code>{command}</code>.",
+                              note="Other Claude sessions: it started, but Claude Code "
+                                   "sent aipager nothing; the terminal Claude was already "
+                                   "closed before",
+                              eg={"title": "fix the login bug",
+                                  "command": "claude --resume "
+                                             "0b6f3c1e-2d4a-4f8e-9c1a-7e5d3b2a1f00"})
 RESUME_FOREIGN_STALE = Msg("toast.resume_foreign_stale",
                            "This list is out of date, so here it is again.",
                            note="Pop-up: a tap on an old Other Claude sessions list")
@@ -2121,6 +2138,12 @@ class DashboardMixin:
             return tr.html(RESUME_FOREIGN_FORBIDDEN), None
         if reason == "not_found":
             return tr.html(RESUME_FOREIGN_NOT_FOUND), None
+        if reason == "hooks_disabled":
+            return tr.html(RESUME_FOREIGN_HOOKS_DISABLED,
+                           file=outcome.settings_file or "?"), None
+        if reason == "no_hooks":
+            return tr.html(RESUME_FOREIGN_NO_HOOKS, title=title,
+                           command=f"claude --resume {conv.session_id}"), None
         # launch_failed, and a reason this build does not know.
         return tr.html(RESUME_FOREIGN_LAUNCH_FAILED, title=title,
                        error=outcome.err or reason), None

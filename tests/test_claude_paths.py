@@ -401,6 +401,37 @@ def test_project_flag_false_skips_project_and_local(home, tmp_path):
     assert [k for k, _ in claude_paths.settings_layers(p, None)] == ["user"]
 
 
+# ---- disableAllHooks ---------------------------------------------------------------
+
+@pytest.mark.parametrize("layers,want", [
+    ({"local": True}, "local"),
+    ({"user": True, "project": False}, None),
+    ({"local": True, "managed": False}, None),
+    ({"managed": True, "local": False}, "managed"),
+    ({"user": True, "local": "yes"}, "user"),          # not a boolean: sets nothing
+])
+def test_hooks_disabled_by_follows_claude_codes_precedence(home, tmp_path, layers,
+                                                           want):
+    folder = tmp_path / "proj"
+    files = {"user": home / ".claude" / "settings.json",
+             "project": folder / ".claude" / "settings.json",
+             "local": folder / ".claude" / "settings.local.json",
+             "managed": claude_paths.MANAGED_SETTINGS_DIR / "managed-settings.json"}
+    for kind, value in layers.items():
+        _write(files[kind], {"disableAllHooks": value})
+    p = claude_paths.locate({}, cwd=str(folder))
+    got = claude_paths.hooks_disabled_by(p, str(folder))
+    assert got == (files[want] if want else None)
+
+
+def test_hooks_disabled_without_a_folder_reads_user_and_managed_only(home, tmp_path):
+    _write(home / ".claude" / "settings.json", {"disableAllHooks": True})
+    p = claude_paths.locate({})
+    assert claude_paths.hooks_disabled_by(p, None) == home / ".claude" / "settings.json"
+    assert claude_paths.sessions_hooks_disabled_by(None) == (
+        home / ".claude" / "settings.json")
+
+
 def test_settings_env_keeps_only_text(home):
     _write(home / ".claude" / "settings.json",
            {"env": {"A": "x", "N": 1, "L": ["y"], "Z": None}})

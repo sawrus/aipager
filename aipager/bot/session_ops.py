@@ -26,7 +26,7 @@ from telegram import (
 
 from aipager.claude_catalog import AdoptOutcome
 from aipager import i18n, perm_modes
-from aipager.config import RESUME_GUARD_SECONDS
+from aipager.config import ADOPT_HOOK_WAIT_SECONDS, RESUME_GUARD_SECONDS
 from aipager.i18n import Command, Msg, Safe, Span
 from aipager.dtach import inject
 from aipager.bot import reactions
@@ -128,6 +128,10 @@ _ALREADY_TRACKED = "already tracked"
 _TAKEOVER_POLL = 0.25
 #: A label is a Telegram bot command too: ``[a-z0-9_]{1,32}``.
 _ADOPT_LABEL_MAX = 32
+#: How long an adopted conversation may run without any hook before
+#: aipager stops its copy (``no_hooks``), and how often it looks.
+_ADOPT_HOOK_WAIT_SECONDS = ADOPT_HOOK_WAIT_SECONDS
+_ADOPT_HOOK_POLL = 0.25
 #: How much of a transcript is read for its folder: its first records.
 _CWD_READ_BYTES = 256 * 1024
 _CWD_READ_LINES = 200
@@ -152,6 +156,17 @@ def _transcript_cwd(path) -> str:
         if isinstance(cwd, str) and cwd:
             return cwd
     return ""
+
+
+def _hooks_disabled_file(cwd: str) -> str:
+    """The settings file whose ``disableAllHooks`` keeps aipager's hooks
+    from running for a session in *cwd* (``""``: the daemon's folder), as
+    the sessions' environment places Claude Code's files; ``""`` when
+    hooks run, or when it cannot be told (the post-launch wait still
+    catches a session whose hooks never come)."""
+    from aipager import claude_paths
+    found = claude_paths.sessions_hooks_disabled_by(cwd or None)
+    return str(found) if found is not None else ""
 
 
 def _adopt_label(base: str, taken) -> str:
@@ -2492,12 +2507,16 @@ class SessionOpsMixin:
         """Run a Claude Code conversation started without aipager under
         aipager, in *chat_id* (fork; see :mod:`aipager.claude_catalog`).
 
-        Owner or admin of *chat_id* only (``forbidden``). A live terminal
+        Owner or admin of *chat_id* only (``forbidden``). A settings file
+        that turns hooks off in the conversation's folder refuses it before
+        anything is closed (``hooks_disabled``). A live terminal
         claude holding it: ``terminal_busy`` while it works; otherwise
         ``needs_takeover`` until *confirm*, then SIGTERM and up to 10 s for
         it to exit (``takeover_failed`` when it does not). Then a GONE
         session with a fresh label is registered and resumed through
-        :meth:`_do_resume_core`. CONTRACT: reasons in
+        :meth:`_do_resume_core`; when no hook of it arrives in
+        :data:`_ADOPT_HOOK_WAIT_SECONDS`, it is stopped and dropped
+        (``no_hooks``). CONTRACT: reasons in
         ``claude_catalog.ADOPT_REASONS``."""
         from aipager import claude_jobs
 
@@ -2541,6 +2560,16 @@ class SessionOpsMixin:
             log.info("adopt %s: refused for user %s in chat %s",
                      session_id, user_id, chat_id)
             return AdoptOutcome(ok=False, reason="forbidden")
+        cwd = _transcript_cwd(transcript)
+        # Before anything is closed or launched: with hooks off there,
+        # aipager would close the terminal's claude for a session it can
+        # never see (no prompt taken, no card, no reply).
+        disabled = _hooks_disabled_file(cwd)
+        if disabled:
+            log.info("adopt %s: hooks are off for %s (%s), nothing done",
+                     session_id, cwd or "<daemon>", disabled)
+            return AdoptOutcome(ok=False, reason="hooks_disabled",
+                                settings_file=disabled)
 
         h = claude_catalog.holder(session_id)
         if h is not None:
@@ -2577,7 +2606,6 @@ class SessionOpsMixin:
                 log.info("adopt %s: terminal claude pid %s closed (SIGTERM)",
                          session_id, pid)
 
-        cwd = _transcript_cwd(transcript)
         name = h.get("name") if h else ""
         if not (isinstance(name, str) and name):
             try:
@@ -2601,8 +2629,12 @@ class SessionOpsMixin:
         self.registry.transition(session_name, Status.GONE)
         self.registry.mark_dirty()
 
+        hook_seen = sess.last_hook_at
         outcome = await self._do_resume_core(sess, driver_user_id=user_id)
         if outcome.ok:
+            if not await self._adopt_hooks_arrive(session_name, hook_seen):
+                return await self._drop_blind_adopt(session_id, session_name,
+                                                    label)
             log.info("adopt %s: running as [%s] (cwd=%s)",
                      session_id, label, cwd or "<daemon>")
             return AdoptOutcome(ok=True, reason="ok", label=label)
@@ -2615,6 +2647,40 @@ class SessionOpsMixin:
                  session_id, label, outcome.reason, outcome.err)
         return AdoptOutcome(ok=False, reason="launch_failed",
                             err=outcome.err or outcome.reason)
+
+    async def _adopt_hooks_arrive(self, session_name: str, seen: float) -> bool:
+        """Whether a hook of the adopted *session_name* reaches the daemon
+        within :data:`_ADOPT_HOOK_WAIT_SECONDS` of its launch: its entry's
+        ``last_hook_at`` moves past *seen* (the hook receiver stamps it on
+        every hook, SessionStart first). False when the entry is gone."""
+        polls = max(1, int(_ADOPT_HOOK_WAIT_SECONDS / _ADOPT_HOOK_POLL))
+        for i in range(polls + 1):
+            sess = self.registry.get(session_name)
+            if sess is None:
+                return False
+            if sess.last_hook_at > seen:
+                return True
+            if i < polls:
+                await _sleep(_ADOPT_HOOK_POLL)
+        return False
+
+    async def _drop_blind_adopt(self, session_id: str, session_name: str,
+                                label: str) -> AdoptOutcome:
+        """Stop an adopted conversation no hook came from and drop its
+        entry: aipager cannot see it, so keeping it only holds the
+        conversation away from the terminal (``no_hooks``). A copy that
+        does not stop keeps its entry, so it can still be killed."""
+        log.warning("adopt %s: no hook from [%s] within %gs, stopping it",
+                    session_id, label, _ADOPT_HOOK_WAIT_SECONDS)
+        killed = await self._kill_session_core(session_name, label)
+        if killed.result in ("still_running", "resuming"):
+            log.warning("adopt %s: [%s] did not stop", session_id, label)
+            return AdoptOutcome(ok=False, reason="launch_failed",
+                                err=killed.result)
+        if self.registry.get(session_name) is not None:
+            self.registry.remove(session_name)
+        self.registry.mark_dirty()
+        return AdoptOutcome(ok=False, reason="no_hooks")
 
     def _may_adopt(self, user_id: int | None, chat_id: int) -> bool:
         """Who may adopt a conversation into *chat_id*: an admin there

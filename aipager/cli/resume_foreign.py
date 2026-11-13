@@ -3,7 +3,8 @@ conversation started without aipager and continue it under aipager.
 
 The terminal mirror of the Telegram picker's "Other Claude sessions"
 (``aipager.claude_catalog``). A terminal claude still holding the
-conversation is closed after ``[y/N]`` (SIGTERM, never while it works).
+conversation is closed after ``[y/N]`` (SIGTERM, never while it works),
+and never when a settings file turns hooks off in its folder.
 """
 
 from __future__ import annotations
@@ -67,6 +68,27 @@ def _pid_alive(pid: int) -> bool:
     except PermissionError:
         return True
     return True
+
+
+def _hooks_disabled_file(cwd: str) -> str:
+    """Seam: the settings file turning hooks off in *cwd*, else ``""``
+    (``""``: no folder)."""
+    from aipager import claude_paths
+    found = claude_paths.sessions_hooks_disabled_by(cwd or None)
+    return str(found) if found is not None else ""
+
+
+#: The refusal when a settings file turns hooks off for the conversation.
+_HOOKS_OFF = ("hooks are turned off for {title!r} in {file}, so aipager would "
+              "not see it; nothing changed.")
+
+
+def _busy(title: str) -> int:
+    """Refuse: the terminal claude holding it works right now."""
+    from aipager.errors import friendly_error
+    friendly_error(f"{title!r} is working in the terminal right now.",
+                   "  Try again when it waits.")
+    return 1
 
 
 def _foreign_title(conv) -> str:
@@ -182,12 +204,16 @@ def _adopt_foreign(conv) -> int:
     from aipager.ui import ok as ui_ok
 
     title = _foreign_title(conv)
+    # Before anything is closed: with hooks off there, aipager could never
+    # see the session it would start (no prompt taken, nothing sent back).
+    disabled = _hooks_disabled_file(conv.cwd or "")
+    if disabled:
+        friendly_error(_HOOKS_OFF.format(title=title, file=disabled))
+        return 1
     held = claude_catalog.holder(conv.session_id)
     if held is not None:
         if held.get("status") == "busy":
-            friendly_error(f"{title!r} is working in the terminal right now.",
-                           "  Try again when it waits.")
-            return 1
+            return _busy(title)
         try:
             answer = input("Close it in the terminal and continue under aipager? [y/N] ")
         except (EOFError, KeyboardInterrupt):
@@ -199,9 +225,7 @@ def _adopt_foreign(conv) -> int:
         held = claude_catalog.holder(conv.session_id)
         if held is not None:
             if held.get("status") == "busy":
-                friendly_error(f"{title!r} is working in the terminal right now.",
-                               "  Try again when it waits.")
-                return 1
+                return _busy(title)
             pid = int(held["pid"])
             _terminate(pid)
             deadline = _clock() + _TAKEOVER_WAIT

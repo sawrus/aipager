@@ -41,7 +41,7 @@
  "aipager/cli/policy.py": 3,
  "aipager/cli/report.py": 3,
  "aipager/cli/resume.py": 38,
- "aipager/cli/resume_foreign.py": 25,
+ "aipager/cli/resume_foreign.py": 24,
  "aipager/cli/session.py": 13,
  "aipager/cli/wrap.py": 17,
  "aipager/config.py": 31,

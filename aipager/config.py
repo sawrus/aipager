@@ -500,6 +500,17 @@ PROMPT_HOOK_GRACE_SECONDS: float = float(
     os.environ.get("PROMPT_HOOK_GRACE_SECONDS", "8")
 )
 
+# Seconds a conversation adopted from "Other Claude sessions" may run
+# under aipager without ANY hook before aipager gives up on it: it stops
+# its copy, drops the entry and says why. Claude Code fires SessionStart
+# (source "resume") within seconds of the launch, so silence this long
+# means the hooks do not run there (a settings file aipager does not
+# read, a hook command that fails). Without it the adopted session was
+# blind: prompts went in, nothing came back. Override via the env var.
+ADOPT_HOOK_WAIT_SECONDS: float = float(
+    os.environ.get("ADOPT_HOOK_WAIT_SECONDS", "30")
+)
+
 # Days a session that has ended stays in the registry — and so in the
 # /resume picker and the dashboard's gone list — before it is dropped
 # (roadmap 8.12). MAX_GONE_HISTORY only caps the COUNT of gone entries,

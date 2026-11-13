@@ -182,10 +182,6 @@ def managed_settings_files() -> list[Path]:
     return files
 
 
-def _managed_layers() -> list[dict]:
-    return [read_settings(p) for p in managed_settings_files()]
-
-
 def _last_value(layers: list[tuple[Path, dict]]) -> tuple[str, Path] | None:
     """The last ``CLAUDE_CONFIG_DIR`` text value among settings *layers*
     (``(file, settings)`` pairs), with the file it is in."""
@@ -306,15 +302,49 @@ def settings_layers(paths: ClaudePaths, folder: str | None, *,
     Local settings are read from *folder*. Claude Code 2.1.303 can read them
     from the git root instead, after an ownership check this does not copy;
     a session aipager starts is normally at the root anyway."""
-    layers: list[tuple[str, dict]] = [("user", read_settings(paths.start_home / "settings.json"))]
+    return [(kind, read_settings(path))
+            for kind, path in _layer_files(paths, folder, project=project)]
+
+
+def _layer_files(paths: ClaudePaths, folder: str | None, *,
+                 project: bool = True) -> list[tuple[str, Path]]:
+    """The files of :func:`settings_layers`, in its order."""
+    files: list[tuple[str, Path]] = [("user", paths.start_home / "settings.json")]
     if paths.moved_by_settings:
-        layers.append(("user", read_settings(paths.user_settings)))
+        files.append(("user", paths.user_settings))
     if folder is not None and project:
         base = Path(folder) / ".claude"
-        layers.append(("project", read_settings(base / "settings.json")))
-        layers.append(("local", read_settings(base / "settings.local.json")))
-    layers.extend(("managed", s) for s in _managed_layers())
-    return layers
+        files.append(("project", base / "settings.json"))
+        files.append(("local", base / "settings.local.json"))
+    files.extend(("managed", p) for p in managed_settings_files())
+    return files
+
+
+def hooks_disabled_by(paths: ClaudePaths, folder: str | None) -> Path | None:
+    """The settings file whose ``disableAllHooks: true`` keeps every hook,
+    aipager's included, from running for a session in *folder*, else None.
+
+    Claude Code's precedence, lowest first: user, project
+    (``<folder>/.claude/settings.json``), local
+    (``<folder>/.claude/settings.local.json``), managed; the last file that
+    sets the key to a boolean decides. A missing, unreadable or invalid
+    file sets nothing. The project files are read whether or not the
+    folder is trusted: a conversation that ran there trusted it."""
+    found: Path | None = None
+    for _, path in _layer_files(paths, folder):
+        value = read_settings(path).get("disableAllHooks")
+        if isinstance(value, bool):
+            found = path if value else None
+    return found
+
+
+def sessions_hooks_disabled_by(folder: str | None) -> Path | None:
+    """:func:`hooks_disabled_by` for the environment aipager's sessions get
+    (:func:`for_sessions`); None when it cannot be told."""
+    try:
+        return hooks_disabled_by(for_sessions(cwd=folder), folder)
+    except Exception:
+        return None
 
 
 def layered_env(env: Mapping[str, str], layers: list[tuple[str, dict]]) -> dict[str, str]:
